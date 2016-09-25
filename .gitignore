@@ -1,0 +1,6 @@
+# Ignore output dirs
+Bin/
+obj/
+
+# Ignore our symlink to the KSP directory
+KSPresources/
