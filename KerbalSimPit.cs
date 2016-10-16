@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 using KSP.IO;
 using UnityEngine;
@@ -17,14 +18,12 @@ public class KerbalSimPit : MonoBehaviour
         KSPitConfig = PluginConfiguration.CreateForType<KerbalSimPit>();
         KSPitConfig.load();
 
-        createPortList(KSPitConfig);
+        SerialPorts = createPortList(KSPitConfig);
 
         // Subscribe to flight scene load and shutdown
         GameEvents.onFlightReady.Add(FlightReadyHandler);
         GameEvents.onGameSceneSwitchRequested.Add(FlightShutdownHandler);
-        
-        // GameEvents.onFlightReady?
-        // GameEvents
+
         Debug.Log("KerbalSimPit: Started.");
     }
 
@@ -91,6 +90,7 @@ public class KerbalSimPit : MonoBehaviour
         {
             if (SerialPorts[i].open())
             {
+                Thread.Sleep(2000);
                 SerialPorts[i].SendHello();
             }
         }

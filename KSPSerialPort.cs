@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 using UnityEngine;
 
@@ -51,7 +53,24 @@ public class KSPSerialPort
 
     private void sendData(object data)
     {
-        byte[] packet = (byte[])data;
-        Port.Write(packet, 0, packet.Length);
+        byte[] buf = ObjectToByteArray(data);
+        if (buf != null && Port.IsOpen)
+        {
+            Port.Write(buf, 0, buf.Length);
+        }
+    }
+
+    private byte[] ObjectToByteArray(object obj)
+    {
+        if (obj == null)
+        {
+            return null;
+        }
+        BinaryFormatter bf = new BinaryFormatter();
+        using (MemoryStream ms = new MemoryStream())
+        {
+            bf.Serialize(ms, obj);
+            return ms.ToArray();
+        }
     }
 }
