@@ -5,7 +5,7 @@ using KSP.IO;
 using UnityEngine;
 
 [KSPAddon(KSPAddon.Startup.Instantly, true)]
-public class KerbalSimPit : MonoBehaviour
+public class KerbalSimPitManager : MonoBehaviour
 {
     private PluginConfiguration KSPitConfig;
     private KSPSerialPort[] SerialPorts;
@@ -38,10 +38,12 @@ public class KerbalSimPit : MonoBehaviour
         int index = 0;
         string PortName;
         int BaudRate;
+        string NameKey;
+        string RateKey;
         do
         {
-            string NameKey = String.Format("SerialPort{0}Name", index);
-            string RateKey = String.Format("SerialPort{0}BaudRate", index);
+            NameKey = String.Format("SerialPort{0}Name", index);
+            RateKey = String.Format("SerialPort{0}BaudRate", index);
             PortName = config.GetValue<String>(NameKey);
             BaudRate = config.GetValue<int>(RateKey, 115200);
             if (PortName != null)
@@ -61,5 +63,15 @@ public class KerbalSimPit : MonoBehaviour
             PortList.Add(new KSPSerialPort("/dev/ttyS0", 38400));
         }
         return PortList.ToArray();
+    }
+
+    private void OpenPorts() {
+        for (int i = SerialPorts.Length-1; i>=0; i--)
+        {
+            if (SerialPorts[i].open())
+            {
+                SerialPorts[i].SendHello();
+            }
+        }
     }
 }
