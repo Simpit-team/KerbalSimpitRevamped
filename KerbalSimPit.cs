@@ -5,7 +5,7 @@ using KSP.IO;
 using UnityEngine;
 
 [KSPAddon(KSPAddon.Startup.Instantly, true)]
-public class KerbalSimPitManager : MonoBehaviour
+public class KerbalSimPit : MonoBehaviour
 {
     private PluginConfiguration KSPitConfig;
     private KSPSerialPort[] SerialPorts;
@@ -18,6 +18,13 @@ public class KerbalSimPitManager : MonoBehaviour
         KSPitConfig.load();
 
         createPortList(KSPitConfig);
+
+        // Subscribe to flight scene load and shutdown
+        GameEvents.onFlightReady.Add(FlightReadyHandler);
+        GameEvents.onGameSceneSwitchRequested.Add(FlightShutdownHandler);
+        
+        // GameEvents.onFlightReady?
+        // GameEvents
         Debug.Log("KerbalSimPit: Started.");
     }
 
@@ -26,6 +33,20 @@ public class KerbalSimPitManager : MonoBehaviour
         KSPitConfig.save();
 
         Debug.Log("KerbalSimPit: Shutting down.");
+    }
+
+    private void FlightReadyHandler()
+    {
+        OpenPorts();
+    }
+
+    private void FlightShutdownHandler(GameEvents.FromToAction
+                                       <GameScenes, GameScenes> scenes)
+    {
+        if (scenes.from == GameScenes.FLIGHT)
+        {
+            ClosePorts();
+        }
     }
 
     /* The PluginConfiguration interface doesn't support lists,
@@ -72,6 +93,13 @@ public class KerbalSimPitManager : MonoBehaviour
             {
                 SerialPorts[i].SendHello();
             }
+        }
+    }
+
+    private void ClosePorts() {
+        for (int i = SerialPorts.Length-1; i>=0; i--)
+        {
+            SerialPorts[i].close();
         }
     }
 }

@@ -34,6 +34,13 @@ public class KSPSerialPort
         return Port.IsOpen;
     }
 
+    public void close() {
+        if (Port.IsOpen)
+        {
+            Port.Close();
+        }
+    }
+
     public void SendHello() {
         if (Port.IsOpen)
         {
