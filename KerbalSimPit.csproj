@@ -11,6 +11,10 @@
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>KSPResources\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>KSPResources\UnityEngine.dll</HintPath>
       <Private>False</Private>
