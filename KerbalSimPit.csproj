@@ -3,17 +3,26 @@
          xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>KerbalSimPit</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <OutputType>Library</OutputType>
     <OutputPath>Bin\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="System">
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>KSPResources\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="PsimaxSerial">
+      <HintPath>..\PsimaxSerial\PsimaxSerial\bin\Release\PsimaxSerial.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KerbalSimPit.cs" />
+    <Compile Include="KSPSerialPort.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

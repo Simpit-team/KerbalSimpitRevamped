@@ -1,9 +1,7 @@
 using System;
+
 using UnityEngine;
 
-namespace KerbalSimPit
+public class KerbalSimPit : MonoBehaviour
 {
-    public class KerbalSimPit : MonoBehaviour
-    {
-    }
 }
