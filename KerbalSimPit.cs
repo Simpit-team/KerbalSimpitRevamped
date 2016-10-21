@@ -48,10 +48,9 @@ public class KerbalSimPit : MonoBehaviour
         }
     }
 
-    /* The PluginConfiguration interface doesn't support lists,
-       so we have to use a slightly dodgy key-based interface
-       to manage ports and speeds. I know, it's not pretty.
-    */
+    // The PluginConfiguration interface doesn't support lists,
+    // so we have to use a slightly dodgy key-based interface
+    // to manage ports and speeds. I know, it's not pretty.
     private KSPSerialPort[] createPortList(PluginConfiguration config)
     {
         List<KSPSerialPort> PortList = new List<KSPSerialPort>();
