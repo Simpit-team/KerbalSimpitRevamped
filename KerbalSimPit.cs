@@ -8,17 +8,16 @@ using UnityEngine;
 [KSPAddon(KSPAddon.Startup.Instantly, true)]
 public class KerbalSimPit : MonoBehaviour
 {
-    private PluginConfiguration KSPitConfig;
+    private KerbalSimPitConfig KSPitConfig;
     private KSPSerialPort[] SerialPorts;
 
     public void Start()
     {
         DontDestroyOnLoad(this);
 
-        KSPitConfig = PluginConfiguration.CreateForType<KerbalSimPit>();
-        KSPitConfig.load();
+        KSPitConfig = new KerbalSimPitConfig();
 
-        SerialPorts = createPortList(KSPitConfig);
+        //SerialPorts = createPortList(KSPitConfig);
 
         // Subscribe to flight scene load and shutdown
         GameEvents.onFlightReady.Add(FlightReadyHandler);
@@ -29,7 +28,7 @@ public class KerbalSimPit : MonoBehaviour
 
     public void OnDestroy()
     {
-        KSPitConfig.save();
+        // TODO: Ensure configuration is up to date.
 
         Debug.Log("KerbalSimPit: Shutting down.");
     }
