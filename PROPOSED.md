@@ -71,6 +71,10 @@ It should keep a list of controllers to send output to.
   
 ## List of packet types
 * **0x00 - 0x0F**: Reserved for internal use.
+  * **0x03**: Register handler. Payload is one or more bytes representing
+    channels to register for.
+  * **0x04**: Deregister handler. Payload is one or more bytes representing
+    channels to register for.
     
 # Common packet types
 
@@ -84,3 +88,4 @@ It should keep a list of controllers to send output to.
     Second byte of payload is an ID. Syn sets the ID, others reuse it.
   * **0x01**: Echo request. Arbitrary (small) payload.
   * **0x02**: Echo reply. Payload dupes the echo request we're replying to.
+
