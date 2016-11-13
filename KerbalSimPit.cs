@@ -86,11 +86,7 @@ public class KerbalSimPit : MonoBehaviour
     private void OpenPorts() {
         for (int i = SerialPorts.Length-1; i>=0; i--)
         {
-            if (SerialPorts[i].open())
-            {
-                Thread.Sleep(2000);
-                SerialPorts[i].SendHello();
-            }
+            SerialPorts[i].open();
         }
     }
 

@@ -12,10 +12,24 @@ public class KSPSerialPort
     private int BaudRate;
     private SerialPort Port;
 
+    // Header bytes are alternating ones and zeroes, with the exception
+    // of encoding the protocol version in the final four bytes.
+    private byte[] PacketHeader = { 0xAA, 0x51 };
+
+    // This is *total* packet size, including all headers.
+    private int MaxPacketSize = 32;
+    private byte[] PacketBuffer;
+
     public KSPSerialPort(string pn, int br)
     {
         PortName = pn;
         BaudRate = br;
+
+        // Note that we initialise the packet buffer once, and reuse it.
+        // I don't know if that's acceptable C# or not.
+        // But I hope it's faster.
+        PacketBuffer = new byte[MaxPacketSize];
+        Array.Copy(PacketHeader, PacketBuffer, PacketHeader.Length);
 
         Port = new SerialPort(PortName, BaudRate, Parity.None,
                               8, StopBits.One);
@@ -43,12 +57,9 @@ public class KSPSerialPort
         }
     }
 
-    public void SendHello() {
-        if (Port.IsOpen)
-        {
-            Debug.Log(String.Format("KerbalSimPit: Sending hello for {0}", PortName));
-            sendData("KerbalSimPit protocol 0");
-        }
+
+    public void sendPacket(byte Type, object Data)
+    {
     }
 
     private void sendData(object data)

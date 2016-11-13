@@ -8,13 +8,13 @@ public class KerbalSimPitConfig
 
     public KerbalSimPitConfig()
     {
-        config = null;
+        config = DefaultConfig();
         // Attempt to load config, create default config if one not found
     }
 
     private ConfigNode DefaultConfig()
     {
-        // Create default confignode
-        return new ConfigNode();
+        config = new ConfigNode("KERBALSIMPITCONFIG");
+        return config;
     }
 }
