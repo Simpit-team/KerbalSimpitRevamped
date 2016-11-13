@@ -23,7 +23,7 @@ It should keep a list of controllers to send output to.
 
 * 2 byte header
   Alternating 1s and 0s, the last 4 bits denote the protocol version.
-  (version 1 header: 0xAA, 0x51)
+  (version 0 header: 0xAA, 0x50)
 * 1 byte size (payload only)
 * 1 byte type
 * x bytes payload
@@ -57,6 +57,9 @@ It should keep a list of controllers to send output to.
 
 ## List of packet types
 * **0x00 - 0x0F**: Reserved for internal use.
+  * **0x03**: Scene change. Payload:
+    * 0x00: Changed in to flight scene.
+    * 0x01: Changed in to any other scene.
 
 # Inbound packet types
 

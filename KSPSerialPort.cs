@@ -14,7 +14,7 @@ public class KSPSerialPort
 
     // Header bytes are alternating ones and zeroes, with the exception
     // of encoding the protocol version in the final four bytes.
-    private byte[] PacketHeader = { 0xAA, 0x51 };
+    private byte[] PacketHeader = { 0xAA, 0x50 };
 
     // This is *total* packet size, including all headers.
     private int MaxPacketSize = 32;
@@ -60,6 +60,23 @@ public class KSPSerialPort
 
     public void sendPacket(byte Type, object Data)
     {
+        // Note that header sizes are hardcoded here:
+        // packet[0] = first byte of header
+        // packet[1] = second byte of header
+        // packet[2] = packet size (including all header bytes)
+        // packet[3] = packet type
+        // packet[4-x] = packet payload
+        byte[] buf = ObjectToByteArray(Data);
+        byte PayloadSize = (byte)Math.Min(buf.Length, MaxPacketSize-4);
+        byte PacketSize = (byte)(PayloadSize + 4);
+        PacketBuffer[2] = PacketSize;
+        PacketBuffer[3] = Type;
+        Array.Copy(buf, 0, PacketBuffer, 4, PayloadSize);
+
+        if (Port.IsOpen)
+        {
+            Port.Write(PacketBuffer, 0, PacketSize);
+        }
     }
 
     private void sendData(object data)
