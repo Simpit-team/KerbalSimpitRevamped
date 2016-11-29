@@ -31,6 +31,11 @@ public class KerbalSimPitConfig
         }
     }
 
+    public bool Save()
+    {
+        return SaveSettings();
+    }
+
     private bool LoadSettings()
     {
         if (File.Exists(FullSettingsPath))

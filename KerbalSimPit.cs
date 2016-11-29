@@ -15,28 +15,29 @@ public class KerbalSimPit : MonoBehaviour
     {
         DontDestroyOnLoad(this);
 
+        // Subscribe to flight scene load and shutdown
+        GameEvents.onFlightReady.Add(FlightReadyHandler);
+        GameEvents.onGameSceneSwitchRequested.Add(FlightShutdownHandler);
+
         KSPitConfig = new KerbalSimPitConfig();
 
         SerialPorts = createPortList(KSPitConfig);
         Debug.Log(String.Format("KerbalSimPit: Found {0} serial ports", SerialPorts.Length));
-
-        // Subscribe to flight scene load and shutdown
-        GameEvents.onFlightReady.Add(FlightReadyHandler);
-        GameEvents.onGameSceneSwitchRequested.Add(FlightShutdownHandler);
+        OpenPorts();
 
         Debug.Log("KerbalSimPit: Started.");
     }
 
     public void OnDestroy()
     {
-        // TODO: Ensure configuration is up to date.
-
+        ClosePorts();
+        KSPitConfig.Save();
         Debug.Log("KerbalSimPit: Shutting down.");
     }
 
     private void FlightReadyHandler()
     {
-        OpenPorts();
+        // TODO: Send flightactive signal to active ports.
     }
 
     private void FlightShutdownHandler(GameEvents.FromToAction
@@ -44,7 +45,7 @@ public class KerbalSimPit : MonoBehaviour
     {
         if (scenes.from == GameScenes.FLIGHT)
         {
-            ClosePorts();
+            // TODO: Send flightshutdown signal to active ports.
         }
     }
 
