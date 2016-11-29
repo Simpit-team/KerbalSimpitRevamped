@@ -15,7 +15,7 @@ all:KerbalSimPit.dll
 KerbalSimPit.dll:
 	$(XBUILD) /p:Configuration=$(CONFIG)
 
-install:
+install:all
 	cp Bin/KerbalSimPit.dll $(INSTALLDIR)
 	cp Bin/PsimaxSerial.dll $(INSTALLDIR)
 
