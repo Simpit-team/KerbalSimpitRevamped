@@ -17,7 +17,8 @@ public class KerbalSimPit : MonoBehaviour
 
         KSPitConfig = new KerbalSimPitConfig();
 
-        //SerialPorts = createPortList(KSPitConfig);
+        SerialPorts = createPortList(KSPitConfig);
+        Debug.Log(String.Format("KerbalSimPit: Found {0} serial ports", SerialPorts.Length));
 
         // Subscribe to flight scene load and shutdown
         GameEvents.onFlightReady.Add(FlightReadyHandler);
@@ -47,38 +48,14 @@ public class KerbalSimPit : MonoBehaviour
         }
     }
 
-    // The PluginConfiguration interface doesn't support lists,
-    // so we have to use a slightly dodgy key-based interface
-    // to manage ports and speeds. I know, it's not pretty.
-    private KSPSerialPort[] createPortList(PluginConfiguration config)
+    private KSPSerialPort[] createPortList(KerbalSimPitConfig config)
     {
         List<KSPSerialPort> PortList = new List<KSPSerialPort>();
-        int index = 0;
-        string PortName;
-        int BaudRate;
-        string NameKey;
-        string RateKey;
-        do
+        for (int i = config.SerialPort.Length-1; i>=0; i--)
         {
-            NameKey = String.Format("SerialPort{0}Name", index);
-            RateKey = String.Format("SerialPort{0}BaudRate", index);
-            PortName = config.GetValue<String>(NameKey);
-            BaudRate = config.GetValue<int>(RateKey, 115200);
-            if (PortName != null)
-            {
-                PortList.Add(new KSPSerialPort(PortName, BaudRate));
-                index++;
-            }
-        } while (PortName != null);
-
-        // Be kind, and add default values if there's no serial ports defined
-        if (index == 0)
-        {
-            Debug.Log("KerbalSimPit: Adding default serial port configuration.");
-            // Ordering seems to put more recent keys on top.
-            config.SetValue("SerialPort0BaudRate", 38400);
-            config.SetValue("SerialPort0Name", "/dev/ttyS0");
-            PortList.Add(new KSPSerialPort("/dev/ttyS0", 38400));
+            // Baud rate currently hardcoded to avoid
+            // nesting ConfigNodes in the config file.
+            PortList.Add(new KSPSerialPort(config.SerialPort[i], 115200));
         }
         return PortList.ToArray();
     }
