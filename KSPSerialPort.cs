@@ -8,7 +8,7 @@ using Psimax.IO.Ports;
 
 public class KSPSerialPort
 {
-    private string PortName;
+    public string PortName;
     private int BaudRate;
     private SerialPort Port;
 

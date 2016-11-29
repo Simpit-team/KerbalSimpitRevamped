@@ -10,6 +10,9 @@ public class KerbalSimPitConfig
     [Persistent]
     public string[] SerialPort;
 
+    [Persistent]
+    public bool Verbose = false;
+
     // Other internal fields follow
     private const string SettingsNodeName = "KerbalSimPit";
     private const string SettingsFile = "PluginData/Settings.cfg";

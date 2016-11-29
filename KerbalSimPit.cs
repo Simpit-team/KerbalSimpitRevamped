@@ -22,7 +22,7 @@ public class KerbalSimPit : MonoBehaviour
         KSPitConfig = new KerbalSimPitConfig();
 
         SerialPorts = createPortList(KSPitConfig);
-        Debug.Log(String.Format("KerbalSimPit: Found {0} serial ports", SerialPorts.Length));
+        if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: Found {0} serial ports", SerialPorts.Length));
         OpenPorts();
 
         Debug.Log("KerbalSimPit: Started.");
@@ -64,7 +64,12 @@ public class KerbalSimPit : MonoBehaviour
     private void OpenPorts() {
         for (int i = SerialPorts.Length-1; i>=0; i--)
         {
-            SerialPorts[i].open();
+            if (SerialPorts[i].open())
+            {
+                if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: Opened {0}", SerialPorts[i].PortName));
+            } else {
+                if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: Unable to open {0}", SerialPorts[i].PortName));
+            }
         }
     }
 
