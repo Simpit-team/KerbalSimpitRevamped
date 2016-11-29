@@ -3,6 +3,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 
+using KSP.IO;
 using UnityEngine;
 
 using Psimax.IO.Ports;
@@ -76,7 +77,7 @@ public class KSPSerialPort
             }
             catch (Exception e)
             {
-                //Debug.Log(String.Format("KerbalSimPit: Error opening serial port {0}: {1}", PortName, e.Message));
+                Debug.Log(String.Format("KerbalSimPit: Error opening serial port {0}: {1}", PortName, e.Message));
             }
         }
         return Port.IsOpen;
@@ -129,7 +130,7 @@ public class KSPSerialPort
             return null;
         }
         BinaryFormatter bf = new BinaryFormatter();
-        using (MemoryStream ms = new MemoryStream())
+        using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
         {
             bf.Serialize(ms, obj);
             return ms.ToArray();
@@ -151,15 +152,15 @@ public class KSPSerialPort
                             Buffer.BlockCopy(buffer, 0, received, 0, actualLength);
                             ReceivedDataEvent(received, actualLength);
                         }
-                        catch(IOException exc)
+                        catch(System.IO.IOException exc)
                         {
-                            //Debug.Log(String.Format("KerbalSimPit: IOException in serial worker for {0}: {1}", PortName, exc.ToString()));
+                            Debug.Log(String.Format("KerbalSimPit: IOException in serial worker for {0}: {1}", PortName, exc.ToString()));
                         }
                     }, null);
             }
             catch (InvalidOperationException)
             {
-                //Debug.Log("KerbalSimPit: Trying to read port {0} that isn't open, sleeping", PortName);
+                Debug.Log(String.Format("KerbalSimPit: Trying to read port {0} that isn't open, sleeping", PortName));
                 Thread.Sleep(500);
             }
         };
