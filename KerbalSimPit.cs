@@ -58,7 +58,7 @@ public class KerbalSimPit : MonoBehaviour
             // Baud rate currently hardcoded to avoid
             // nesting ConfigNodes in the config file.
             KSPSerialPort newPort = new KSPSerialPort(config.SerialPort[i],
-                                                      114200, i);
+                                                      115200, i);
             newPort.registerPacketHandler(packetHandler);
             PortList.Add(newPort);
         }
@@ -105,16 +105,20 @@ public class KerbalSimPit : MonoBehaviour
 
     private void processHandshakePacket(int idx, byte type, byte[] data)
     {
+        byte[] SynAck = new byte[] {0x01, 0x37};
+        //byte[] Ack = new byte[] {0x02, 0x37};
         switch(data[0])
         {
             case 0x00:
-                // send SYN/ACK
+                if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYN received on port {0}. Replying.", SerialPorts[idx].PortName));
+                SerialPorts[idx].sendPacket(0x00, SynAck);
                 break;
             case 0x01:
-                // send ACK
+                if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYNACK recieved on port {0}. Replying.", SerialPorts[idx].PortName));
+                SerialPorts[idx].sendPacket(0x00, new byte[] {0x02, 0x37});
                 break;
             case 0x02:
-                // connection established
+                Debug.Log(String.Format("KerbalSimPit: ACK received on port {0}. Handshake complete.", SerialPorts[idx].PortName));
                 break;
         }
     }

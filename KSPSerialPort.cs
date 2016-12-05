@@ -52,7 +52,7 @@ public class KSPSerialPort
     public KSPSerialPort(string pn, int br): this(pn, br, 37, false)
     {
     }
-    public KSPSerialPort(string pn, int br, int idx): this(pn, br, 37, false)
+    public KSPSerialPort(string pn, int br, int idx): this(pn, br, idx, false)
     {
     }
     public KSPSerialPort(string pn, int br, int idx, bool vb)
@@ -113,16 +113,17 @@ public class KSPSerialPort
         // Note that header sizes are hardcoded here:
         // packet[0] = first byte of header
         // packet[1] = second byte of header
-        // packet[2] = packet size (including all header bytes)
+        // packet[2] = payload size
         // packet[3] = packet type
         // packet[4-x] = packet payload
+        // TODO: Right now calling sendPacket with a 2 byte array as data
+        // results in buf being 30 bytes. Figure out why.
         byte[] buf = ObjectToByteArray(Data);
-        byte PayloadSize = (byte)Math.Min(buf.Length, MaxPacketSize-4);
+        byte PayloadSize = (byte)Math.Min(buf.Length, (MaxPacketSize-4));
         byte PacketSize = (byte)(PayloadSize + 4);
         OutboundPacketBuffer[2] = PacketSize;
         OutboundPacketBuffer[3] = Type;
         Array.Copy(buf, 0, OutboundPacketBuffer, 4, PayloadSize);
-
         if (Port.IsOpen)
         {
             Port.Write(OutboundPacketBuffer, 0, PacketSize);
@@ -183,6 +184,7 @@ public class KSPSerialPort
             }
         };
         DoSerialRead = true;
+        Debug.Log(String.Format("KerbalSimPit: Starting read thread for port {0}", PortName));
         while (DoSerialRead)
         {
             SerialRead();
