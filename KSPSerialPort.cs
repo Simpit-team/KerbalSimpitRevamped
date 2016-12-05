@@ -15,6 +15,9 @@ public class KSPSerialPort
     public  int ID;
 
     private SerialPort Port;
+    // Method signature of callback functions must be:
+    // callback(int idx, int type, object data)
+    private Func<int, byte, object, bool> callback;
 
     // Header bytes are alternating ones and zeroes, with the exception
     // of encoding the protocol version in the final four bytes.
@@ -29,18 +32,15 @@ public class KSPSerialPort
         HEADER1, // Waiting for first header byte
         HEADER2, // Waiting for second header byte
         SIZE,    // Waiting for payload size
+        TYPE,    // Waiting for packet type
         PAYLOAD  // Waiting for payload packets
     }
+    // Serial worker uses these to bufferinbound data
     private ReceiveStates CurrentState;
     private byte CurrentPayloadSize;
+    private byte CurrentPayloadType;
     private byte CurrentBytesRead;
-    // Guards access to data shared between threads
-    private Mutex SerialMutex;
-    // Serial worker uses this buffer to read bytes
-    private byte[] PayloadBuffer;
-    // Buffer for sharing packets from serial worker to main thread
-    private volatile bool NewPacketFlag;
-    private volatile byte[] NewPacketBuffer;
+    private byte[] PayloadBuffer = new byte[255];
     // Semaphore to indicate whether the reader worker should do work
     private volatile bool DoSerialRead;
     private Thread SerialThread;
@@ -79,6 +79,9 @@ public class KSPSerialPort
             try
             {
                 Port.Open();
+                SerialThread = new Thread(ReaderWorker);;
+                SerialThread.Start();
+                while (!SerialThread.IsAlive);
             }
             catch (Exception e)
             {
@@ -98,6 +101,11 @@ public class KSPSerialPort
         }
     }
 
+    // Register a function to handle inbound data
+    public void registerPacketHandler(Func<int, byte, object, bool> packetHandler)
+    {
+        callback = packetHandler;
+    }
 
     // Send a KerbalSimPit packet
     public void sendPacket(byte Type, object Data)
@@ -205,6 +213,10 @@ public class KSPSerialPort
                     break;
                 case ReceiveStates.SIZE:
                     CurrentPayloadSize = ReadBuffer[x];
+                    CurrentState = ReceiveStates.TYPE;
+                    break;
+                case ReceiveStates.TYPE:
+                    CurrentPayloadType = ReadBuffer[x];
                     CurrentBytesRead = 0;
                     CurrentState = ReceiveStates.PAYLOAD;
                     break;
@@ -213,10 +225,10 @@ public class KSPSerialPort
                     CurrentBytesRead++;
                     if (CurrentBytesRead == CurrentPayloadSize)
                     {
-                        SerialMutex.WaitOne();
-                        Buffer.BlockCopy(PayloadBuffer, 0, NewPacketBuffer, 0, CurrentBytesRead);
-                        NewPacketFlag = true;
-                        SerialMutex.ReleaseMutex();
+                        if (callback != null)
+                        {
+                            callback(ID, CurrentPayloadType, PayloadBuffer);
+                        }
                         CurrentState = ReceiveStates.HEADER1;
                     }
                     break;

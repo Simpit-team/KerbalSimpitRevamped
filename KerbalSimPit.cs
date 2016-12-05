@@ -57,7 +57,10 @@ public class KerbalSimPit : MonoBehaviour
         {
             // Baud rate currently hardcoded to avoid
             // nesting ConfigNodes in the config file.
-            PortList.Add(new KSPSerialPort(config.SerialPort[i], 115200, i));
+            KSPSerialPort newPort = new KSPSerialPort(config.SerialPort[i],
+                                                      114200, i);
+            newPort.registerPacketHandler(packetHandler);
+            PortList.Add(newPort);
         }
         return PortList.ToArray();
     }
@@ -79,5 +82,15 @@ public class KerbalSimPit : MonoBehaviour
         {
             SerialPorts[i].close();
         }
+    }
+
+    // Receive and process packets from a serial port.
+    // index: the identifier for the serial port that received the packet.
+    // type: The packet type.
+    // data: Packet data.
+    bool packetHandler(int idx, byte type, object data)
+    {
+        if (data != null) return true;
+        else return false;
     }
 }
