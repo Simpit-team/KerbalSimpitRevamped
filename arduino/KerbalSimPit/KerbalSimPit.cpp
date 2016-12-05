@@ -5,14 +5,49 @@ KerbalSimPit::KerbalSimPit(int speed)
   Serial.begin(speed);
 }
 
-void KerbalSimPit::init()
+bool KerbalSimPit::init()
 {
-  // Nothing yet
+  Serial.begin(115200);
+  delay(10);
+  while (!Serial);
+  _outboundBuffer[0] = 0x00;
+  _outboundBuffer[1] = 0x37;
+  send(0x00, _outboundBuffer, 2); // Send SYN
+  while (!Serial.available());
+  if (Serial.read() == 0xAA) { // First byte of header
+    while (!Serial.available());
+    if (Serial.read() == 0x50) { // Second byte of header
+      while (!Serial.available());
+      Serial.read(); // size
+      while (!Serial.available());
+      if (Serial.read() == 0x00) { // type
+        while (!Serial.available());
+        if (Serial.read() == 0x01) { // first byte of payload, we got a SYNACK
+          // TODO: Do we care about tracking handshake state?
+          _outboundBuffer[0] = 0x02;
+          send(0x00, _outboundBuffer, 2); // Send ACK
+          return true;
+        }
+      }
+    }
+  }
+  return false;
 }
 
 void KerbalSimPit::inboundHandler(void (*packetHandler)(void))
 {
   _packetHandler = packetHandler;
+}
+
+void KerbalSimPit::send(byte PacketType, byte *msg, byte msgSize)
+{
+  Serial.write(0xAA);
+  Serial.write(0x50);
+  Serial.write(msgSize);
+  Serial.write(PacketType);
+  for (int x=0; x<msgSize; x++) {
+    Serial.write(*(msg+x));
+  }
 }
 
 void KerbalSimPit::update()

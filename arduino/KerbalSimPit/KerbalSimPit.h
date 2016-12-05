@@ -7,7 +7,7 @@ class KerbalSimPit
 {
  public:
   KerbalSimPit(int speed);
-  void init();
+  bool init();
   void inboundHandler(void (*packetHandler)(void));
   void send(byte packetType, byte *msg, byte msgSize);
   void update();
@@ -31,7 +31,8 @@ class KerbalSimPit
  private:
   byte _inboundBuffer[32];
   byte _outboundBuffer[32];
-  
+  byte _outboundSize;
+
   enum ReceiveState_t
   {
     WaitingFirstByte,
