@@ -88,9 +88,40 @@ public class KerbalSimPit : MonoBehaviour
     // index: the identifier for the serial port that received the packet.
     // type: The packet type.
     // data: Packet data.
-    bool packetHandler(int idx, byte type, object data)
+    private bool packetHandler(int idx, byte type, object data)
     {
-        if (data != null) return true;
-        else return false;
+        switch (type)
+        {
+            case 0x00:
+                processHandshakePacket(idx, type, (byte[])data);
+                return true;
+            case 0x01:
+                processEchoRequest(idx, type, data);
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void processHandshakePacket(int idx, byte type, byte[] data)
+    {
+        switch(data[0])
+        {
+            case 0x00:
+                // send SYN/ACK
+                break;
+            case 0x01:
+                // send ACK
+                break;
+            case 0x02:
+                // connection established
+                break;
+        }
+    }
+
+    private void processEchoRequest(int idx, byte type, object data)
+    {
+        if (KSPitConfig.Verbose) Debug.Log(String.Format("Echo request on port {0}. Replying.", SerialPorts[idx].PortName));
+        SerialPorts[idx].sendPacket(type, data);
     }
 }
