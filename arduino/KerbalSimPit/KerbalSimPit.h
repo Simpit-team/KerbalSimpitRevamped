@@ -7,7 +7,9 @@ class KerbalSimPit
 {
  public:
   KerbalSimPit(int speed);
+  void init();
   void inboundHandler(void (*packetHandler)(void));
+  void send(byte packetType, byte *msg, byte msgSize);
   void update();
 
   enum CommonPackets

@@ -5,6 +5,11 @@ KerbalSimPit::KerbalSimPit(int speed)
   Serial.begin(speed);
 }
 
+void KerbalSimPit::init()
+{
+  // Nothing yet
+}
+
 void KerbalSimPit::inboundHandler(void (*packetHandler)(void))
 {
   _packetHandler = packetHandler;
