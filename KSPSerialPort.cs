@@ -12,7 +12,7 @@ public class KSPSerialPort
 {
     public string PortName;
     private int BaudRate;
-    private int ID;
+    public  int ID;
 
     private SerialPort Port;
 
@@ -45,6 +45,10 @@ public class KSPSerialPort
     private volatile bool DoSerialRead;
     private Thread SerialThread;
 
+    // Constructors:
+    // pn: port number
+    // br: baud rate
+    // idx: a unique identifier for this port
     public KSPSerialPort(string pn, int br): this(pn, br, 37, false)
     {
     }
@@ -68,6 +72,7 @@ public class KSPSerialPort
                               8, StopBits.One);
     }
 
+    // Open the serial port
     public bool open() {
         if (!Port.IsOpen)
         {
@@ -83,6 +88,7 @@ public class KSPSerialPort
         return Port.IsOpen;
     }
 
+    // Close the serial port
     public void close() {
         if (Port.IsOpen)
         {
@@ -93,6 +99,7 @@ public class KSPSerialPort
     }
 
 
+    // Send a KerbalSimPit packet
     public void sendPacket(byte Type, object Data)
     {
         // Note that header sizes are hardcoded here:
@@ -114,6 +121,7 @@ public class KSPSerialPort
         }
     }
 
+    // Send arbitrary data. Shouldn't be used.
     private void sendData(object data)
     {
         byte[] buf = ObjectToByteArray(data);
@@ -123,6 +131,7 @@ public class KSPSerialPort
         }
     }
 
+    // Convert the given object to an array of bytes
     private byte[] ObjectToByteArray(object obj)
     {
         if (obj == null)
@@ -137,6 +146,7 @@ public class KSPSerialPort
         }
     }
 
+    // This method spawns a new thread to read data from the serial connection
     private void ReaderWorker()
     {
         byte[] buffer = new byte[MaxPacketSize];
@@ -171,6 +181,7 @@ public class KSPSerialPort
         }
     }
 
+    // Handle data read in worker thread
     private void ReceivedDataEvent(byte[] ReadBuffer, int BufferLength)
     {
         for (int x=0; x<BufferLength; x++)
