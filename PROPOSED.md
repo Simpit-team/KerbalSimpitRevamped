@@ -89,3 +89,23 @@ It should keep a list of controllers to send output to.
   * **0x01**: Echo request. Arbitrary (small) payload.
   * **0x02**: Echo reply. Payload dupes the echo request we're replying to.
 
+# Data generators
+
+Data generators are responsible for gathering data from the game, and sending it to
+serial devices.
+
+Each generator is implemented as a class. The class should maintain a list of KSPSerialPort
+objects that it will send data to, and its update method should gather required data
+and send to the ports.
+
+A data generator can be time- or event- based. Time-based generators have an interval
+that can be specified in the config file, and both a global refresh and generator-specific
+refresh rates should be supported.
+
+A time-based generator also has a random component, at run-time each generator has a
+random offset equal to the refresh rate. The intention is that this will smear updates
+for each generator across the update range.
+
+Event-based generators only send data when their associated event takes place. For example,
+the action group generator only needs to send an update when an action group changes state.
+
