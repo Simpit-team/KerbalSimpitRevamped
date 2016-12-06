@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 using KSP.IO;
@@ -8,6 +9,13 @@ using UnityEngine;
 [KSPAddon(KSPAddon.Startup.Instantly, true)]
 public class KerbalSimPit : MonoBehaviour
 {
+    [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
+    public struct HandshakePacket
+    {
+        public byte HandShakeType;
+        public byte Payload;
+    }
+
     private KerbalSimPitConfig KSPitConfig;
     private KSPSerialPort[] SerialPorts;
 
@@ -105,17 +113,20 @@ public class KerbalSimPit : MonoBehaviour
 
     private void processHandshakePacket(int idx, byte type, byte[] data)
     {
-        byte[] SynAck = new byte[] {0x01, 0x37};
-        //byte[] Ack = new byte[] {0x02, 0x37};
+        HandshakePacket hs;
+        SynAck.Payload = 0x37;
+
         switch(data[0])
         {
             case 0x00:
                 if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYN received on port {0}. Replying.", SerialPorts[idx].PortName));
-                SerialPorts[idx].sendPacket(0x00, SynAck);
+                hs.HandShakeType = 0x01;
+                SerialPorts[idx].sendPacket(0x00, hs);
                 break;
             case 0x01:
                 if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYNACK recieved on port {0}. Replying.", SerialPorts[idx].PortName));
-                SerialPorts[idx].sendPacket(0x00, new byte[] {0x02, 0x37});
+                hs.HandShakeType = 0x02;
+                SerialPorts[idx].sendPacket(0x00, hs);
                 break;
             case 0x02:
                 Debug.Log(String.Format("KerbalSimPit: ACK received on port {0}. Handshake complete.", SerialPorts[idx].PortName));

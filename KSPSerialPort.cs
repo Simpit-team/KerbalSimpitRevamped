@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 using KSP.IO;
@@ -121,7 +121,7 @@ public class KSPSerialPort
         byte[] buf = ObjectToByteArray(Data);
         byte PayloadSize = (byte)Math.Min(buf.Length, (MaxPacketSize-4));
         byte PacketSize = (byte)(PayloadSize + 4);
-        OutboundPacketBuffer[2] = PacketSize;
+        OutboundPacketBuffer[2] = PayloadSize;
         OutboundPacketBuffer[3] = Type;
         Array.Copy(buf, 0, OutboundPacketBuffer, 4, PayloadSize);
         if (Port.IsOpen)
@@ -143,16 +143,13 @@ public class KSPSerialPort
     // Convert the given object to an array of bytes
     private byte[] ObjectToByteArray(object obj)
     {
-        if (obj == null)
-        {
-            return null;
-        }
-        BinaryFormatter bf = new BinaryFormatter();
-        using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
-        {
-            bf.Serialize(ms, obj);
-            return ms.ToArray();
-        }
+        int len = Marshal.SizeOf(obj);
+        byte[] arr = new byte[len];
+        IntPtr ptr = Marshal.AllocHGlobal(len);
+        Marshal.StructureToPtr(obj, ptr, true);
+        Marshal.Copy(ptr, arr, 0, len);
+        Marshal.FreeHGlobal(ptr);
+        return arr;
     }
 
     // This method spawns a new thread to read data from the serial connection
