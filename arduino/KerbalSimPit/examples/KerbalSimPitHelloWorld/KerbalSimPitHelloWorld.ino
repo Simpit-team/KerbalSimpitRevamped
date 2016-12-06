@@ -10,6 +10,10 @@
 KerbalSimPit mySimPit(115200);
 
 void setup() {
+  for (int i=0; i<14; i++) {
+    pinMode(i, OUTPUT);
+    digitalWrite(i, LOW);
+  }
   Serial.begin(115200);
   if(mySimPit.init()) {
     pinMode(13, OUTPUT);

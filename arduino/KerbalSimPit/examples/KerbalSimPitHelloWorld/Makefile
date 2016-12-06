@@ -15,7 +15,7 @@
 
 # Hardcoded options:
 # This is for an Uno compatible board
-BOARD=arduino:avr:pro:cpu=16MHzatmega328
+BOARD=arduino:avr:uno
 PORT=/dev/tty.usbmodem1421
 ARDUINOCMD=arduino
 
