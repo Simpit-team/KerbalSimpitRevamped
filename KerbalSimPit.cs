@@ -114,7 +114,7 @@ public class KerbalSimPit : MonoBehaviour
     private void processHandshakePacket(int idx, byte type, byte[] data)
     {
         HandshakePacket hs;
-        SynAck.Payload = 0x37;
+        hs.Payload = 0x37;
 
         switch(data[0])
         {
