@@ -17,7 +17,7 @@ KerbalSimPit.dll:
 
 install:all
 	cp Bin/KerbalSimPit.dll $(INSTALLDIR)
-	cp Bin/PsimaxSerial.dll $(INSTALLDIR)
+	cp Bin/SerialPortLib2.dll $(INSTALLDIR)
 
 clean:
 	$(XBUILD) /p:Configuration=$(CONFIG) /t:Clean

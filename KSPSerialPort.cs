@@ -6,7 +6,7 @@ using System.Threading;
 using KSP.IO;
 using UnityEngine;
 
-using Psimax.IO.Ports;
+using SerialPortLib2.Port;
 
 public class KSPSerialPort
 {
@@ -69,7 +69,7 @@ public class KSPSerialPort
         Array.Copy(PacketHeader, OutboundPacketBuffer, PacketHeader.Length);
 
         Port = new SerialPort(PortName, BaudRate, Parity.None,
-                              8, StopBits.One);
+                              8, StopBits.One, false);
     }
 
     // Open the serial port
