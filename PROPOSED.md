@@ -4,20 +4,32 @@
 
 An object used to open and talk to a serial port.
 
-## SimPitController
+## Event handling
 
-An object representing a control panel. Contains a **KSPSerialPort**,
-and a list of **SimPitControllerOutput** references for outputs this
-controller would like to receive.
+Check out http://stackoverflow.com/questions/987050/array-of-events-in-c
+for an event handler for an array.
 
-## SimPitControllerOutput
+I could have one array for FromDevice events, and one for ToDevice events.
 
-The **SimPitControllerOutput** class defines a piece of data that will be sent
-from the game to a controller.
+### Events from port to game
 
-It should keep a list of controllers to send output to.
+The FromDevice event handler array. A class adds its event handler to
+the index matching the packet ID. When any serial port receives that
+serial ID, it just dispatches the data to FromDevice[ID].
 
+### Events from game to port
 
+The ToDevice event handler array. When a port receives a register/deregister
+packet, it adds its event handler to the appropriate ID in the ToDevice
+array. When a class wants to publish to that event, it calls a method
+in KerbalSimPit, which delegates to the appropriate ID in ToDevice.
+
+#### Periodic events from game
+
+I think the scheduling should be handled by KerbalSimPit. If a class wants
+to send data periodically, it registers a callback function. Calling this
+function triggers an update by the class, eventually calling the ToDevice
+delegate wrapper above.
 
 # Data Packet
 

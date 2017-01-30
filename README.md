@@ -8,10 +8,9 @@ make building hardware devices utilising this plugin easy.
 
 ## Current status
 
-The plugin is capable of completing a handshake with a single device.
-No other data is currently sent or acknowledged. It is able to open more
-than one port, but I haven't yet tested handshaking with multiple
-devices.
+The plugin has full support for specifying multiple devices, and will
+attempt to handshake with all of them at startup. After a successful
+handshake, no further data is either accepted or acknowledged.
 
 The Arduino library has a basic inbound packet parser. It still needs to be
 fleshed out to handle sending data, and some more example code.
@@ -30,6 +29,11 @@ Other versions of Windows are untested.
 
 This plugin is developed against KSP version 1.2.2. Other versions are not
 supported.
+
+## TODO
+
+* Flesh out event handling framework.
+* Add register / deregister handlers for ToDevice and FromDevice events.
 
 ## Planned features
 
