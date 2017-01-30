@@ -1,18 +1,36 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
 using UnityEngine;
 
+public class SerialPortNode
+{
+    [Persistent]
+    public string PortName;
+    [Persistent]
+    public int BaudRate;
+
+    public SerialPortNode()
+    {
+        // Nothing
+    }
+    public SerialPortNode(string pn, int br)
+    {
+        PortName = pn;
+        BaudRate = br;
+    }
+}
+
 public class KerbalSimPitConfig
 {
     // Settings in the config file are here:
     [Persistent]
-    public string[] SerialPort;
-
-    [Persistent]
     public bool Verbose = false;
 
+    public List <SerialPortNode> SerialPorts = new List <SerialPortNode> {};
+    
     // Other internal fields follow
     private const string SettingsNodeName = "KerbalSimPit";
     private const string SettingsFile = "PluginData/Settings.cfg";
@@ -48,6 +66,12 @@ public class KerbalSimPitConfig
                 ConfigNode node = ConfigNode.Load(FullSettingsPath);
                 ConfigNode config = node.GetNode(SettingsNodeName);
                 ConfigNode.LoadObjectFromConfig(this, config);
+                ConfigNode[] portNodes = config.GetNodes("SerialPort");
+                for (int i=0; i<portNodes.Length; i++) {
+                    SerialPortNode portNode = new SerialPortNode();
+                    ConfigNode.LoadObjectFromConfig(portNode, portNodes[i]);
+                    SerialPorts.Add(portNode);
+                }
                 return true;
             }
             catch (Exception e)
@@ -67,6 +91,11 @@ public class KerbalSimPitConfig
         {
             ConfigNode node = new ConfigNode(SettingsNodeName);
             node = ConfigNode.CreateConfigFromObject(this, node);
+            for (int i=0; i<SerialPorts.Count; i++) {
+                ConfigNode portNode = new ConfigNode("SerialPort");
+                portNode = ConfigNode.CreateConfigFromObject(SerialPorts[i], portNode);
+                node.AddNode(portNode);
+            }
             ConfigNode wrapper = new ConfigNode(SettingsNodeName);
             wrapper.AddNode(node);
 
@@ -84,7 +113,8 @@ public class KerbalSimPitConfig
 
     private void CreateDefaultSettings()
     {
-        SerialPort = new string[] { "/dev/ttyS0" };
+        SerialPortNode defaultPort = new SerialPortNode("/dev/ttyS0", 115200);
+        SerialPorts.Add(defaultPort);
         SaveSettings();
     }
 }

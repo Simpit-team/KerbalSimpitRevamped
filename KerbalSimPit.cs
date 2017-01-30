@@ -60,13 +60,12 @@ public class KerbalSimPit : MonoBehaviour
     private KSPSerialPort[] createPortList(KerbalSimPitConfig config)
     {
         List<KSPSerialPort> PortList = new List<KSPSerialPort>();
-        int count = config.SerialPort.Length;
+        int count = config.SerialPorts.Count;
         for (int i = 0; i<count; i++)
         {
-            // Baud rate currently hardcoded to avoid
-            // nesting ConfigNodes in the config file.
-            KSPSerialPort newPort = new KSPSerialPort(config.SerialPort[i],
-                                                      115200, i);
+            KSPSerialPort newPort = new KSPSerialPort(config.SerialPorts[i].PortName,
+                                                      config.SerialPorts[i].BaudRate,
+                                                      i);
             newPort.registerPacketHandler(packetHandler);
             PortList.Add(newPort);
         }
