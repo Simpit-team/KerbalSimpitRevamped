@@ -19,6 +19,9 @@ public class KerbalSimPit : MonoBehaviour
     private KerbalSimPitConfig KSPitConfig;
     private KSPSerialPort[] SerialPorts;
 
+    private SimPitEventElement[] FromDevice;
+    private SimPitEventElement[] ToDevice;
+
     public void Start()
     {
         DontDestroyOnLoad(this);
@@ -31,6 +34,16 @@ public class KerbalSimPit : MonoBehaviour
 
         SerialPorts = createPortList(KSPitConfig);
         if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: Found {0} serial ports", SerialPorts.Length));
+
+        FromDevice = new SimPitEventElement[255];
+        //FromDevice[0] += new SimPitEventHandler(processHandshakePacket);
+        FromDevice[1] += new SimPitEventHandler(processEchoRequest);
+        ToDevice = new SimPitEventElement[SerialPorts.Length];
+        for (int i=0; i<SerialPorts.Length; i++)
+        {
+            ToDevice[i] += new SimPitEventHandler(SerialPorts[i].outboundEventHandler);
+        }
+        
         OpenPorts();
 
         Debug.Log("KerbalSimPit: Started.");
@@ -61,7 +74,7 @@ public class KerbalSimPit : MonoBehaviour
     {
         List<KSPSerialPort> PortList = new List<KSPSerialPort>();
         int count = config.SerialPorts.Count;
-        for (int i = 0; i<count; i++)
+        for (byte i = 0; i<count; i++)
         {
             KSPSerialPort newPort = new KSPSerialPort(config.SerialPorts[i].PortName,
                                                       config.SerialPorts[i].BaudRate,
@@ -95,27 +108,18 @@ public class KerbalSimPit : MonoBehaviour
     // index: the identifier for the serial port that received the packet.
     // type: The packet type.
     // data: Packet data.
-    private bool packetHandler(int idx, byte type, object data)
+    private void packetHandler(byte idx, byte type, object data)
     {
-        switch (type)
-        {
-            case 0x00:
-                processHandshakePacket(idx, type, (byte[])data);
-                return true;
-            case 0x01:
-                processEchoRequest(idx, type, data);
-                return true;
-            default:
-                return false;
-        }
+        FromDevice[type].Dispatch(idx, type, data);
     }
 
-    private void processHandshakePacket(int idx, byte type, byte[] data)
+    private void processHandshakePacket(byte idx, byte type, object data)
     {
         HandshakePacket hs;
         hs.Payload = 0x37;
 
-        switch(data[0])
+        byte[] dataarr = KSPSerialPort.ObjectToByteArray(data);
+        switch(dataarr[0])
         {
             case 0x00:
                 if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYN received on port {0}. Replying.", SerialPorts[idx].PortName));
@@ -133,7 +137,7 @@ public class KerbalSimPit : MonoBehaviour
         }
     }
 
-    private void processEchoRequest(int idx, byte type, object data)
+    private void processEchoRequest(byte idx, byte type, object data)
     {
         if (KSPitConfig.Verbose) Debug.Log(String.Format("Echo request on port {0}. Replying.", SerialPorts[idx].PortName));
         SerialPorts[idx].sendPacket(type, data);

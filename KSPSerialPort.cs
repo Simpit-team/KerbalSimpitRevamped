@@ -12,12 +12,12 @@ public class KSPSerialPort
 {
     public string PortName;
     private int BaudRate;
-    public  int ID;
+    public byte ID;
 
     private SerialPort Port;
     // Method signature of callback functions must be:
     // callback(int idx, int type, object data)
-    private Func<int, byte, object, bool> callback;
+    private Action<byte, byte, object> callback;
 
     // Header bytes are alternating ones and zeroes, with the exception
     // of encoding the protocol version in the final four bytes.
@@ -52,10 +52,10 @@ public class KSPSerialPort
     public KSPSerialPort(string pn, int br): this(pn, br, 37, false)
     {
     }
-    public KSPSerialPort(string pn, int br, int idx): this(pn, br, idx, false)
+    public KSPSerialPort(string pn, int br, byte idx): this(pn, br, idx, false)
     {
     }
-    public KSPSerialPort(string pn, int br, int idx, bool vb)
+    public KSPSerialPort(string pn, int br, byte idx, bool vb)
     {
         PortName = pn;
         BaudRate = br;
@@ -102,9 +102,16 @@ public class KSPSerialPort
     }
 
     // Register a function to handle inbound data
-    public void registerPacketHandler(Func<int, byte, object, bool> packetHandler)
+    public void registerPacketHandler(Action<byte, byte, object> packetHandler)
     {
         callback = packetHandler;
+    }
+
+    public void outboundEventHandler(byte idx, byte type, object data)
+    {
+        // I think I'm going to have to use reflection to get the 
+        //byte type = sender.KerbalSimPitType;
+        //sendPacket(type, data);
     }
 
     // Send a KerbalSimPit packet
@@ -141,7 +148,7 @@ public class KSPSerialPort
     }
 
     // Convert the given object to an array of bytes
-    private byte[] ObjectToByteArray(object obj)
+    public static byte[] ObjectToByteArray(object obj)
     {
         int len = Marshal.SizeOf(obj);
         byte[] arr = new byte[len];
@@ -152,6 +159,17 @@ public class KSPSerialPort
         return arr;
     }
 
+    public static object ByteArrayToObject(byte[] arr)
+    {
+        int len = Marshal.SizeOf(arr);
+        IntPtr ptr = Marshal.AllocHGlobal(len);
+        Marshal.Copy(arr, 0, ptr, len);
+        object obj = new object();
+        obj = Marshal.PtrToStructure(ptr, obj.GetType());
+        Marshal.FreeHGlobal(ptr);
+        return obj;
+    }
+        
     // This method spawns a new thread to read data from the serial connection
     private void ReaderWorker()
     {
