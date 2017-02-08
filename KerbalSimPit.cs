@@ -66,7 +66,6 @@ public class KerbalSimPit : MonoBehaviour
             KSPSerialPort newPort = new KSPSerialPort(config.SerialPorts[i].PortName,
                                                       config.SerialPorts[i].BaudRate,
                                                       i);
-            // 
             newPort.InboundData += processHandshakeEvent;
             PortList.Add(newPort);
         }
@@ -123,8 +122,9 @@ public class KerbalSimPit : MonoBehaviour
     {
         if (e.Type == 1)
         {
-            if (KSPitConfig.Verbose) Debug.Log(String.Format("Echo request on port {0}. Replying.", SerialPorts[idx].PortName));
-            SerialPorts[idx].sendPacket(type, data);
+            KSPSerialPort Port = (KSPSerialPort)sender;
+            if (KSPitConfig.Verbose) Debug.Log(String.Format("Echo request on port {0}. Replying.", Port.PortName));
+            Port.sendPacket(e.Type, e.Data);
         }
     }
 }
