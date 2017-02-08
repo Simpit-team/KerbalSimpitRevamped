@@ -19,6 +19,9 @@ public class KerbalSimPit : MonoBehaviour
     private KerbalSimPitConfig KSPitConfig;
     private KSPSerialPort[] SerialPorts;
 
+    private EventHandler<KSPSerialPortEventArgs>[] FromDeviceEvents =
+        new EventHandler<KSPSerialPortEventArgs>[255];
+
     public void Start()
     {
         DontDestroyOnLoad(this);
@@ -33,7 +36,8 @@ public class KerbalSimPit : MonoBehaviour
         if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: Found {0} serial ports", SerialPorts.Length));
         OpenPorts();
 
-        AddFromDeviceHandler(processHandshakeEvent);
+        AddFromDeviceHandler(processGenericEvent);
+        AddFromDeviceHandler(0, processHandshakeEvent);
         Debug.Log("KerbalSimPit: Started.");
     }
 
@@ -44,6 +48,20 @@ public class KerbalSimPit : MonoBehaviour
         Debug.Log("KerbalSimPit: Shutting down.");
     }
 
+    // Handlers added using this function receive events only for the
+    // given index. They don't need to be selective.
+    public void AddFromDeviceHandler(int idx, EventHandler<KSPSerialPortEventArgs> h)
+    {
+        FromDeviceEvents[idx] = h;
+    }
+
+    public void RemoveFromDeviceHandler(int idx)
+    {
+        FromDeviceEvents[idx] = null;
+    }
+
+    // Handlers added using this function receive events from all ports.
+    // They should probably check the Type of the event args they get.
     public void AddFromDeviceHandler(EventHandler<KSPSerialPortEventArgs> h)
     {
         for (int i=SerialPorts.Length-1; i>=0; i--)
@@ -107,40 +125,43 @@ public class KerbalSimPit : MonoBehaviour
         }
     }
 
+    private void processGenericEvent(object sender, KSPSerialPortEventArgs e)
+    {
+        byte idx = e.Type;
+        if (FromDeviceEvents[idx] != null)
+        {
+            FromDeviceEvents[idx](sender, e);
+        }
+    }
+
     private void processHandshakeEvent(object sender, KSPSerialPortEventArgs e)
     {
-        if (e.Type == 0)
-        {
-            KSPSerialPort Port = (KSPSerialPort)sender;
-            HandshakePacket hs;
-            hs.Payload = 0x37;
+        KSPSerialPort Port = (KSPSerialPort)sender;
+        HandshakePacket hs;
+        hs.Payload = 0x37;
 
-            switch(e.Data[0])
-            {
-                case 0x00:
-                    if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYN received on port {0}. Replying.", Port.PortName));
-                    hs.HandShakeType = 0x01;
-                    Port.sendPacket(0x00, hs);
-                    break;
-                case 0x01:
-                    if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYNACK recieved on port {0}. Replying.", Port.PortName));
-                    hs.HandShakeType = 0x02;
-                    Port.sendPacket(0x00, hs);
-                    break;
-                case 0x02:
-                    Debug.Log(String.Format("KerbalSimPit: ACK received on port {0}. Handshake complete.", Port.PortName));
-                    break;
-            }
+        switch(e.Data[0])
+        {
+            case 0x00:
+                if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYN received on port {0}. Replying.", Port.PortName));
+                hs.HandShakeType = 0x01;
+                Port.sendPacket(0x00, hs);
+                break;
+            case 0x01:
+                if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYNACK recieved on port {0}. Replying.", Port.PortName));
+                hs.HandShakeType = 0x02;
+                Port.sendPacket(0x00, hs);
+                break;
+            case 0x02:
+                Debug.Log(String.Format("KerbalSimPit: ACK received on port {0}. Handshake complete.", Port.PortName));
+                break;
         }
     }
 
     private void processEchoEvent(object sender, KSPSerialPortEventArgs e)
     {
-        if (e.Type == 1)
-        {
-            KSPSerialPort Port = (KSPSerialPort)sender;
-            if (KSPitConfig.Verbose) Debug.Log(String.Format("Echo request on port {0}. Replying.", Port.PortName));
-            Port.sendPacket(e.Type, e.Data);
-        }
+        KSPSerialPort Port = (KSPSerialPort)sender;
+        if (KSPitConfig.Verbose) Debug.Log(String.Format("Echo request on port {0}. Replying.", Port.PortName));
+        Port.sendPacket(e.Type, e.Data);
     }
 }
