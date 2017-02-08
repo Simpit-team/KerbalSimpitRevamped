@@ -8,17 +8,22 @@ using UnityEngine;
 
 using SerialPortLib2.Port;
 
+public class KSPSerialPortEventArgs : EventArgs
+{
+    public byte Type { get; set; }
+    public byte[] Data { get; set; }
+}
+
 public class KSPSerialPort
 {
     public string PortName;
     private int BaudRate;
     public  int ID;
 
-    private SerialPort Port;
-    // Method signature of callback functions must be:
-    // callback(int idx, int type, object data)
-    private Func<int, byte, object, bool> callback;
+    public event EventHandler<KSPSerialPortEventArgs> InboundData;
 
+    private SerialPort Port;
+    
     // Header bytes are alternating ones and zeroes, with the exception
     // of encoding the protocol version in the final four bytes.
     private readonly byte[] PacketHeader = { 0xAA, 0x50 };
@@ -35,7 +40,7 @@ public class KSPSerialPort
         TYPE,    // Waiting for packet type
         PAYLOAD  // Waiting for payload packets
     }
-    // Serial worker uses these to bufferinbound data
+    // Serial worker uses these to buffer inbound data
     private ReceiveStates CurrentState;
     private byte CurrentPayloadSize;
     private byte CurrentPayloadType;
@@ -99,12 +104,6 @@ public class KSPSerialPort
             Thread.Sleep(500);
             Port.Close();
         }
-    }
-
-    // Register a function to handle inbound data
-    public void registerPacketHandler(Func<int, byte, object, bool> packetHandler)
-    {
-        callback = packetHandler;
     }
 
     // Send a KerbalSimPit packet
@@ -224,14 +223,27 @@ public class KSPSerialPort
                     CurrentBytesRead++;
                     if (CurrentBytesRead == CurrentPayloadSize)
                     {
-                        if (callback != null)
-                        {
-                            callback(ID, CurrentPayloadType, PayloadBuffer);
-                        }
+                        OnPacketReceived(CurrentPayloadType, PayloadBuffer,
+                                         CurrentBytesRead);
                         CurrentState = ReceiveStates.HEADER1;
                     }
                     break;
             }
         }
-    }       
+    }
+
+    private void OnPacketReceived(byte Type, byte[] Payload, byte Size)
+    {
+        
+        EventHandler<KSPSerialPortEventArgs> handler = InboundData;
+        if (handler != null)
+        {
+            KSPSerialPortEventArgs args = new KSPSerialPortEventArgs();
+            args.Type = Type;
+            args.Data = new byte[Size];
+            Array.Copy(Payload, args.Data, Size);
+
+            handler(this, args);
+        }
+    }
 }

@@ -66,7 +66,8 @@ public class KerbalSimPit : MonoBehaviour
             KSPSerialPort newPort = new KSPSerialPort(config.SerialPorts[i].PortName,
                                                       config.SerialPorts[i].BaudRate,
                                                       i);
-            newPort.registerPacketHandler(packetHandler);
+            // 
+            newPort.InboundData += processHandshakeEvent;
             PortList.Add(newPort);
         }
         return PortList.ToArray();
@@ -91,51 +92,39 @@ public class KerbalSimPit : MonoBehaviour
         }
     }
 
-    // Receive and process packets from a serial port.
-    // index: the identifier for the serial port that received the packet.
-    // type: The packet type.
-    // data: Packet data.
-    private bool packetHandler(int idx, byte type, object data)
+    private void processHandshakeEvent(object sender, KSPSerialPortEventArgs e)
     {
-        switch (type)
+        if (e.Type == 0)
         {
-            case 0x00:
-                processHandshakePacket(idx, type, (byte[])data);
-                return true;
-            case 0x01:
-                processEchoRequest(idx, type, data);
-                return true;
-            default:
-                return false;
+            KSPSerialPort Port = (KSPSerialPort)sender;
+            HandshakePacket hs;
+            hs.Payload = 0x37;
+
+            switch(e.Data[0])
+            {
+                case 0x00:
+                    if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYN received on port {0}. Replying.", Port.PortName));
+                    hs.HandShakeType = 0x01;
+                    Port.sendPacket(0x00, hs);
+                    break;
+                case 0x01:
+                    if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYNACK recieved on port {0}. Replying.", Port.PortName));
+                    hs.HandShakeType = 0x02;
+                    Port.sendPacket(0x00, hs);
+                    break;
+                case 0x02:
+                    Debug.Log(String.Format("KerbalSimPit: ACK received on port {0}. Handshake complete.", Port.PortName));
+                    break;
+            }
         }
     }
 
-    private void processHandshakePacket(int idx, byte type, byte[] data)
+    private void processEchoEvent(object sender, KSPSerialPortEventArgs e)
     {
-        HandshakePacket hs;
-        hs.Payload = 0x37;
-
-        switch(data[0])
+        if (e.Type == 1)
         {
-            case 0x00:
-                if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYN received on port {0}. Replying.", SerialPorts[idx].PortName));
-                hs.HandShakeType = 0x01;
-                SerialPorts[idx].sendPacket(0x00, hs);
-                break;
-            case 0x01:
-                if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYNACK recieved on port {0}. Replying.", SerialPorts[idx].PortName));
-                hs.HandShakeType = 0x02;
-                SerialPorts[idx].sendPacket(0x00, hs);
-                break;
-            case 0x02:
-                Debug.Log(String.Format("KerbalSimPit: ACK received on port {0}. Handshake complete.", SerialPorts[idx].PortName));
-                break;
+            if (KSPitConfig.Verbose) Debug.Log(String.Format("Echo request on port {0}. Replying.", SerialPorts[idx].PortName));
+            SerialPorts[idx].sendPacket(type, data);
         }
-    }
-
-    private void processEchoRequest(int idx, byte type, object data)
-    {
-        if (KSPitConfig.Verbose) Debug.Log(String.Format("Echo request on port {0}. Replying.", SerialPorts[idx].PortName));
-        SerialPorts[idx].sendPacket(type, data);
     }
 }
