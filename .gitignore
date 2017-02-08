@@ -2,5 +2,6 @@
 Bin/
 obj/
 
-# Ignore our symlink to the KSP directory
+# Ignore our gathered resources
+SerialPortLib2.dll
 KSPresources/
