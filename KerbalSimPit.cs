@@ -41,6 +41,8 @@ public class KerbalSimPit : MonoBehaviour
 
         AddFromDeviceHandler(processGenericEvent);
         AddFromDeviceHandler(0, processHandshakeEvent);
+        AddFromDeviceHandler(3, processRegisterEvent);
+        AddFromDeviceHandler(4, processDeregisterEvent);
         Debug.Log("KerbalSimPit: Started.");
     }
 
@@ -61,16 +63,6 @@ public class KerbalSimPit : MonoBehaviour
     public void RemoveFromDeviceHandler(int idx)
     {
         FromDeviceEvents[idx] = null;
-    }
-
-    public void AddSerialHandler(int idx, EventHandler<KerbalSimPitDataEventArgs> h)
-    {
-        ToDeviceClasses[idx].SerialData += h;
-    }
-
-    public void RemoveSerialHandler(int idx, EventHandler<KerbalSimPitDataEventArgs> h)
-    {
-        ToDeviceClasses[idx].SerialData -= h;
     }
 
     // Handlers added using this function receive events from all ports.
@@ -176,5 +168,27 @@ public class KerbalSimPit : MonoBehaviour
         KSPSerialPort Port = (KSPSerialPort)sender;
         if (KSPitConfig.Verbose) Debug.Log(String.Format("Echo request on port {0}. Replying.", Port.PortName));
         Port.sendPacket(e.Type, e.Data);
+    }
+
+    private void processRegisterEvent(object sender, KSPSerialPortEventArgs e)
+    {
+        KSPSerialPort Port = (KSPSerialPort)sender;
+        byte idx;
+        for (int i=e.Data.Length-1; i>=0; i--)
+        {
+            idx = e.Data[i];
+            ToDeviceClasses[idx].SerialData += Port.ToDeviceEventHandler;
+        }
+    }
+
+    private void processDeregisterEvent(object sender, KSPSerialPortEventArgs e)
+    {
+        KSPSerialPort Port = (KSPSerialPort)sender;
+        byte idx;
+        for (int i=e.Data.Length-1; i>=0; i--)
+        {
+            idx = e.Data[i];
+            ToDeviceClasses[idx].SerialData -= Port.ToDeviceEventHandler;
+        }
     }
 }
