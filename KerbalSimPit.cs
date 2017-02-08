@@ -33,6 +33,7 @@ public class KerbalSimPit : MonoBehaviour
         if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: Found {0} serial ports", SerialPorts.Length));
         OpenPorts();
 
+        AddFromDeviceHandler(processHandshakeEvent);
         Debug.Log("KerbalSimPit: Started.");
     }
 
@@ -41,6 +42,22 @@ public class KerbalSimPit : MonoBehaviour
         ClosePorts();
         KSPitConfig.Save();
         Debug.Log("KerbalSimPit: Shutting down.");
+    }
+
+    public void AddFromDeviceHandler(EventHandler<KSPSerialPortEventArgs> h)
+    {
+        for (int i=SerialPorts.Length-1; i>=0; i--)
+        {
+            SerialPorts[i].InboundData += h;
+        }
+    }
+
+    public void RemoveFromDeviceHandler(EventHandler<KSPSerialPortEventArgs> h)
+    {
+        for (int i=SerialPorts.Length-1; i>=0; i--)
+        {
+            SerialPorts[i].InboundData -= h;
+        }
     }
 
     private void FlightReadyHandler()
@@ -66,7 +83,6 @@ public class KerbalSimPit : MonoBehaviour
             KSPSerialPort newPort = new KSPSerialPort(config.SerialPorts[i].PortName,
                                                       config.SerialPorts[i].BaudRate,
                                                       i);
-            newPort.InboundData += processHandshakeEvent;
             PortList.Add(newPort);
         }
         return PortList.ToArray();
