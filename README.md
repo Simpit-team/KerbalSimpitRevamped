@@ -12,6 +12,12 @@ The plugin has full support for specifying multiple devices, and will
 attempt to handshake with all of them at startup. After a successful
 handshake, no further data is either accepted or acknowledged.
 
+The framework for adding methods that receive data from the game is complete.
+An object can create an event handler function and tell KerbalSimPit that it
+should receive all packets from all serial ports, or only packets for a
+given channel. Note that this just uses an array of functions, so each
+channel can only have one function. I'm not convinced this is worth changing.
+
 The Arduino library has a basic inbound packet parser. It still needs to be
 fleshed out to handle sending data, and some more example code.
 

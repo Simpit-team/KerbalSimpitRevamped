@@ -11,18 +11,19 @@ for an event handler for an array.
 
 I could have one array for FromDevice events, and one for ToDevice events.
 
-### Events from port to game
-
-The FromDevice event handler array. A class adds its event handler to
-the index matching the packet ID. When any serial port receives that
-serial ID, it just dispatches the data to FromDevice[ID].
-
 ### Events from game to port
 
-The ToDevice event handler array. When a port receives a register/deregister
-packet, it adds its event handler to the appropriate ID in the ToDevice
-array. When a class wants to publish to that event, it calls a method
-in KerbalSimPit, which delegates to the appropriate ID in ToDevice.
+The plugin maintains an array of events. An object that wants to send data
+to devices adds its event to this array by calling an Add function.
+
+When a port receives a register/deregister packet, it adds/removes its
+event handler to the appropriate event in the array.
+
+In addition, the plugin maintains a rudimentary scheduler. An object can
+register a callback with this scheduler, and will receive an event when
+it is that object's turn to send data. This gives the plugin a way to
+attempt to space out data transmissions from objects that want to send
+data periodically.
 
 #### Periodic events from game
 
