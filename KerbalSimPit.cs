@@ -22,6 +22,9 @@ public class KerbalSimPit : MonoBehaviour
     private EventHandler<KSPSerialPortEventArgs>[] FromDeviceEvents =
         new EventHandler<KSPSerialPortEventArgs>[255];
 
+    private KerbalSimPitProvider[] ToDeviceClasses =
+        new KerbalSimPitProvider[255];
+
     public void Start()
     {
         DontDestroyOnLoad(this);
@@ -58,6 +61,16 @@ public class KerbalSimPit : MonoBehaviour
     public void RemoveFromDeviceHandler(int idx)
     {
         FromDeviceEvents[idx] = null;
+    }
+
+    public void AddSerialHandler(int idx, EventHandler<KerbalSimPitDataEventArgs> h)
+    {
+        ToDeviceClasses[idx].SerialData += h;
+    }
+
+    public void RemoveSerialHandler(int idx, EventHandler<KerbalSimPitDataEventArgs> h)
+    {
+        ToDeviceClasses[idx].SerialData -= h;
     }
 
     // Handlers added using this function receive events from all ports.

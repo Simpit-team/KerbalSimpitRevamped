@@ -8,12 +8,6 @@ using UnityEngine;
 
 using SerialPortLib2.Port;
 
-public class KSPSerialPortEventArgs : EventArgs
-{
-    public byte Type { get; set; }
-    public byte[] Data { get; set; }
-}
-
 public class KSPSerialPort
 {
     public string PortName;
@@ -104,6 +98,11 @@ public class KSPSerialPort
             Thread.Sleep(500);
             Port.Close();
         }
+    }
+
+    public void ToDeviceEventHandler(object sender, KerbalSimPitDataEventArgs e)
+    {
+        sendPacket(e.Type, e.Data);
     }
 
     // Send a KerbalSimPit packet
