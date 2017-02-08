@@ -30,7 +30,6 @@
     <Compile Include="KerbalSimPitConfig.cs" />
     <Compile Include="KerbalSimPitPackets.cs" />
     <Compile Include="CoreProviders.cs" />
-    <Compile Include="SerialEventDelegate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
