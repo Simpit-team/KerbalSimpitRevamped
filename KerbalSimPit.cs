@@ -85,7 +85,10 @@ public class KerbalSimPit : MonoBehaviour
 
     private void FlightReadyHandler()
     {
-        // TODO: Send flightactive signal to active ports.
+        for (int i=SerialPorts.Length-1; i>=0; i--)
+        {
+            SerialPorts[i].sendPacket(0x03, 0x00);
+        }
     }
 
     private void FlightShutdownHandler(GameEvents.FromToAction
@@ -93,7 +96,10 @@ public class KerbalSimPit : MonoBehaviour
     {
         if (scenes.from == GameScenes.FLIGHT)
         {
-            // TODO: Send flightshutdown signal to active ports.
+            for (int i=SerialPorts.Length-1; i>=0; i--)
+            {
+                SerialPorts[i].sendPacket(0x03, 0x01);
+            }
         }
     }
 
