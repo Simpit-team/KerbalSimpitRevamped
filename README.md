@@ -15,7 +15,7 @@ handshake, no further data is either accepted or acknowledged.
 The framework for adding methods that receive data from the game is complete.
 An object can create an event handler function and tell KerbalSimPit that it
 should receive all packets from all serial ports, or only packets for a
-given channel. Note that this just uses an array of functions, so each
+given channel. Note that this just uses an array of delegates, so each
 channel can only have one function. I'm not convinced this is worth changing.
 
 The Arduino library has a basic inbound packet parser. It still needs to be
