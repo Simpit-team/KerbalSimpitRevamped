@@ -3,6 +3,23 @@
 
 #include <Arduino.h>
 
+// These are the recognised packet types
+// Sync packets are used for handshaking
+const byte SYNC_PACKET = 0x00;
+// Echo request packet. Either end can send this.
+const byte ECHO_REQ_PACKET = 0x01;
+// Echo response packet. Sent in reply to an echo request.
+const byte ECHO_RESP_PACKET = 0x02;
+
+// Scene change packets are sent by the game when
+// entering or leaving the flight scene.
+const byte SCENE_CHANGE_PACKET = 0x03;
+
+// Register and deregister packets are sent by a device to register
+// or deregister to event channels.
+const byte REGISTER_PACKET = 0x03;
+const byte DEREGISTER_PACKET = 0x04;
+
 class KerbalSimPit
 {
  public:
@@ -11,22 +28,6 @@ class KerbalSimPit
   void inboundHandler(void (*packetHandler)(void));
   void send(byte packetType, byte *msg, byte msgSize);
   void update();
-
-  enum CommonPackets
-  {
-    Synchronisation = 0x00,
-    EchoRequest = 0x01,
-    EchoResponse = 0x02,
-  };
-  enum InboundPacketes
-  {
-    SceneChange = 0x03,
-  };
-  enum OutboundPackets
-  {
-    RegisterHandler = 0x03,
-    DeregisterHandler = 0x04,
-  };
 
  private:
   byte _inboundBuffer[32];
