@@ -17,9 +17,9 @@ public class KerbalSimPit : MonoBehaviour
     }
 
     private KerbalSimPitConfig KSPitConfig;
-    private KSPSerialPort[] SerialPorts;
+    private static KSPSerialPort[] SerialPorts;
 
-    private EventHandler<KSPSerialPortEventArgs>[] FromDeviceEvents =
+    private static EventHandler<KSPSerialPortEventArgs>[] FromDeviceEvents =
         new EventHandler<KSPSerialPortEventArgs>[255];
 
     private KerbalSimPitProvider[] ToDeviceClasses =
@@ -28,10 +28,10 @@ public class KerbalSimPit : MonoBehaviour
     public void Start()
     {
         DontDestroyOnLoad(this);
-
         // Subscribe to flight scene load and shutdown
-        GameEvents.onFlightReady.Add(FlightReadyHandler);
-        GameEvents.onGameSceneSwitchRequested.Add(FlightShutdownHandler);
+        // Shouldn't be required any more, we'll use a core provider to do it.
+        //GameEvents.onFlightReady.Add(FlightReadyHandler);
+        //GameEvents.onGameSceneSwitchRequested.Add(FlightShutdownHandler);
 
         KSPitConfig = new KerbalSimPitConfig();
 
@@ -55,19 +55,19 @@ public class KerbalSimPit : MonoBehaviour
 
     // Handlers added using this function receive events only for the
     // given index. They don't need to be selective.
-    public void AddFromDeviceHandler(int idx, EventHandler<KSPSerialPortEventArgs> h)
+    public static void AddFromDeviceHandler(int idx, EventHandler<KSPSerialPortEventArgs> h)
     {
         FromDeviceEvents[idx] = h;
     }
 
-    public void RemoveFromDeviceHandler(int idx)
+    public static void RemoveFromDeviceHandler(int idx)
     {
         FromDeviceEvents[idx] = null;
     }
 
     // Handlers added using this function receive events from all ports.
     // They should probably check the Type of the event args they get.
-    public void AddFromDeviceHandler(EventHandler<KSPSerialPortEventArgs> h)
+    public static void AddFromDeviceHandler(EventHandler<KSPSerialPortEventArgs> h)
     {
         for (int i=SerialPorts.Length-1; i>=0; i--)
         {
@@ -75,7 +75,7 @@ public class KerbalSimPit : MonoBehaviour
         }
     }
 
-    public void RemoveFromDeviceHandler(EventHandler<KSPSerialPortEventArgs> h)
+    public static void RemoveFromDeviceHandler(EventHandler<KSPSerialPortEventArgs> h)
     {
         for (int i=SerialPorts.Length-1; i>=0; i--)
         {
@@ -83,7 +83,7 @@ public class KerbalSimPit : MonoBehaviour
         }
     }
 
-    private void FlightReadyHandler()
+    private static void FlightReadyHandler()
     {
         for (int i=SerialPorts.Length-1; i>=0; i--)
         {
