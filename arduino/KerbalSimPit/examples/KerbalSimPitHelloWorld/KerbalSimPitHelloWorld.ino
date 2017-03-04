@@ -24,9 +24,9 @@ void setup() {
 
 void loop() {
   digitalWrite(13, LOW);
-  // todo, serial echo here
+  mySimPit.send(ECHO_REQ_PACKET, "low", 4);
   delay(1000);
-  // nothing here yet
   digitalWrite(13, HIGH);
+  mySimPit.send(ECHO_REQ_PACKET, "high", 5);
   delay(1000);
 }
