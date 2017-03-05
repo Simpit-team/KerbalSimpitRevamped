@@ -25,11 +25,14 @@ class KerbalSimPit
  public:
   KerbalSimPit(int speed);
   bool init();
-  void inboundHandler(void (*packetHandler)(void));
+  void inboundHandler(void (*packetHandler)(byte packetType,
+                                            byte *msg, byte msgSize));
   void send(byte packetType, byte *msg, byte msgSize);
   void update();
 
  private:
+  byte _inboundType;
+  byte _inboundSize;
   byte _inboundBuffer[32];
   byte _outboundBuffer[32];
   byte _outboundSize;
@@ -45,7 +48,7 @@ class KerbalSimPit
   ReceiveState_t _receiveState;
   byte _receivedIndex;
 
-  void (*_packetHandler)(void);
+  void (*_packetHandler)(byte packetType, byte *msg, byte msgSize);
 };
 
 #endif

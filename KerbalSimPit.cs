@@ -16,7 +16,8 @@ public class KerbalSimPit : MonoBehaviour
         public byte Payload;
     }
 
-    private KerbalSimPitConfig KSPitConfig;
+    public static KerbalSimPitConfig KSPitConfig;
+
     private static KSPSerialPort[] SerialPorts;
 
     private static EventHandler<KSPSerialPortEventArgs>[] FromDeviceEvents =

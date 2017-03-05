@@ -16,7 +16,10 @@ public class KerbalSimPitEchoProvider : MonoBehaviour, KerbalSimPitProvider
 
     public void EchoRequestHandler(object sender, KSPSerialPortEventArgs e)
     {
-        Debug.Log("Got an echo request");
+        KSPSerialPort Port = (KSPSerialPort)sender;
+        if (KerbalSimPit.KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: Echo request on port {0}. Replying.", Port.PortName));
+        Port.sendPacket(0x02, e.Data);
+        if (KerbalSimPit.KSPitConfig.Verbose) Debug.Log("KerbalSimPit: Replied");
     }
 
     public void EchoReplyHandler(object sender, KSPSerialPortEventArgs e)

@@ -34,7 +34,9 @@ bool KerbalSimPit::init()
   return false;
 }
 
-void KerbalSimPit::inboundHandler(void (*packetHandler)(void))
+void KerbalSimPit::inboundHandler(void (*packetHandler)(byte packetType,
+                                                        byte *msg,
+                                                        byte msgSize))
 {
   _packetHandler = packetHandler;
 }
@@ -66,21 +68,20 @@ void KerbalSimPit::update()
         break;
       }
     case WaitingSize:
-      _inboundBuffer[2] = nextByte;
+      _inboundSize = nextByte;
       _receiveState = WaitingType;
       break;
     case WaitingType:
-      _inboundBuffer[3] = nextByte;
-      _receivedIndex = 4;
+      _inboundType = nextByte;
       _receiveState = WaitingData;
       break;
     case WaitingData:
       _inboundBuffer[_receivedIndex] = nextByte;
       _receivedIndex++;
-      if (_receivedIndex == _inboundBuffer[2]) {
-        // TODO: process packet here
+      if (_receivedIndex == _inboundSize) {
         _receiveState = WaitingFirstByte;
         _receivedIndex = 0;
+        _packetHandler(_inboundType, _inboundBuffer, _inboundSize);
         break;
       }
     }
