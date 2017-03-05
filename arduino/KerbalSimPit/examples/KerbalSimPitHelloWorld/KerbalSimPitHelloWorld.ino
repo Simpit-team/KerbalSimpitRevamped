@@ -10,6 +10,8 @@
 KerbalSimPit mySimPit(115200);
 
 bool state = false;
+unsigned int lastSent = 0;
+int sendInterval = 1000;
 
 void setup() {
   for (int i=0; i<14; i++) {
@@ -29,17 +31,24 @@ void setup() {
 }
 
 void loop() {
-  mySimPit.send(ECHO_REQ_PACKET, "low", 4);
-  delay(1000);
-  mySimPit.send(ECHO_REQ_PACKET, "high", 5);
-  delay(1000);
+  unsigned int now = millis();
+  if (now > lastSent + sendInterval) {
+    if (state) {
+      mySimPit.send(ECHO_REQ_PACKET, "high", 5);
+    } else {
+      mySimPit.send(ECHO_REQ_PACKET, "low", 4);
+    }
+    lastSent = now;
+  }
+  mySimPit.update();
 }
 
-void packetHandler(byte packetSize, byte *msg, byte msgSize) {
-  if (state) {
+void packetHandler(byte packetType, byte *msg, byte msgSize) {
+  if (strcmp(msg, "low")) {
     digitalWrite(13, LOW);
+    state = false;
   } else {
     digitalWrite(13, HIGH);
+    state = true;
   }
-  state = !state;
 }
