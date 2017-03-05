@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Collections;
+using System.Linq;
 using System.Threading;
 
 using KSP.IO;
@@ -141,12 +143,24 @@ public class KSPSerialPort
     // Convert the given object to an array of bytes
     private byte[] ObjectToByteArray(object obj)
     {
-        int len = Marshal.SizeOf(obj);
+        int len;
+        Type objType = obj.GetType();
+        if (objType.IsArray)
+        {
+            // The Cast method here is from Linq.
+            // TODO: Find a better way to do this.
+            object[] objarr = ((Array)obj).Cast<object>().ToArray();
+            len = objarr.Length * Marshal.SizeOf(objType.GetElementType());
+        } else
+        {
+            len = Marshal.SizeOf(obj);
+        }
         byte[] arr = new byte[len];
         IntPtr ptr = Marshal.AllocHGlobal(len);
         Marshal.StructureToPtr(obj, ptr, true);
         Marshal.Copy(ptr, arr, 0, len);
         Marshal.FreeHGlobal(ptr);
+        int newlen = arr.Length;
         return arr;
     }
 
