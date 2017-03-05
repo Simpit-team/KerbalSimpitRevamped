@@ -149,6 +149,9 @@ public class KSPSerialPort
         {
             // The Cast method here is from Linq.
             // TODO: Find a better way to do this.
+            // If you're in here, len is correctly calculated but
+            // right now we only send len bytes of 0x00.
+            // TODO: Fix what we're sending.
             object[] objarr = ((Array)obj).Cast<object>().ToArray();
             len = objarr.Length * Marshal.SizeOf(objType.GetElementType());
         } else
