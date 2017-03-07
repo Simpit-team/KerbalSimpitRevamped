@@ -29,6 +29,9 @@ public class KerbalSimPitConfig
     [Persistent]
     public bool Verbose = false;
 
+    [Persistent]
+    public int MaxUpdateInterval = 50;
+
     public List <SerialPortNode> SerialPorts = new List <SerialPortNode> {};
     
     // Other internal fields follow
