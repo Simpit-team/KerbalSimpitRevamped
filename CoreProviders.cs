@@ -14,6 +14,12 @@ public class KerbalSimPitEchoProvider : MonoBehaviour, KerbalSimPitProvider
         KerbalSimPit.AddFromDeviceHandler(0x02, EchoReplyHandler);
     }
 
+    public void OnDestroy()
+    {
+        KerbalSimPit.RemoveFromDeviceHandler(0x01);
+        KerbalSimPit.RemoveFromDeviceHandler(0x02);
+    }
+
     public void EchoRequestHandler(object sender, KSPSerialPortEventArgs e)
     {
         KSPSerialPort Port = (KSPSerialPort)sender;
