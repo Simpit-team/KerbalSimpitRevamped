@@ -27,7 +27,7 @@ public class KerbalSimPit : MonoBehaviour
 
     private KerbalSimPitProvider[] ToDeviceClasses =
         new KerbalSimPitProvider[255];
-    private List<ToDeviceCallback> RegularEventList =
+    private static List<ToDeviceCallback> RegularEventList =
         new List<ToDeviceCallback>(255);
     private bool DoEventDispatching = false;
     private Thread EventDispatchThread;
@@ -94,6 +94,16 @@ public class KerbalSimPit : MonoBehaviour
         {
             SerialPorts[i].InboundData -= h;
         }
+    }
+
+    public static void AddToDeviceHandler(ToDeviceCallback cb)
+    {
+        RegularEventList.Add(cb);
+    }
+
+    public static void RemoveToDeviceHandler(ToDeviceCallback cb)
+    {
+        RegularEventList.Remove(cb);
     }
 
     public static void SendSerialData(byte Channel, object Data)
