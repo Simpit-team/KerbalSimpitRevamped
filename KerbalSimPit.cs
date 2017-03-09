@@ -6,6 +6,8 @@ using System.Threading;
 using KSP.IO;
 using UnityEngine;
 
+public delegate void ToDeviceCallback();
+
 [KSPAddon(KSPAddon.Startup.Instantly, true)]
 public class KerbalSimPit : MonoBehaviour
 {
@@ -25,7 +27,11 @@ public class KerbalSimPit : MonoBehaviour
 
     private KerbalSimPitProvider[] ToDeviceClasses =
         new KerbalSimPitProvider[255];
-
+    private List<ToDeviceCallback> RegularEventList =
+        new List<ToDeviceCallback>(255);
+    private bool DoEventDispatching = false;
+    private Thread EventDispatchThread;
+    
     public void Start()
     {
         DontDestroyOnLoad(this);
@@ -44,6 +50,11 @@ public class KerbalSimPit : MonoBehaviour
         AddFromDeviceHandler(0, processHandshakeEvent);
         AddFromDeviceHandler(3, processRegisterEvent);
         AddFromDeviceHandler(4, processDeregisterEvent);
+
+        EventDispatchThread = new Thread(EventWorker);
+        EventDispatchThread.Start();
+        while (!EventDispatchThread.IsAlive);
+
         Debug.Log("KerbalSimPit: Started.");
     }
 
@@ -51,6 +62,7 @@ public class KerbalSimPit : MonoBehaviour
     {
         ClosePorts();
         KSPitConfig.Save();
+        DoEventDispatching = false;
         Debug.Log("KerbalSimPit: Shutting down.");
     }
 
@@ -84,6 +96,39 @@ public class KerbalSimPit : MonoBehaviour
         }
     }
 
+    public static void SendSerialData(byte Channel, object Data)
+    {
+        // Nothing yet
+    }
+
+    private void EventWorker()
+    {
+        Action EventNotifier = null;
+        ToDeviceCallback[] EventListCopy = new ToDeviceCallback[255];
+        int EventCount;
+        int TimeSlice;
+        EventNotifier = delegate {
+            EventCount = RegularEventList.Count;
+            RegularEventList.CopyTo(EventListCopy);
+            TimeSlice = KSPitConfig.RefreshRate / EventCount;
+            for (int i=EventCount; i>=0; --i)
+            {
+                if (EventListCopy[i] != null)
+                {
+                    EventListCopy[i]();
+                    Thread.Sleep(TimeSlice);
+                }
+            }
+        };
+        DoEventDispatching = true;
+        Debug.Log("KerbalSimPit: Starting event dispatch loop");
+        while (DoEventDispatching)
+        {
+            EventNotifier();
+        }
+        Debug.Log("KerbalSimPit: Event dispatch loop exiting");
+    }
+            
     private static void FlightReadyHandler()
     {
         for (int i=SerialPorts.Length-1; i>=0; i--)

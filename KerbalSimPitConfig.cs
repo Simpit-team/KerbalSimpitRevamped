@@ -29,8 +29,9 @@ public class KerbalSimPitConfig
     [Persistent]
     public bool Verbose = false;
 
-    [Persistent]
-    public int MaxUpdateInterval = 50;
+    // public members that aren't persisted in the config file:
+    public int EventQueueSize = 32;
+    public int RefreshRate = 80;
 
     public List <SerialPortNode> SerialPorts = new List <SerialPortNode> {};
     
