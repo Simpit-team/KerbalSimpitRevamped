@@ -25,7 +25,7 @@ public class KerbalSimPitEchoProvider : MonoBehaviour
     public void EchoRequestCallback(byte ID, object Data)
     {
         if (KerbalSimPit.KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: Echo request on port {0}. Replying.", ID));
-        KerbalSimPit.SendToSerialPort(ID, 0x02, Data);
+        KerbalSimPit.SendToSerialPort(ID, CommonPackets.EchoResponse, Data);
     }
 
     public void EchoReplyCallback(byte ID, object Data)
