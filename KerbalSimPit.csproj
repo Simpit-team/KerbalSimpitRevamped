@@ -25,11 +25,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="KerbalSimPit.cs" />
-    <Compile Include="KSPSerialPort.cs" />
-    <Compile Include="KerbalSimPitConfig.cs" />
-    <Compile Include="KerbalSimPitPackets.cs" />
-    <Compile Include="Providers\CoreProviders.cs" />
+    <Compile Include="Src\KerbalSimPit.cs" />
+    <Compile Include="Src\KSPSerialPort.cs" />
+    <Compile Include="Src\KerbalSimPitConfig.cs" />
+    <Compile Include="Src\KerbalSimPitPackets.cs" />
+    <Compile Include="Src\Providers\CoreProviders.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
