@@ -57,8 +57,7 @@ public class KerbalSimPit : MonoBehaviour
         if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: Found {0} serial ports", SerialPorts.Length));
         OpenPorts();
 
-        AddFromDeviceHandler(processGenericEvent);
-        AddFromDeviceHandler(0, processHandshakeEvent);
+        onSerialReceivedArray[0].Add(handshakeCallback);
         AddFromDeviceHandler(3, processRegisterEvent);
         AddFromDeviceHandler(4, processDeregisterEvent);
 
@@ -203,35 +202,25 @@ public class KerbalSimPit : MonoBehaviour
         }
     }
 
-    private void processGenericEvent(object sender, KSPSerialPortEventArgs e)
+    private void handshakeCallback(byte portID, object data)
     {
-        byte idx = e.Type;
-        if (FromDeviceEvents[idx] != null)
-        {
-            FromDeviceEvents[idx](sender, e);
-        }
-    }
-
-    private void processHandshakeEvent(object sender, KSPSerialPortEventArgs e)
-    {
-        KSPSerialPort Port = (KSPSerialPort)sender;
+        byte[] payload = (byte[])data;
         HandshakePacket hs;
         hs.Payload = 0x37;
-
-        switch(e.Data[0])
+        switch(payload[0])
         {
             case 0x00:
-                if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYN received on port {0}. Replying.", Port.PortName));
+                if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYN received on port {0}. Replying.", SerialPorts[portID].PortName));
                 hs.HandShakeType = 0x01;
-                Port.sendPacket(0x00, hs);
+                SerialPorts[portID].sendPacket(0x00, hs);
                 break;
             case 0x01:
-                if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYNACK recieved on port {0}. Replying.", Port.PortName));
+                if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYNACK received on port {0}. Replying.", SerialPorts[portID].PortName));
                 hs.HandShakeType = 0x02;
-                Port.sendPacket(0x00, hs);
+                SerialPorts[portID].sendPacket(0x00, hs);
                 break;
             case 0x02:
-                Debug.Log(String.Format("KerbalSimPit: ACK received on port {0}. Handshake complete.", Port.PortName));
+                Debug.Log(String.Format("KerbalSimPit: ACK received on port {0}. Handshake complete.", SerialPorts[portID].PortName));
                 break;
         }
     }
