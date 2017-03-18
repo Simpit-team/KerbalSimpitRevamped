@@ -9,14 +9,18 @@ make building hardware devices utilising this plugin easy.
 ## Current status
 
 The plugin has full support for specifying multiple devices, and will
-attempt to handshake with all of them at startup. After a successful
-handshake, no further data is either accepted or acknowledged.
+attempt to handshake with all of them at startup. As a proof of concept,
+an echo provider has been implemented. The Arduino library comes with
+an example sketch that every second will send an echo request. The plugin
+will reply with an echo response.
 
-The framework for adding methods that receive data from the game is complete.
-An object can create an event handler function and tell KerbalSimPit that it
-should receive all packets from all serial ports, or only packets for a
-given channel. Note that this just uses an array of delegates, so each
-channel can only have one function. I'm not convinced this is worth changing.
+The plugin utilises KSP's GameEvents extension to pass data between
+serial ports and handler classes. Any class can register a simple callback
+to begin receiving data from a channel, and can publish to a channel by
+finding it and calling its Fire method.
+
+All of the functionality for serial devices registering and deregistering
+from channels is implemented but not heavily tested.
 
 The Arduino library has a basic inbound packet parser. It still needs to be
 fleshed out to handle sending data, and some more example code.
@@ -25,21 +29,26 @@ fleshed out to handle sending data, and some more example code.
 
 I regularly test this plugin on MacOS and Linux (64 bit Debian).
 
-Windows 10 is not (yet) supported. The device is opened, but from what I
-can see with a logic analyzer hooked up to the UART, no data is sent or
-received. Any help troubleshooting this would be much appreciated.
+Windows 10 is not (yet) supported. This requires further testing, but I
+suspect it's down to the multithreaded serial read implementation. I'm
+in the process of exploring other options for this, and may just fall
+back on using the event handler that's proved buggy on other operating
+systems, with a config option to switch between the two. Help is still
+appreciated with this.
 
 Other versions of Windows are untested.
 
 ### KSP compatibility
 
-This plugin is developed against KSP version 1.2.2. Other versions are not
+This plugin is developed against KSP version 1.2.9. Other versions are not
 supported.
 
 ## TODO
 
-* Flesh out event handling framework.
-* Add register / deregister handlers for ToDevice and FromDevice events.
+* Begin implementing actual data handlers.
+* Flesh out Arduino library, and fix the warnings that break compile on
+  some platforms (like teensy).
+* Runtime configuration of serial ports.
 
 ## Planned features
 
