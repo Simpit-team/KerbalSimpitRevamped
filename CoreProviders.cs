@@ -3,33 +3,33 @@ using KSP.IO;
 using UnityEngine;
 
 [KSPAddon(KSPAddon.Startup.Flight, false)]
-public class KerbalSimPitEchoProvider : MonoBehaviour, KerbalSimPitProvider
+public class KerbalSimPitEchoProvider : MonoBehaviour
 {
-    // I don't think this is going to be used for echoes.
-    public event EventHandler<KerbalSimPitDataEventArgs> SerialData;
+    private EventData<byte, object> echoRequestEvent;
+    private EventData<byte, object> echoReplyEvent;
 
     public void Start()
     {
-        KerbalSimPit.AddFromDeviceHandler(0x01, EchoRequestHandler);
-        KerbalSimPit.AddFromDeviceHandler(0x02, EchoReplyHandler);
+        echoRequestEvent = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived1");
+        if (echoRequestEvent != null) echoRequestEvent.Add(EchoRequestCallback);
+        echoReplyEvent = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived2");
+        if (echoReplyEvent != null) echoReplyEvent.Add(EchoReplyCallback);
     }
 
     public void OnDestroy()
     {
-        KerbalSimPit.RemoveFromDeviceHandler(0x01);
-        KerbalSimPit.RemoveFromDeviceHandler(0x02);
+        if (echoRequestEvent != null) echoRequestEvent.Remove(EchoRequestCallback);
+        if (echoReplyEvent != null) echoReplyEvent.Remove(EchoReplyCallback);
     }
 
-    public void EchoRequestHandler(object sender, KSPSerialPortEventArgs e)
+    public void EchoRequestCallback(byte ID, object Data)
     {
-        KSPSerialPort Port = (KSPSerialPort)sender;
-        if (KerbalSimPit.KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: Echo request on port {0}. Replying.", Port.PortName));
-        Port.sendPacket(0x02, e.Data);
-        if (KerbalSimPit.KSPitConfig.Verbose) Debug.Log("KerbalSimPit: Replied");
+        if (KerbalSimPit.KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: Echo request on port {0}. Replying.", ID));
+        KerbalSimPit.SendToSerialPort(ID, 0x02, Data);
     }
 
-    public void EchoReplyHandler(object sender, KSPSerialPortEventArgs e)
+    public void EchoReplyCallback(byte ID, object Data)
     {
-        Debug.Log("Got an echo reply");
+        Debug.Log(String.Format("KerbalSimPit: Echo reply received on port {0}.", ID));
     }
 }
