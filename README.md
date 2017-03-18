@@ -72,3 +72,11 @@ support extending capabilities by external add-ons.
 This plugin depends on
 [SerialPortLib2](https://github.com/JTrotta/SerialPortLib2). I build it
 from source, targetting .NET 3.5. The source code is otherwise unchanged.
+
+The project file makes these assumptions:
+
+* SerialPortLib2.dll is present in the same directory as the project file.
+  I symlink this to the release build.
+* KSP resources are available in a KSPresources directory in the same
+  directory as the project file. It's easiest to just create this as a
+  symlink to `Resources/Data/Managed` in the KSP root.
