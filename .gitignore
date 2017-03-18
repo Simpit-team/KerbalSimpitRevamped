@@ -5,3 +5,7 @@ obj/
 # Ignore our gathered resources
 SerialPortLib2.dll
 KSPresources/
+
+# Ignore WIP bits
+junk/
+
