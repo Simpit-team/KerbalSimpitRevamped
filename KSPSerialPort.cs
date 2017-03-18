@@ -14,7 +14,7 @@ public class KSPSerialPort
 {
     public string PortName;
     private int BaudRate;
-    public  int ID;
+    public  byte ID;
 
     public event EventHandler<KSPSerialPortEventArgs> InboundData;
 
@@ -53,10 +53,10 @@ public class KSPSerialPort
     public KSPSerialPort(string pn, int br): this(pn, br, 37, false)
     {
     }
-    public KSPSerialPort(string pn, int br, int idx): this(pn, br, idx, false)
+    public KSPSerialPort(string pn, int br, byte idx): this(pn, br, idx, false)
     {
     }
-    public KSPSerialPort(string pn, int br, int idx, bool vb)
+    public KSPSerialPort(string pn, int br, byte idx, bool vb)
     {
         PortName = pn;
         BaudRate = br;
@@ -250,6 +250,6 @@ public class KSPSerialPort
 
     private void OnPacketReceived(byte Type, byte[] Payload, byte Size)
     {
-        KerbalSimPit.onSerialReceivedArray[Type].Fire(Payload);
+        KerbalSimPit.onSerialReceivedArray[Type].Fire(ID, Payload);
     }
 }

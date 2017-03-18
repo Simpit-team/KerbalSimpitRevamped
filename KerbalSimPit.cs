@@ -13,8 +13,8 @@ public class KerbalSimPit : MonoBehaviour
 {
     // To receive events from serial devices on channel i,
     // register a callback for onSerialReceivedArray[i].
-    public static EventData<object>[] onSerialReceivedArray =
-        new EventData<object>[255];
+    public static EventData<byte, object>[] onSerialReceivedArray =
+        new EventData<byte, object>[255];
     // To send a packet on channel i, call
     // toSerialArray[i].Fire()
     public static EventData<object>[] toSerialArray =
@@ -47,7 +47,7 @@ public class KerbalSimPit : MonoBehaviour
 
         for (int i=254; i>=0; i--)
         {
-            onSerialReceivedArray[i] = new EventData<object>(String.Format("onSerialReceived{0}", i));
+            onSerialReceivedArray[i] = new EventData<byte, object>(String.Format("onSerialReceived{0}", i));
             toSerialArray[i] = new EventData<object>(String.Format("toSerial{0}", i));
         }
 
@@ -174,7 +174,7 @@ public class KerbalSimPit : MonoBehaviour
     {
         List<KSPSerialPort> PortList = new List<KSPSerialPort>();
         int count = config.SerialPorts.Count;
-        for (int i = 0; i<count; i++)
+        for (byte i = 0; i<count; i++)
         {
             KSPSerialPort newPort = new KSPSerialPort(config.SerialPorts[i].PortName,
                                                       config.SerialPorts[i].BaudRate,
