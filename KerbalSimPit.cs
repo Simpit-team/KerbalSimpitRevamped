@@ -116,6 +116,11 @@ public class KerbalSimPit : MonoBehaviour
         RegularEventList.Remove(cb);
     }
 
+    public static void SendToSerialPort(byte PortID, byte Type, object Data)
+    {
+        SerialPorts[PortID].sendPacket(Type, Data);
+    }
+
     public static void SendSerialData(byte Channel, object Data)
     {
         // Nothing yet
