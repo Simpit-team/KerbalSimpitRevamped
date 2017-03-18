@@ -17,8 +17,8 @@ public class KerbalSimPit : MonoBehaviour
         new EventData<byte, object>[255];
     // To send a packet on channel i, call
     // toSerialArray[i].Fire()
-    public static EventData<object>[] toSerialArray =
-        new EventData<object>[255];
+    public static EventData<byte, object>[] toSerialArray =
+        new EventData<byte, object>[255];
 
     [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
     public struct HandshakePacket
@@ -31,11 +31,6 @@ public class KerbalSimPit : MonoBehaviour
 
     private static KSPSerialPort[] SerialPorts;
 
-    private static EventHandler<KSPSerialPortEventArgs>[] FromDeviceEvents =
-        new EventHandler<KSPSerialPortEventArgs>[255];
-
-    private KerbalSimPitProvider[] ToDeviceClasses =
-        new KerbalSimPitProvider[255];
     private static List<ToDeviceCallback> RegularEventList =
         new List<ToDeviceCallback>(255);
     private bool DoEventDispatching = false;
@@ -48,7 +43,7 @@ public class KerbalSimPit : MonoBehaviour
         for (int i=254; i>=0; i--)
         {
             onSerialReceivedArray[i] = new EventData<byte, object>(String.Format("onSerialReceived{0}", i));
-            toSerialArray[i] = new EventData<object>(String.Format("toSerial{0}", i));
+            toSerialArray[i] = new EventData<byte, object>(String.Format("toSerial{0}", i));
         }
 
         KSPitConfig = new KerbalSimPitConfig();
@@ -58,8 +53,8 @@ public class KerbalSimPit : MonoBehaviour
         OpenPorts();
 
         onSerialReceivedArray[0].Add(handshakeCallback);
-        AddFromDeviceHandler(3, processRegisterEvent);
-        AddFromDeviceHandler(4, processDeregisterEvent);
+        onSerialReceivedArray[3].Add(registerCallback);
+        onSerialReceivedArray[4].Add(deregisterCallback);
 
         EventDispatchThread = new Thread(EventWorker);
         EventDispatchThread.Start();
@@ -74,36 +69,6 @@ public class KerbalSimPit : MonoBehaviour
         KSPitConfig.Save();
         DoEventDispatching = false;
         Debug.Log("KerbalSimPit: Shutting down.");
-    }
-
-    // Handlers added using this function receive events only for the
-    // given index. They don't need to be selective.
-    public static void AddFromDeviceHandler(int idx, EventHandler<KSPSerialPortEventArgs> h)
-    {
-        FromDeviceEvents[idx] = h;
-    }
-
-    public static void RemoveFromDeviceHandler(int idx)
-    {
-        FromDeviceEvents[idx] = null;
-    }
-
-    // Handlers added using this function receive events from all ports.
-    // They should probably check the Type of the event args they get.
-    public static void AddFromDeviceHandler(EventHandler<KSPSerialPortEventArgs> h)
-    {
-        for (int i=SerialPorts.Length-1; i>=0; i--)
-        {
-            SerialPorts[i].InboundData += h;
-        }
-    }
-
-    public static void RemoveFromDeviceHandler(EventHandler<KSPSerialPortEventArgs> h)
-    {
-        for (int i=SerialPorts.Length-1; i>=0; i--)
-        {
-            SerialPorts[i].InboundData -= h;
-        }
     }
 
     public static void AddToDeviceHandler(ToDeviceCallback cb)
@@ -230,32 +195,25 @@ public class KerbalSimPit : MonoBehaviour
         }
     }
 
-    private void processEchoEvent(object sender, KSPSerialPortEventArgs e)
+    private void registerCallback(byte portID, object data)
     {
-        KSPSerialPort Port = (KSPSerialPort)sender;
-        if (KSPitConfig.Verbose) Debug.Log(String.Format("Echo request on port {0}. Replying.", Port.PortName));
-        Port.sendPacket(e.Type, e.Data);
-    }
-
-    private void processRegisterEvent(object sender, KSPSerialPortEventArgs e)
-    {
-        KSPSerialPort Port = (KSPSerialPort)sender;
+        byte[] payload = (byte[]) data;
         byte idx;
-        for (int i=e.Data.Length-1; i>=0; i--)
+        for (int i=payload.Length-1; i>=0; i--)
         {
-            idx = e.Data[i];
-            ToDeviceClasses[idx].SerialData += Port.ToDeviceEventHandler;
+            idx = payload[i];
+            toSerialArray[idx].Add(SerialPorts[portID].sendPacket);
         }
     }
 
-    private void processDeregisterEvent(object sender, KSPSerialPortEventArgs e)
+    private void deregisterCallback(byte portID, object data)
     {
-        KSPSerialPort Port = (KSPSerialPort)sender;
+        byte[] payload = (byte[]) data;
         byte idx;
-        for (int i=e.Data.Length-1; i>=0; i--)
+        for (int i=payload.Length-1; i>=0; i--)
         {
-            idx = e.Data[i];
-            ToDeviceClasses[idx].SerialData -= Port.ToDeviceEventHandler;
+            idx = payload[i];
+            toSerialArray[idx].Remove(SerialPorts[portID].sendPacket);
         }
     }
 }

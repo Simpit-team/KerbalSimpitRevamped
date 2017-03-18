@@ -16,8 +16,6 @@ public class KSPSerialPort
     private int BaudRate;
     public  byte ID;
 
-    public event EventHandler<KSPSerialPortEventArgs> InboundData;
-
     private SerialPort Port;
     
     // Header bytes are alternating ones and zeroes, with the exception
