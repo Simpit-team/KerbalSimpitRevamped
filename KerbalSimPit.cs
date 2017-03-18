@@ -11,6 +11,15 @@ public delegate void ToDeviceCallback();
 [KSPAddon(KSPAddon.Startup.Instantly, true)]
 public class KerbalSimPit : MonoBehaviour
 {
+    // To receive events from serial devices on channel i,
+    // register a callback for onSerialReceivedArray[i].
+    public static EventData<object>[] onSerialReceivedArray =
+        new EventData<object>[255];
+    // To send a packet on channel i, call
+    // toSerialArray[i].Fire()
+    public static EventData<object>[] toSerialArray =
+        new EventData<object>[255];
+
     [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
     public struct HandshakePacket
     {
@@ -35,10 +44,12 @@ public class KerbalSimPit : MonoBehaviour
     public void Start()
     {
         DontDestroyOnLoad(this);
-        // Subscribe to flight scene load and shutdown
-        // Shouldn't be required any more, we'll use a core provider to do it.
-        //GameEvents.onFlightReady.Add(FlightReadyHandler);
-        //GameEvents.onGameSceneSwitchRequested.Add(FlightShutdownHandler);
+
+        for (int i=254; i>=0; i--)
+        {
+            onSerialReceivedArray[i] = new EventData<object>(String.Format("onSerialReceived{0}", i));
+            toSerialArray[i] = new EventData<object>(String.Format("toSerial{0}", i));
+        }
 
         KSPitConfig = new KerbalSimPitConfig();
 

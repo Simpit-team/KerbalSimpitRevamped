@@ -250,16 +250,6 @@ public class KSPSerialPort
 
     private void OnPacketReceived(byte Type, byte[] Payload, byte Size)
     {
-        
-        EventHandler<KSPSerialPortEventArgs> handler = InboundData;
-        if (handler != null)
-        {
-            KSPSerialPortEventArgs args = new KSPSerialPortEventArgs();
-            args.Type = Type;
-            args.Data = new byte[Size];
-            Array.Copy(Payload, args.Data, Size);
-
-            handler(this, args);
-        }
+        KerbalSimPit.onSerialReceivedArray[Type].Fire(Payload);
     }
 }
