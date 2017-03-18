@@ -100,11 +100,6 @@ public class KSPSerialPort
         }
     }
 
-    public void ToDeviceEventHandler(object sender, KerbalSimPitDataEventArgs e)
-    {
-        sendPacket(e.Type, e.Data);
-    }
-
     // Send a KerbalSimPit packet
     public void sendPacket(byte Type, object Data)
     {
