@@ -4,24 +4,20 @@
 
    Peter Hardy <peter@hardy.dropbear.id.au>
 */
-
 #include "KerbalSimPit.h"
 
 KerbalSimPit mySimPit(115200);
 
 bool state = false;
-unsigned int lastSent = 0;
-int sendInterval = 1000;
+unsigned long lastSent = 0;
+unsigned int sendInterval = 1000;
 
 void setup() {
-  for (int i=0; i<14; i++) {
-    pinMode(i, OUTPUT);
-    digitalWrite(i, LOW);
-  }
   Serial.begin(115200);
+
   pinMode(13, OUTPUT);
+  digitalWrite(13, LOW);
   if(mySimPit.init()) {
-    digitalWrite(13, LOW);
     mySimPit.inboundHandler(packetHandler);
   } else {
     // Don't know what to do. Abort.
@@ -31,14 +27,15 @@ void setup() {
 }
 
 void loop() {
-  unsigned int now = millis();
-  if (now > lastSent + sendInterval) {
+  unsigned long now = millis();
+  if (now - lastSent >= sendInterval) {
     if (state) {
-      mySimPit.send(ECHO_REQ_PACKET, "high", 5);
-    } else {
       mySimPit.send(ECHO_REQ_PACKET, "low", 4);
+    } else {
+      mySimPit.send(ECHO_REQ_PACKET, "high", 5);
     }
     lastSent = now;
+    state = !state;
   }
   mySimPit.update();
 }
@@ -46,9 +43,7 @@ void loop() {
 void packetHandler(byte packetType, byte *msg, byte msgSize) {
   if (strcmp(msg, "low")) {
     digitalWrite(13, LOW);
-    state = false;
   } else {
     digitalWrite(13, HIGH);
-    state = true;
   }
 }
