@@ -100,7 +100,12 @@ public class KerbalSimPit : MonoBehaviour
         EventNotifier = delegate {
             EventCount = RegularEventList.Count;
             RegularEventList.CopyTo(EventListCopy);
-            TimeSlice = KSPitConfig.RefreshRate / EventCount;
+            if (EventCount > 0)
+            {
+                TimeSlice = KSPitConfig.RefreshRate / EventCount;
+            } else {
+                TimeSlice = KSPitConfig.RefreshRate;
+            }
             for (int i=EventCount; i>=0; --i)
             {
                 if (EventListCopy[i] != null)
