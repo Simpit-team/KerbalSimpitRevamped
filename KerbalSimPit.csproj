@@ -29,7 +29,7 @@
     <Compile Include="Src\KSPSerialPort.cs" />
     <Compile Include="Src\KerbalSimPitConfig.cs" />
     <Compile Include="Src\KerbalSimPitPackets.cs" />
-    <Compile Include="Src\Providers\CoreProviders.cs" />
+    <Compile Include="Src\Providers\*.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
