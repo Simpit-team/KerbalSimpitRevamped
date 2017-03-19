@@ -109,9 +109,14 @@ public class KSPSerialPort
         // packet[2] = payload size
         // packet[3] = packet type
         // packet[4-x] = packet payload
-        // TODO: Right now calling sendPacket with a 2 byte array as data
-        // results in buf being 30 bytes. Figure out why.
-        byte[] buf = ObjectToByteArray(Data);
+        byte[] buf;
+        if (Data.GetType().Name == "Byte[]")
+        {
+            buf = (byte[])Data;
+            Debug.Log(String.Format("KerbalSimPit: Byte array {0}", System.Text.Encoding.Default.GetString(buf)));
+        } else {
+            buf = ObjectToByteArray(Data);
+        }
         byte PayloadSize = (byte)Math.Min(buf.Length, (MaxPacketSize-4));
         byte PacketSize = (byte)(PayloadSize + 4);
         OutboundPacketBuffer[2] = PayloadSize;
@@ -243,6 +248,9 @@ public class KSPSerialPort
 
     private void OnPacketReceived(byte Type, byte[] Payload, byte Size)
     {
-        KerbalSimPit.onSerialReceivedArray[Type].Fire(ID, Payload);
+        byte[] buf = new byte[Size];
+        Array.Copy(Payload, buf, Size);
+
+        KerbalSimPit.onSerialReceivedArray[Type].Fire(ID, buf);
     }
 }
