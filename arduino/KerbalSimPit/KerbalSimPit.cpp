@@ -12,11 +12,6 @@ bool KerbalSimPit::init()
   while (!Serial);
   _outboundBuffer[0] = 0x00;
   _outboundBuffer[1] = 0x37;
-<<<<<<< Updated upstream
-=======
-  _lastPoll = 0;
-  _receiveState = WaitingFirstByte;
->>>>>>> Stashed changes
   send(0x00, _outboundBuffer, 2); // Send SYN
   while (!Serial.available());
   if (Serial.read() == 0xAA) { // First byte of header
@@ -78,7 +73,6 @@ void KerbalSimPit::update()
       break;
     case WaitingType:
       _inboundType = nextByte;
-      _receivedIndex = 0;
       _receiveState = WaitingData;
       break;
     case WaitingData:
@@ -88,10 +82,8 @@ void KerbalSimPit::update()
         _receiveState = WaitingFirstByte;
         _receivedIndex = 0;
         _packetHandler(_inboundType, _inboundBuffer, _inboundSize);
+        break;
       }
-      break;
-    case default:
-      _receivedState = WaitingFirstByte;
     }
   }
 }
