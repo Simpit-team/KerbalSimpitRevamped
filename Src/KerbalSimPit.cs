@@ -103,16 +103,16 @@ public class KerbalSimPit : MonoBehaviour
             if (EventCount > 0)
             {
                 TimeSlice = KSPitConfig.RefreshRate / EventCount;
-            } else {
-                TimeSlice = KSPitConfig.RefreshRate;
-            }
-            for (int i=EventCount; i>=0; --i)
-            {
-                if (EventListCopy[i] != null)
+                for (int i=EventCount; i>=0; --i)
                 {
-                    EventListCopy[i]();
-                    Thread.Sleep(TimeSlice);
+                    if (EventListCopy[i] != null)
+                    {
+                        EventListCopy[i]();
+                        Thread.Sleep(TimeSlice);
+                    }
                 }
+            } else {
+                Thread.Sleep(KSPitConfig.RefreshRate);
             }
         };
         DoEventDispatching = true;
