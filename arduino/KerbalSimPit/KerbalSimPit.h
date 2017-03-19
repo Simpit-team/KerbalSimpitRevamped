@@ -20,9 +20,6 @@ const byte SCENE_CHANGE_PACKET = 0x03;
 const byte REGISTER_PACKET = 0x03;
 const byte DEREGISTER_PACKET = 0x04;
 
-// How often the plugin should poll for serial data, in ms
-static byte CLAMP_TIME = 2;
-
 class KerbalSimPit
 {
  public:
@@ -39,7 +36,6 @@ class KerbalSimPit
   byte _inboundBuffer[32];
   byte _outboundBuffer[32];
   byte _outboundSize;
-  unsigned long _lastPoll;
 
   enum ReceiveState_t
   {
