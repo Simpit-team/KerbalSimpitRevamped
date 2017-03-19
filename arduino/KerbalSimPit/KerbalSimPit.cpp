@@ -12,6 +12,7 @@ bool KerbalSimPit::init()
   while (!Serial);
   _outboundBuffer[0] = 0x00;
   _outboundBuffer[1] = 0x37;
+  _lastPoll = 0;
   send(0x00, _outboundBuffer, 2); // Send SYN
   while (!Serial.available());
   if (Serial.read() == 0xAA) { // First byte of header
@@ -54,36 +55,40 @@ void KerbalSimPit::send(byte PacketType, byte *msg, byte msgSize)
 
 void KerbalSimPit::update()
 {
-  while (Serial.available()) {
-    byte nextByte = Serial.read();
-    switch (_receiveState) {
-    case WaitingFirstByte:
-      if (nextByte == 0xAA) {
-        _receiveState = WaitingSecondByte;
+  unsigned long now = millis();
+  if (now < _lastPoll + CLAMP_TIME) {
+    while (Serial.available()) {
+      byte nextByte = Serial.read();
+      switch (_receiveState) {
+      case WaitingFirstByte:
+        if (nextByte == 0xAA) {
+          _receiveState = WaitingSecondByte;
+          break;
+        }
+      case WaitingSecondByte:
+        if (nextByte == 0x50) {
+          _receiveState = WaitingSize;
+          break;
+        }
+      case WaitingSize:
+        _inboundSize = nextByte;
+        _receiveState = WaitingType;
         break;
-      }
-    case WaitingSecondByte:
-      if (nextByte == 0x50) {
-        _receiveState = WaitingSize;
+      case WaitingType:
+        _inboundType = nextByte;
+        _receiveState = WaitingData;
         break;
-      }
-    case WaitingSize:
-      _inboundSize = nextByte;
-      _receiveState = WaitingType;
-      break;
-    case WaitingType:
-      _inboundType = nextByte;
-      _receiveState = WaitingData;
-      break;
-    case WaitingData:
-      _inboundBuffer[_receivedIndex] = nextByte;
-      _receivedIndex++;
-      if (_receivedIndex == _inboundSize) {
-        _receiveState = WaitingFirstByte;
-        _receivedIndex = 0;
-        _packetHandler(_inboundType, _inboundBuffer, _inboundSize);
-        break;
+      case WaitingData:
+        _inboundBuffer[_receivedIndex] = nextByte;
+        _receivedIndex++;
+        if (_receivedIndex == _inboundSize) {
+          _receiveState = WaitingFirstByte;
+          _receivedIndex = 0;
+          _packetHandler(_inboundType, _inboundBuffer, _inboundSize);
+          break;
+        }
       }
     }
+    _lastPoll = now;
   }
 }
