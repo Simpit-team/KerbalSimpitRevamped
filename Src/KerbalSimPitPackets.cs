@@ -8,6 +8,7 @@ public static class CommonPackets
 public static class OutboundPackets
 {
     public static byte SceneChange = 0x03;
+    public static byte Altitude = 0x04;
 }
 
 public static class InboundPackets

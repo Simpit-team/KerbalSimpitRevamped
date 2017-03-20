@@ -76,9 +76,9 @@ public class KerbalSimPit : MonoBehaviour
         RegularEventList.Add(cb);
     }
 
-    public static void RemoveToDeviceHandler(ToDeviceCallback cb)
+    public static bool RemoveToDeviceHandler(ToDeviceCallback cb)
     {
-        RegularEventList.Remove(cb);
+        return RegularEventList.Remove(cb);
     }
 
     public static void SendToSerialPort(byte PortID, byte Type, object Data)
@@ -207,6 +207,10 @@ public class KerbalSimPit : MonoBehaviour
         for (int i=payload.Length-1; i>=0; i--)
         {
             idx = payload[i];
+            if (KSPitConfig.Verbose)
+            {
+                Debug.Log(String.Format("KerbalSimPit: Serial port {0} subscribing to channel {1}", portID, idx));
+            }
             toSerialArray[idx].Add(SerialPorts[portID].sendPacket);
         }
     }
