@@ -26,6 +26,7 @@ install:all
 
 clean:
 	$(XBUILD) /p:Configuration=$(CONFIG) /t:Clean
+	rm *.zip
 
 package: all
 	mkdir -p $(PACKAGEDIR)
