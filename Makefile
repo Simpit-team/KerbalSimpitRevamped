@@ -10,8 +10,8 @@ PLUGINVERSION=$(shell egrep "^[.*AssemblyVersion" Properties/AssemblyInfo.cs|cut
 PACKAGEDIR=package/KerbalSimPit
 PACKAGECONFIGDIR=$(PACKAGEDIR/PluginData/KerbalSimPit
 
-ifdef bamboo.buildNumber
-	ZIPNAME=KerbalSimPit-$(bamboo.buildNumber).zip
+ifdef PLUGINVERSION
+	ZIPNAME=KerbalSimPit-$(PLUGINVERSION).zip
 else
 	ZIPNAME=KerbalSimPit.zip
 endif
