@@ -1,10 +1,11 @@
 # Ignore output dirs
 Bin/
 obj/
+*.zip
 
 # Ignore our gathered resources
 SerialPortLib2.dll
-KSPresources/
+KSPresources
 
 # Ignore WIP bits
 junk/
