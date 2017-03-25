@@ -6,7 +6,6 @@ KSPDIR=/Users/peter/Library/Application\ Support/Steam/steamapps/common/Kerbal\ 
 INSTALLDIR=$(KSPDIR)/GameData/KerbalSimPit
 CONFIGDIR=$(INSTALLDIR)/PluginData/KerbalSimPit
 
-PLUGINVERSION=$(shell egrep "^[.*AssemblyVersion" Properties/AssemblyInfo.cs|cut -d\" -f2)
 PACKAGEDIR=package/KerbalSimPit
 PACKAGECONFIGDIR=$(PACKAGEDIR/PluginData/KerbalSimPit
 
