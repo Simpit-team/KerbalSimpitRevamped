@@ -10,6 +10,12 @@ PLUGINVERSION=$(shell egrep "^[.*AssemblyVersion" Properties/AssemblyInfo.cs|cut
 PACKAGEDIR=package/KerbalSimPit
 PACKAGECONFIGDIR=$(PACKAGEDIR/PluginData/KerbalSimPit
 
+ifdef bamboo.buildNumber
+	ZIPNAME=KerbalSimPit-$(bamboo.buildNumber).zip
+else
+	ZIPNAME=KerbalSimPit.zip
+endif
+
 all:KerbalSimPit.dll
 
 KerbalSimPit.dll:
@@ -22,4 +28,9 @@ install:all
 clean:
 	$(XBUILD) /p:Configuration=$(CONFIG) /t:Clean
 
-package: all # TODO
+package: all
+	mkdir -p $(PACKAGEDIR)
+	cp Bin/*.dll $(PACKAGEDIR)
+	cd package; zip -r -9 ../$(ZIPNAME) KerbalSimPit
+	rm -r package
+
