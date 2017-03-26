@@ -2,6 +2,7 @@
 Bin/
 obj/
 *.zip
+KerbalSimPit.version
 
 # Ignore our gathered resources
 SerialPortLib2.dll
