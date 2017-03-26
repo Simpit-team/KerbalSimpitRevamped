@@ -6,18 +6,6 @@ to enable communication with devices over a serial connection.
 It works with an accompanying [Arduino library](https://bitbucket.org/pjhardy/kerbalsimpit-arduino)
 to make building hardware devices simpler.
 
-## Getting started
-
-1. Read the "Installation" section below.
-1. Install the plugin.
-1. There is currently no supplied configuration file. Run the game
-once to generate one. It can be found in
-`GameData/KerbalSimPit/PluginData/Settings.cfg`
-1. Flash one of the [Arduino library](https://bitbucket.org/pjhardy/kerbalsimpit-arduino) example sketches to a demo board.
-1. Edit the configuration file to point to your device's serial port.
-1. Run the game again. A successful handshake should be logged to
-the `KSP.log`.
-
 ## Current status
 
 The plugin has full support for specifying multiple devices, and will
@@ -38,54 +26,10 @@ device.
 All of the functionality for serial devices registering and deregistering
 from channels is implemented but not heavily tested.
 
-### Operating system compatibility
+## Usage
 
-I regularly test this plugin on MacOS and Linux (64 bit Debian).
-
-This plugin is supported and working on Windows 10. Other versions of
-Windows are untested (and I don't have access to them to support them).
-
-### Hardware compatibility
-
-Unfortunately, not all devices work properly on all platforms.
-
-#### Official Arduino Uno, Mega and compatible
-
-These boards (and others that use an ATmega8U2 for USB-serial) *do not work*
-in Windows 10. There seems to be something odd in the interaction between
-the Windows driver and the mono runtime used by the game. Note that I've
-tested these boards successfully in both Linux and MacOS, it's purely a
-Windows issue.
-
-Suggested solutions for this:
-
-* Go for Arduino compatible boards that do not use an ATmega8U2. Cheaper
-Arduino compatibles use the popular CH340G serial chip, which works fine.
-* Buy a serial breakout board. I've personally used the [SparkFun CH340G breakout](https://www.sparkfun.com/products/14050), but there's plenty of
-equivalents available from AliExpress.
-
-#### Arduino compatible boards with CH340G serial chipset
-
-These boards work properly on all platforms.
-
-#### Teensy 3.2
-
-My Teensy currently does not successfully handshake with the plugin onMacOS.
-No idea why yet. It performs properly on other platforms.
-
-Tested using Arduino 1.8.1 and TeensyDuino 1.35. Ensure "USB Type" is set to
-"Serial".
-
-#### FTDI serial adapters
-
-I've successfully tested an Arduino Pro Mini using an FTL-232R-5V cable on
-all supported platforms. Other devices using the FT232 chip should also run
-fine.
-
-### KSP compatibility
-
-This plugin is developed against KSP version 1.2.9. Other versions are not
-supported.
+Refer to the [https://bitbucket.org/pjhardy/kerbalsimpit/wiki/Home](wiki)
+for installation and usage.
 
 ## TODO
 
@@ -106,10 +50,6 @@ connections, each with individual input and output configuration.
 * Easily extensible. New functionality should be provided to the plugin by
 including small classes with a well-defined interface. It should also
 support extending capabilities by external add-ons.
-
-## Installing
-
-1. Don't.
 
 ## Building
 
