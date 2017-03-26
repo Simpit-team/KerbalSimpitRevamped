@@ -4,6 +4,7 @@ define(`PATCHVER', `0')dnl
 {
   "NAME": "Kerbal Sim Pit",
   "URL": "https://hardy.dropbear.id.au/KerbalSimPit/KerbalSimPit.version",
+  "DOWNLOAD": "https://hardy.dropbear.id.au/KerbalSimPit/pool/KerbalSimPit-BUILDVER.zip",
   "VERSION": {
     "MAJOR": MAJORVER,
     "MINOR": MINORVER,
