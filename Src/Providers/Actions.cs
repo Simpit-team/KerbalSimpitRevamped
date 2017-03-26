@@ -41,10 +41,10 @@ public class KerbalSimPitActionProvider : MonoBehaviour
         {
             if (StageState)
             {
-                if (KerbalSimPit.KSPitConfig.Verbose) Debug.Log("KerbalSimPit: Staging!");
+                if (KerbalSimPit.Config.Verbose) Debug.Log("KerbalSimPit: Staging!");
                 fireStage = true;
             } else {
-                if (KerbalSimPit.KSPitConfig.Verbose) Debug.Log("KerbalSimPit: Not staging");
+                if (KerbalSimPit.Config.Verbose) Debug.Log("KerbalSimPit: Not staging");
             }
             oldStageState = StageState;
         }

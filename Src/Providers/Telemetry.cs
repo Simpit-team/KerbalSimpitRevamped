@@ -27,7 +27,7 @@ public class KerbalSimPitTelemetryProvider : MonoBehaviour
     {
         if (KerbalSimPit.RemoveToDeviceHandler(AltitudeProvider))
         {
-            if (KerbalSimPit.KSPitConfig.Verbose)
+            if (KerbalSimPit.Config.Verbose)
             {
                 Debug.Log("KerbalSimPit: Succesfully removed AltitudeProvider");
             } else {

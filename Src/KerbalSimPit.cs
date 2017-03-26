@@ -27,7 +27,7 @@ public class KerbalSimPit : MonoBehaviour
         public byte Payload;
     }
 
-    public static KerbalSimPitConfig KSPitConfig;
+    public static KerbalSimPitConfig Config;
 
     private static KSPSerialPort[] SerialPorts;
 
@@ -46,10 +46,10 @@ public class KerbalSimPit : MonoBehaviour
             toSerialArray[i] = new EventData<byte, object>(String.Format("toSerial{0}", i));
         }
 
-        KSPitConfig = new KerbalSimPitConfig();
+        Config = new KerbalSimPitConfig();
 
-        SerialPorts = createPortList(KSPitConfig);
-        if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: Found {0} serial ports", SerialPorts.Length));
+        SerialPorts = createPortList(Config);
+        if (Config.Verbose) Debug.Log(String.Format("KerbalSimPit: Found {0} serial ports", SerialPorts.Length));
         OpenPorts();
 
         onSerialReceivedArray[CommonPackets.Synchronisation].Add(handshakeCallback);
@@ -66,7 +66,7 @@ public class KerbalSimPit : MonoBehaviour
     public void OnDestroy()
     {
         ClosePorts();
-        KSPitConfig.Save();
+        Config.Save();
         DoEventDispatching = false;
         Debug.Log("KerbalSimPit: Shutting down.");
     }
@@ -102,7 +102,7 @@ public class KerbalSimPit : MonoBehaviour
             RegularEventList.CopyTo(EventListCopy);
             if (EventCount > 0)
             {
-                TimeSlice = KSPitConfig.RefreshRate / EventCount;
+                TimeSlice = Config.RefreshRate / EventCount;
                 for (int i=EventCount; i>=0; --i)
                 {
                     if (EventListCopy[i] != null)
@@ -112,7 +112,7 @@ public class KerbalSimPit : MonoBehaviour
                     }
                 }
             } else {
-                Thread.Sleep(KSPitConfig.RefreshRate);
+                Thread.Sleep(Config.RefreshRate);
             }
         };
         DoEventDispatching = true;
@@ -163,9 +163,9 @@ public class KerbalSimPit : MonoBehaviour
         {
             if (SerialPorts[i].open())
             {
-                if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: Opened {0}", SerialPorts[i].PortName));
+                if (Config.Verbose) Debug.Log(String.Format("KerbalSimPit: Opened {0}", SerialPorts[i].PortName));
             } else {
-                if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: Unable to open {0}", SerialPorts[i].PortName));
+                if (Config.Verbose) Debug.Log(String.Format("KerbalSimPit: Unable to open {0}", SerialPorts[i].PortName));
             }
         }
     }
@@ -185,12 +185,12 @@ public class KerbalSimPit : MonoBehaviour
         switch(payload[0])
         {
             case 0x00:
-                if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYN received on port {0}. Replying.", SerialPorts[portID].PortName));
+                if (Config.Verbose) Debug.Log(String.Format("KerbalSimPit: SYN received on port {0}. Replying.", SerialPorts[portID].PortName));
                 hs.HandShakeType = 0x01;
                 SerialPorts[portID].sendPacket(CommonPackets.Synchronisation, hs);
                 break;
             case 0x01:
-                if (KSPitConfig.Verbose) Debug.Log(String.Format("KerbalSimPit: SYNACK received on port {0}. Replying.", SerialPorts[portID].PortName));
+                if (Config.Verbose) Debug.Log(String.Format("KerbalSimPit: SYNACK received on port {0}. Replying.", SerialPorts[portID].PortName));
                 hs.HandShakeType = 0x02;
                 SerialPorts[portID].sendPacket(CommonPackets.Synchronisation, hs);
                 break;
@@ -207,7 +207,7 @@ public class KerbalSimPit : MonoBehaviour
         for (int i=payload.Length-1; i>=0; i--)
         {
             idx = payload[i];
-            if (KSPitConfig.Verbose)
+            if (Config.Verbose)
             {
                 Debug.Log(String.Format("KerbalSimPit: Serial port {0} subscribing to channel {1}", portID, idx));
             }
