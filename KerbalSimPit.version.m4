@@ -3,6 +3,7 @@ define(`MINORVER', `0')dnl
 define(`PATCHVER', `0')dnl
 {
   "NAME": "Kerbal Sim Pit",
+  "URL": "https://hardy.dropbear.id.au/KerbalSimPit/KerbalSimPit.version",
   "VERSION": {
     "MAJOR": MAJORVER,
     "MINOR": MINORVER,
