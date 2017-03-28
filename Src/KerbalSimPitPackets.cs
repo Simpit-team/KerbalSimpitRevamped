@@ -15,4 +15,7 @@ public static class InboundPackets
 {
     public static byte RegisterHandler = 0x03;
     public static byte DeregisterHandler = 0x04;
+    public static byte StageEvent = 0x05;
+    public static byte AGEnable = 0x06;
+    public static byte AGDisable = 0x07;
 }
