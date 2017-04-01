@@ -36,17 +36,22 @@ public class KerbalSimPitActionProvider : MonoBehaviour
 
     public void stageCallback(byte ID, object Data)
     {
-        bool StageState = ((byte[])Data)[0] > 0;
-        if (StageState != oldStageState)
+        byte[] payload = (byte[])Data;
+        bool StageState;
+        for (int i=payload.Length; i>=0; --i)
         {
-            if (StageState)
+            StageState = payload[i] > 0;
+            if (StageState != oldStageState)
             {
-                if (KerbalSimPit.Config.Verbose) Debug.Log("KerbalSimPit: Staging!");
-                fireStage = true;
-            } else {
-                if (KerbalSimPit.Config.Verbose) Debug.Log("KerbalSimPit: Not staging");
+                if (StageState)
+                {
+                    if (KerbalSimPit.Config.Verbose) Debug.Log("KerbalSimPit: Staging!");
+                    fireStage = true;
+                } else {
+                    if (KerbalSimPit.Config.Verbose) Debug.Log("KerbalSimPit: Not staging");
+                }
+                oldStageState = StageState;
             }
-            oldStageState = StageState;
         }
     }
 }
