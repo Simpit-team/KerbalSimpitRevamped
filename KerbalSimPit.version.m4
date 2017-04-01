@@ -1,5 +1,5 @@
 define(`MAJORVER', `0')dnl
-define(`MINORVER', `2')dnl
+define(`MINORVER', `3')dnl
 define(`PATCHVER', `0')dnl
 {
   "NAME": "Kerbal Sim Pit",
