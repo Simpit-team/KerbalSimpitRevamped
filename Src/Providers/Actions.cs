@@ -38,7 +38,8 @@ public class KerbalSimPitActionProvider : MonoBehaviour
     {
         byte[] payload = (byte[])Data;
         bool StageState;
-        for (int i=payload.Length; i>=0; --i)
+
+        for (int i=payload.Length-1; i>=0; i--)
         {
             StageState = payload[i] > 0;
             if (StageState != oldStageState)
