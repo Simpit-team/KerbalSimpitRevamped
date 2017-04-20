@@ -70,7 +70,7 @@ public class KerbalSimPitCAGProvider : MonoBehaviour
     {
         byte[] groupIDs = (byte[])Data;
         int idx;
-        for (int i=groupIDs.Length; i>=0; i--)
+        for (int i=groupIDs.Length-1; i>=0; i--)
         {
             idx = (int)groupIDs[i];
             if (AGXPresent)
@@ -87,7 +87,7 @@ public class KerbalSimPitCAGProvider : MonoBehaviour
     {
         byte[] groupIDs = (byte[])Data;
         int idx;
-        for (int i=groupIDs.Length; i>=0; i--)
+        for (int i=groupIDs.Length-1; i>=0; i--)
         {
             idx = (int)groupIDs[i];
             if (AGXPresent)
