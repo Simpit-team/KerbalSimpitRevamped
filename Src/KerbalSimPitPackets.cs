@@ -18,4 +18,5 @@ public static class InboundPackets
     public static byte StageEvent = 0x05;
     public static byte AGEnable = 0x06;
     public static byte AGDisable = 0x07;
+    public static byte AGToggle = 0x08;
 }

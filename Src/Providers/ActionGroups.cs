@@ -6,7 +6,8 @@ using UnityEngine;
 [KSPAddon(KSPAddon.Startup.Flight, false)]
 public class KerbalSimPitCAGProvider : MonoBehaviour
 {
-    private EventData<byte, object> enableChannel, disableChannel;
+    private EventData<byte, object> enableChannel, disableChannel,
+        toggleChannel;
     private static bool AGXPresent;
     private static Type AGXExternal;
     
@@ -33,12 +34,15 @@ public class KerbalSimPitCAGProvider : MonoBehaviour
         if (enableChannel != null) enableChannel.Add(enableCAGCallback);
         disableChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived7");
         if (disableChannel != null) disableChannel.Add(disableCAGCallback);
+        toggleChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived8");
+        if (toggleChannel != null) disableChannel.Add(toggleCAGCallback);
     }
 
     public void OnDestroy()
     {
         if (enableChannel != null) enableChannel.Remove(enableCAGCallback);
         if (disableChannel != null) disableChannel.Remove(disableCAGCallback);
+        if (toggleChannel != null) toggleChannel.Remove(toggleCAGCallback);
     }
 
     public static bool AGXInstalled()
@@ -54,13 +58,25 @@ public class KerbalSimPitCAGProvider : MonoBehaviour
         }
     }
 
-    public static bool AGXActivateGroupDelayCheck(int group, bool forceDir)
+    private static bool AGXActivateGroupDelayCheck(int group, bool forceDir)
     {
         if (AGXPresent)
         {
             return (bool)AGXExternal.InvokeMember("AGXActivateGroupDelayCheck",
                      BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Static,
                      null, null, new System.Object[] { group, forceDir});
+        } else {
+            return false;
+        }
+    }
+
+    private static bool AGXToggleGroupDelayCheck(int group)
+    {
+        if (AGXPresent)
+        {
+            return (bool)AGXExternal.InvokeMember("AGXToggleGroupDelayCheck",
+                     BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Static,
+                     null, null, new System.Object[] { group });
         } else {
             return false;
         }
@@ -96,6 +112,23 @@ public class KerbalSimPitCAGProvider : MonoBehaviour
             } else {
                 FlightGlobals.ActiveVessel.ActionGroups.SetGroup
                     (ActionGroupIDs[idx], false);
+            }
+        }
+    }
+
+    public void toggleCAGCallback(byte ID, object Data)
+    {
+        byte[] groupIDs = (byte[])Data;
+        int idx;
+        for (int i=groupIDs.Length-1; i>=0; i--)
+        {
+            idx = (int)groupIDs[i];
+            if (AGXPresent)
+            {
+                AGXToggleGroupDelayCheck(idx);
+            } else {
+                FlightGlobals.ActiveVessel.ActionGroups.ToggleGroup
+                    (ActionGroupIDs[idx]);
             }
         }
     }
