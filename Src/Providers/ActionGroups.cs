@@ -35,7 +35,7 @@ public class KerbalSimPitCAGProvider : MonoBehaviour
         disableChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived7");
         if (disableChannel != null) disableChannel.Add(disableCAGCallback);
         toggleChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived8");
-        if (toggleChannel != null) disableChannel.Add(toggleCAGCallback);
+        if (toggleChannel != null) toggleChannel.Add(toggleCAGCallback);
     }
 
     public void OnDestroy()
