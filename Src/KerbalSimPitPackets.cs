@@ -19,6 +19,19 @@ public static class InboundPackets
     public static byte CAGEnable = 6;
     public static byte CAGDisable = 7;
     public static byte CAGToggle = 8;
-    public static byte ActionGroupEnable = 9;
-    public static byte ActionGroupDisable = 10;
+    public static byte ActionGroupActivate = 9;
+    public static byte ActionGroupDeactivate = 10;
+}
+
+public static class ActionGroupBits
+{
+    // This is the same order given in
+    // https://kerbalspaceprogram.com/api/_base_action_8cs.html
+    public static byte StageBit = 1;
+    public static byte GearBit = 2;
+    public static byte LightBit = 4;
+    public static byte RCSBit = 8;
+    public static byte SASBit = 16;
+    public static byte BrakesBit = 32;
+    public static byte AbortBit = 64;
 }
