@@ -131,7 +131,7 @@ public class KerbalSimPitActionProvider : MonoBehaviour
             }
             if ((toggleBuffer & ActionGroupBits.LightBit) != 0)
             {
-                if (KerbalSimPit.Config.Verbose) Debug.Log("KerbalSimPit: Toggling light";
+                if (KerbalSimPit.Config.Verbose) Debug.Log("KerbalSimPit: Toggling light");
                 av.ActionGroups.ToggleGroup(KSPActionGroup.Light);
             }
             if ((toggleBuffer & ActionGroupBits.RCSBit) != 0)
