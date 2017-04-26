@@ -9,8 +9,8 @@
     "BUILD": BUILDVER
   },
   "KSP_VERSION": {
-    "MAJOR": 1,
-    "MINOR": 2,
-    "PATCH": 9
+    "MAJOR": KSPMAJORVER,
+    "MINOR": KSPMINORVER,
+    "PATCH": KSPPATCHVER
   }
 }
