@@ -32,7 +32,7 @@ clean:
 	rm -f *.zip
 
 KerbalSimPit.version:
-	m4 -DBUILDVER=$(BUILDVERSION) KerbalSimPit.version.m4 > KerbalSimPit.version
+	m4 -DBUILDVER=$(BUILDVERSION) version.m4 KerbalSimPit.version.m4 > KerbalSimPit.version
 
 package: all KerbalSimPit.version
 	mkdir -p $(PACKAGEDIR)
