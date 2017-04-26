@@ -19,7 +19,7 @@ endif
 
 all:KerbalSimPit.dll
 
-KerbalSimPit.dll:
+KerbalSimPit.dll:Properties/AssemblyInfo.cs
 	$(XBUILD) /p:Configuration=$(CONFIG)
 
 install:all
@@ -29,10 +29,14 @@ install:all
 clean:
 	$(XBUILD) /p:Configuration=$(CONFIG) /t:Clean
 	rm -f KerbalSimPit.version
+	rm -f Properties/AssemblyInfo.cs
 	rm -f *.zip
 
 KerbalSimPit.version:
-	m4 -DBUILDVER=$(BUILDVERSION) version.m4 KerbalSimPit.version.m4 > KerbalSimPit.version
+	m4 -DBUILDVER=$(BUILDVERSION) version-info.m4 KerbalSimPit.version.m4 > KerbalSimPit.version
+
+Properties/AssemblyInfo.cs:
+	m4 -DBUILDVER=$(BUILDVERSION) version-info.m4 Properties/AssemblyInfo.cs.m4 > Properties/AssemblyInfo.cs
 
 package: all KerbalSimPit.version
 	mkdir -p $(PACKAGEDIR)
