@@ -1,8 +1,9 @@
-# Ignore output dirs
+# Ignore generated files/directories
 Bin/
 obj/
 *.zip
 KerbalSimPit.version
+Properties/AssemblyInfo.cs
 
 # Ignore our gathered resources
 SerialPortLib2.dll
