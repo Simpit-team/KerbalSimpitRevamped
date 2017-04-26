@@ -17,6 +17,15 @@ Kerbal Sim Pit is entirely developed and built using command-line utilities.
 IDEs such as Visual Studio and MonoDevelop / Xamarin Studio aren't really
 supported, and some minor work is required to compile using them.
 
+### Dependencies
+
+Kerbal Sim Pit depends on
+[SerialPortLib2](https://github.com/phardy/SerialPortLib2). My fork of this
+project makes no changes apart from targetting .NET 3.5. The csproj file
+for Kerbal Sim Pit is hardcoded to look for SerialPortLib2.dll in the
+root KerbalSimPit project directory. Either copy/link the dll there, or
+update the references in the csproj to point to the correct location.
+
 ### Compilation prerequisites
 
 Ensure the following utilites are installed:
