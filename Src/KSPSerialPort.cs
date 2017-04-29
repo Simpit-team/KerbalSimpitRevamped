@@ -95,7 +95,8 @@ public class KSPSerialPort
                     SerialThread.Start();
                     while (!SerialThread.IsAlive);
                 } else {
-                    // TODO: Set up DataReceived event handler here
+                    // TODO: Check this and make sure we're using the right event.
+                    Port.DataReceived += DataReceivedEventHandler;
                 }
             }
             catch (Exception e)
@@ -115,7 +116,7 @@ public class KSPSerialPort
                 DoSerialRead = false;
                 Thread.Sleep(500);
             } else {
-                // TODO: Clean up DataReceived event handler here
+                Port.DataReceived -= DataReceivedEventHandler;
             }
             Port.Close();
         }
@@ -147,6 +148,18 @@ public class KSPSerialPort
         {
             Port.Write(OutboundPacketBuffer, 0, PacketSize);
         }
+    }
+
+    public void DataReceivedEventHandler(object sender, SerialDataReceivedEventArgs args)
+    {
+        byte[] buffer = new byte[MaxPacketSize];
+        int idx = 0;
+        while (Port.BytesToRead > 0 && idx < MaxPacketSize)
+        {
+            buffer[idx] = (byte)Port.ReadByte();
+            idx++;
+        }
+        ReceivedDataEvent(buffer, idx);
     }
 
     // Send arbitrary data. Shouldn't be used.
