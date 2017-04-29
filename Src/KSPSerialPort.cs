@@ -110,8 +110,13 @@ public class KSPSerialPort
     public void close() {
         if (Port.IsOpen)
         {
-            DoSerialRead = false;
-            Thread.Sleep(500);
+            if (DoSerialRead)
+            {
+                DoSerialRead = false;
+                Thread.Sleep(500);
+            } else {
+                // TODO: Clean up DataReceived event handler here
+            }
             Port.Close();
         }
     }
