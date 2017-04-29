@@ -69,6 +69,17 @@ public class KSPSerialPort
 
         Port = new SerialPort(PortName, BaudRate, Parity.None,
                               8, StopBits.One, false);
+
+        if (System.Text.RegularExpressions.Regex.IsMatch(pn, "^COM[0-9]?",
+                        System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+        {
+            if (KerbalSimPit.Config.Verbose)
+                Debug.Log(String.Format("KerbalSimPit: Using DataReceived event handler for {0}", pn));
+        } else {
+            if (KerbalSimPit.Config.Verbose)
+                Debug.Log(String.Format("KerbalSimPit: Using async reader thread for {0}", pn));
+            DoSerialRead = true;
+        }       
     }
 
     // Open the serial port
@@ -78,9 +89,14 @@ public class KSPSerialPort
             try
             {
                 Port.Open();
-                SerialThread = new Thread(ReaderWorker);;
-                SerialThread.Start();
-                while (!SerialThread.IsAlive);
+                if (DoSerialRead)
+                {
+                    SerialThread = new Thread(ReaderWorker);;
+                    SerialThread.Start();
+                    while (!SerialThread.IsAlive);
+                } else {
+                    // TODO: Set up DataReceived event handler here
+                }
             }
             catch (Exception e)
             {
