@@ -24,7 +24,8 @@ KerbalSimPit.dll:Properties/AssemblyInfo.cs
 
 install:all
 	cp Bin/KerbalSimPit.dll $(INSTALLDIR)
-	cp Bin/SerialPortLib2.dll $(INSTALLDIR)
+	cp Bin/PsimaxSerial.dll $(INSTALLDIR)
+	cp Bin/Mono.Posix.dll $(INSTALLDIR)
 
 clean:
 	$(XBUILD) /p:Configuration=$(CONFIG) /t:Clean

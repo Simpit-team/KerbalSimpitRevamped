@@ -19,8 +19,12 @@
       <HintPath>KSPResources\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="SerialPortLib2">
-      <HintPath>./SerialPortLib2.dll</HintPath>
+    <Reference Include="PsimaxSerial">
+      <HintPath>./PsimaxSerial.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Posix">
+      <HintPath>./Mono.Posix.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>

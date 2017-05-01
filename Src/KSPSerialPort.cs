@@ -8,7 +8,7 @@ using System.Threading;
 using KSP.IO;
 using UnityEngine;
 
-using SerialPortLib2.Port;
+using Psimax.IO.Ports;
 
 public class KSPSerialPort
 {
@@ -71,7 +71,7 @@ public class KSPSerialPort
         Array.Copy(PacketHeader, OutboundPacketBuffer, PacketHeader.Length);
 
         Port = new SerialPort(PortName, BaudRate, Parity.None,
-                              8, StopBits.One, false);
+                              8, StopBits.One);
 
         if (System.Text.RegularExpressions.Regex.IsMatch(pn, "^COM[0-9]?",
                         System.Text.RegularExpressions.RegexOptions.IgnoreCase))
@@ -92,11 +92,11 @@ public class KSPSerialPort
             try
             {
                 Port.Open();
-                if (DoSerialRead)
+                if (isWindows)
                 {
-                    SerialThread = new Thread(AsyncReaderWorker);
-                } else {
                     SerialThread = new Thread(SerialPollingWorker);
+                } else {
+                    SerialThread = new Thread(AsyncReaderWorker);
                 }
                 SerialThread.Start();
                 while (!SerialThread.IsAlive);

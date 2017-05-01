@@ -6,7 +6,8 @@ KerbalSimPit.version
 Properties/AssemblyInfo.cs
 
 # Ignore our gathered resources
-SerialPortLib2.dll
+Mono.Posix.dll
+PsimaxSerial.dll
 KSPresources
 
 # Ignore WIP bits
