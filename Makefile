@@ -33,10 +33,10 @@ clean:
 	rm -f Properties/AssemblyInfo.cs
 	rm -f *.zip
 
-KerbalSimPit.version:
+KerbalSimPit.version:KerbalSimPit.version.m4 version-info.m4
 	m4 -DBUILDVER=$(BUILDVERSION) version-info.m4 KerbalSimPit.version.m4 > KerbalSimPit.version
 
-Properties/AssemblyInfo.cs:
+Properties/AssemblyInfo.cs:Properties/AssemblyInfo.cs.m4 version-info.m4
 	m4 -DBUILDVER=$(BUILDVERSION) version-info.m4 Properties/AssemblyInfo.cs.m4 > Properties/AssemblyInfo.cs
 
 package: all KerbalSimPit.version
