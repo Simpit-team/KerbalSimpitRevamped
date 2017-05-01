@@ -1,5 +1,5 @@
 define(`MAJORVER', `0')dnl
-define(`MINORVER', `6')dnl
+define(`MINORVER', `7')dnl
 define(`PATCHVER', `0')dnl
 
 define(`KSPMAJORVER', `1')dnl
