@@ -132,7 +132,6 @@ public class KSPSerialPort
         if (Data.GetType().Name == "Byte[]")
         {
             buf = (byte[])Data;
-            Debug.Log(String.Format("KerbalSimPit: Byte array {0}", System.Text.Encoding.Default.GetString(buf)));
         } else {
             buf = ObjectToByteArray(Data);
         }
@@ -202,15 +201,12 @@ public class KSPSerialPort
         SerialRead = delegate {
             try
             {
-                Debug.Log("KerbalSimPit: Polling");
                 int actualLength = Port.BytesToRead;
-                Debug.Log(String.Format("KerbalSimPit: {0} bytes to read", actualLength));
                 if (actualLength > 0)
                 {
                     byte[] received = new byte[actualLength];
                     Port.Read(received, 0, actualLength);
                     ReceivedDataEvent(received, actualLength);
-                    Debug.Log(String.Format("KerbalSimPit: Received {0} bytes", actualLength));
                 }
             }
             catch(System.IO.IOException exc)
@@ -235,12 +231,6 @@ public class KSPSerialPort
         SerialRead = delegate {
             try
             {
-                // FIXME: This is probably generating a lot of garbage.
-                if (isWindows)
-                {
-                    Debug.Log("KerbalSimPit: Wiping buffer");
-                    buffer = new byte[MaxPacketSize];
-                }
                 Port.BaseStream.BeginRead(buffer, 0, buffer.Length, delegate(IAsyncResult ar) {
                         try
                         {
@@ -248,7 +238,6 @@ public class KSPSerialPort
                             byte[] received = new byte[actualLength];
                             Buffer.BlockCopy(buffer, 0, received, 0, actualLength);
                             ReceivedDataEvent(received, actualLength);
-                            Debug.Log(String.Format("KerbalSimPit: Received {0} bytes", actualLength));
                         }
                         catch(System.IO.IOException exc)
                         {
@@ -263,7 +252,7 @@ public class KSPSerialPort
             }
         };
         DoSerialRead = true;
-        Debug.Log(String.Format("KerbalSimPit: Starting read thread for port {0}", PortName));
+        Debug.Log(String.Format("KerbalSimPit: Starting async read thread for port {0}", PortName));
         while (DoSerialRead)
         {
             SerialRead();
