@@ -44,6 +44,9 @@ public class KSPSerialPort
     private volatile bool DoSerialRead;
     private Thread SerialThread;
 
+    // If we're opening a COM serial port, assume we're running on Windows.
+    private bool isWindows = false;
+
     // Constructors:
     // pn: port number
     // br: baud rate
@@ -73,13 +76,13 @@ public class KSPSerialPort
         if (System.Text.RegularExpressions.Regex.IsMatch(pn, "^COM[0-9]?",
                         System.Text.RegularExpressions.RegexOptions.IgnoreCase))
         {
+            isWindows = true;
             if (KerbalSimPit.Config.Verbose)
-                Debug.Log(String.Format("KerbalSimPit: Using DataReceived event handler for {0}", pn));
+                Debug.Log(String.Format("KerbalSimPit: Using serial polling thread for {0}", pn));
         } else {
             if (KerbalSimPit.Config.Verbose)
                 Debug.Log(String.Format("KerbalSimPit: Using async reader thread for {0}", pn));
-            DoSerialRead = true;
-        }       
+        }
     }
 
     // Open the serial port
@@ -91,13 +94,12 @@ public class KSPSerialPort
                 Port.Open();
                 if (DoSerialRead)
                 {
-                    SerialThread = new Thread(ReaderWorker);;
-                    SerialThread.Start();
-                    while (!SerialThread.IsAlive);
+                    SerialThread = new Thread(AsyncReaderWorker);
                 } else {
-                    // TODO: Check this and make sure we're using the right event.
-                    Port.DataReceived += DataReceivedEventHandler;
+                    SerialThread = new Thread(SerialPollingWorker);
                 }
+                SerialThread.Start();
+                while (!SerialThread.IsAlive);
             }
             catch (Exception e)
             {
@@ -111,13 +113,8 @@ public class KSPSerialPort
     public void close() {
         if (Port.IsOpen)
         {
-            if (DoSerialRead)
-            {
-                DoSerialRead = false;
-                Thread.Sleep(500);
-            } else {
-                Port.DataReceived -= DataReceivedEventHandler;
-            }
+            DoSerialRead = false;
+            Thread.Sleep(500);
             Port.Close();
         }
     }
@@ -199,14 +196,51 @@ public class KSPSerialPort
         return arr;
     }
 
+    private void SerialPollingWorker()
+    {
+        Action SerialRead = null;
+        SerialRead = delegate {
+            try
+            {
+                Debug.Log("KerbalSimPit: Polling");
+                int actualLength = Port.BytesToRead;
+                Debug.Log(String.Format("KerbalSimPit: {0} bytes to read", actualLength));
+                if (actualLength > 0)
+                {
+                    byte[] received = new byte[actualLength];
+                    Port.Read(received, 0, actualLength);
+                    ReceivedDataEvent(received, actualLength);
+                    Debug.Log(String.Format("KerbalSimPit: Received {0} bytes", actualLength));
+                }
+            }
+            catch(System.IO.IOException exc)
+            {
+                Debug.Log(String.Format("KerbalSimPit: IOException in serial worker for {0}: {1}", PortName, exc.ToString()));
+            }
+            Thread.Sleep(10); // TODO: Tune this.
+        };
+        DoSerialRead = true;
+        Debug.Log(String.Format("KerbalSimPit: Starting poll thread for port {0}", PortName));
+        while (DoSerialRead)
+        {
+            SerialRead();
+        }
+    }
+
     // This method spawns a new thread to read data from the serial connection
-    private void ReaderWorker()
+    private void AsyncReaderWorker()
     {
         byte[] buffer = new byte[MaxPacketSize];
         Action SerialRead = null;
         SerialRead = delegate {
             try
             {
+                // FIXME: This is probably generating a lot of garbage.
+                if (isWindows)
+                {
+                    Debug.Log("KerbalSimPit: Wiping buffer");
+                    buffer = new byte[MaxPacketSize];
+                }
                 Port.BaseStream.BeginRead(buffer, 0, buffer.Length, delegate(IAsyncResult ar) {
                         try
                         {
@@ -214,6 +248,7 @@ public class KSPSerialPort
                             byte[] received = new byte[actualLength];
                             Buffer.BlockCopy(buffer, 0, received, 0, actualLength);
                             ReceivedDataEvent(received, actualLength);
+                            Debug.Log(String.Format("KerbalSimPit: Received {0} bytes", actualLength));
                         }
                         catch(System.IO.IOException exc)
                         {
