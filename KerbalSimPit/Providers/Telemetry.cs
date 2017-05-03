@@ -3,6 +3,8 @@ using System.Runtime.InteropServices;
 using KSP.IO;
 using UnityEngine;
 
+using KerbalSimPit.External;
+
 namespace KerbalSimPit.Providers
 {
     [KSPAddon(KSPAddon.Startup.Flight, false)]
@@ -22,6 +24,13 @@ namespace KerbalSimPit.Providers
             public float apoapsis;
         }
 
+        [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
+        public struct StagedResourceStruct
+        {
+            public float total;
+            public float stage;
+        }
+
         private AltitudeStruct myAlt;
         private ApsidesStruct myApsides;
 
@@ -30,6 +39,11 @@ namespace KerbalSimPit.Providers
 
         public void Start()
         {
+            ARPWrapper.InitKSPARPWrapper();
+            if (!ARPWrapper.APIReady)
+            {
+                Debug.Log("KerbalSimPit: AlternateResourcePanel not found. Resource providers WILL NOT WORK.");
+            }
             KSPit.AddToDeviceHandler(AltitudeProvider);
             altitudeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial4");
             KSPit.AddToDeviceHandler(ApsidesProvider);

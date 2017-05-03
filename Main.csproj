@@ -32,6 +32,7 @@
     <Compile Include="KerbalSimPit\KSPSerialPort.cs" />
     <Compile Include="KerbalSimPit\KerbalSimPitConfig.cs" />
     <Compile Include="KerbalSimPit\KerbalSimPitPackets.cs" />
+    <Compile Include="KerbalSimPit\External\ARPWrapper.cs" />
     <Compile Include="KerbalSimPit\Providers\*.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
