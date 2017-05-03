@@ -8,7 +8,7 @@ using System.Threading;
 using KSP.IO;
 using UnityEngine;
 
-using Psimax.IO.Ports;
+using KerbalSimPit.IO.Ports;
 
 namespace KerbalSimPit.Serial
 {

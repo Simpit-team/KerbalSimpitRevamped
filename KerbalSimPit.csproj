@@ -19,14 +19,6 @@
       <HintPath>KSPResources\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="PsimaxSerial">
-      <HintPath>./PsimaxSerial.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Mono.Posix">
-      <HintPath>./Mono.Posix.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Src\KerbalSimPit.cs" />
@@ -35,6 +27,23 @@
     <Compile Include="Src\KerbalSimPitPackets.cs" />
     <Compile Include="Src\Providers\*.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <PropertyGroup>
+    <AssemblyName>KerbalSimPitSerial</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <OutputType>Library</OutputType>
+    <OutputPath>Bin\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mono.Posix">
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Src\KerbalSimPit.IO.Ports\SerialPort.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
