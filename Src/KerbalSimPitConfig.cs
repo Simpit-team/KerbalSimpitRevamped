@@ -5,120 +5,123 @@ using System.Reflection;
 
 using UnityEngine;
 
-public class SerialPortNode
+namespace KerbalSimPit.Config
 {
-    [Persistent]
-    public string PortName;
-    [Persistent]
-    public int BaudRate;
-
-    public SerialPortNode()
+    public class SerialPortNode
     {
-        // Nothing
+        [Persistent]
+        public string PortName;
+        [Persistent]
+        public int BaudRate;
+
+        public SerialPortNode()
+        {
+            // Nothing
+        }
+        public SerialPortNode(string pn, int br)
+        {
+            PortName = pn;
+            BaudRate = br;
+        }
     }
-    public SerialPortNode(string pn, int br)
+
+    public class KerbalSimPitConfig
     {
-        PortName = pn;
-        BaudRate = br;
-    }
-}
+        // Settings in the config file are here:
+        [Persistent]
+        public bool Verbose = false;
 
-public class KerbalSimPitConfig
-{
-    // Settings in the config file are here:
-    [Persistent]
-    public bool Verbose = false;
+        // public members that aren't persisted in the config file:
+        public int EventQueueSize = 32;
+        public int RefreshRate = 80;
 
-    // public members that aren't persisted in the config file:
-    public int EventQueueSize = 32;
-    public int RefreshRate = 80;
-
-    public List <SerialPortNode> SerialPorts = new List <SerialPortNode> {};
+        public List <SerialPortNode> SerialPorts = new List <SerialPortNode> {};
     
-    // Other internal fields follow
-    private const string SettingsNodeName = "KerbalSimPit";
-    private const string SettingsFile = "PluginData/Settings.cfg";
+        // Other internal fields follow
+        private const string SettingsNodeName = "KerbalSimPit";
+        private const string SettingsFile = "PluginData/Settings.cfg";
 
-    private string FullSettingsPath;
+        private string FullSettingsPath;
 
-    public KerbalSimPitConfig()
-    {
-        FullSettingsPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), SettingsFile).Replace("\\", "/");
-
-        if (LoadSettings())
+        public KerbalSimPitConfig()
         {
-            Debug.Log("KerbalSimPit: Settings loaded.");
+            FullSettingsPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), SettingsFile).Replace("\\", "/");
+
+            if (LoadSettings())
+            {
+                Debug.Log("KerbalSimPit: Settings loaded.");
+            }
+            else
+            {
+                Debug.Log("KerbalSimPit: Creating default settings.");
+                CreateDefaultSettings();
+            }
         }
-        else
+
+        public bool Save()
         {
-            Debug.Log("KerbalSimPit: Creating default settings.");
-            CreateDefaultSettings();
+            return SaveSettings();
         }
-    }
 
-    public bool Save()
-    {
-        return SaveSettings();
-    }
+        private bool LoadSettings()
+        {
+            if (File.Exists(FullSettingsPath))
+            {
+                try
+                {
+                    ConfigNode node = ConfigNode.Load(FullSettingsPath);
+                    ConfigNode config = node.GetNode(SettingsNodeName);
+                    ConfigNode.LoadObjectFromConfig(this, config);
+                    ConfigNode[] portNodes = config.GetNodes("SerialPort");
+                    for (int i=0; i<portNodes.Length; i++) {
+                        SerialPortNode portNode = new SerialPortNode();
+                        ConfigNode.LoadObjectFromConfig(portNode, portNodes[i]);
+                        SerialPorts.Add(portNode);
+                    }
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    Debug.Log(String.Format("KerbalSimPit: Settings file couldn't be read: {0}", e));
+                }
+            } else {
+                Debug.Log(String.Format("KerbalSimPit: Settings file not found: {0}", FullSettingsPath));
+            }
 
-    private bool LoadSettings()
-    {
-        if (File.Exists(FullSettingsPath))
+            return false;
+        }
+
+        private bool SaveSettings()
         {
             try
             {
-                ConfigNode node = ConfigNode.Load(FullSettingsPath);
-                ConfigNode config = node.GetNode(SettingsNodeName);
-                ConfigNode.LoadObjectFromConfig(this, config);
-                ConfigNode[] portNodes = config.GetNodes("SerialPort");
-                for (int i=0; i<portNodes.Length; i++) {
-                    SerialPortNode portNode = new SerialPortNode();
-                    ConfigNode.LoadObjectFromConfig(portNode, portNodes[i]);
-                    SerialPorts.Add(portNode);
+                ConfigNode node = new ConfigNode(SettingsNodeName);
+                node = ConfigNode.CreateConfigFromObject(this, node);
+                for (int i=0; i<SerialPorts.Count; i++) {
+                    ConfigNode portNode = new ConfigNode("SerialPort");
+                    portNode = ConfigNode.CreateConfigFromObject(SerialPorts[i], portNode);
+                    node.AddNode(portNode);
                 }
+                ConfigNode wrapper = new ConfigNode(SettingsNodeName);
+                wrapper.AddNode(node);
+
+                Directory.CreateDirectory(Path.GetDirectoryName(FullSettingsPath));
+                wrapper.Save(FullSettingsPath);
                 return true;
             }
             catch (Exception e)
             {
-                Debug.Log(String.Format("KerbalSimPit: Settings file couldn't be read: {0}", e));
+                Debug.Log(String.Format("KerbalSimPit: Settings file couldn't be saved: {0}", e));
             }
-        } else {
-            Debug.Log(String.Format("KerbalSimPit: Settings file not found: {0}", FullSettingsPath));
+
+            return false;
         }
 
-        return false;
-    }
-
-    private bool SaveSettings()
-    {
-        try
+        private void CreateDefaultSettings()
         {
-            ConfigNode node = new ConfigNode(SettingsNodeName);
-            node = ConfigNode.CreateConfigFromObject(this, node);
-            for (int i=0; i<SerialPorts.Count; i++) {
-                ConfigNode portNode = new ConfigNode("SerialPort");
-                portNode = ConfigNode.CreateConfigFromObject(SerialPorts[i], portNode);
-                node.AddNode(portNode);
-            }
-            ConfigNode wrapper = new ConfigNode(SettingsNodeName);
-            wrapper.AddNode(node);
-
-            Directory.CreateDirectory(Path.GetDirectoryName(FullSettingsPath));
-            wrapper.Save(FullSettingsPath);
-            return true;
+            SerialPortNode defaultPort = new SerialPortNode("/dev/ttyS0", 115200);
+            SerialPorts.Add(defaultPort);
+            SaveSettings();
         }
-        catch (Exception e)
-        {
-            Debug.Log(String.Format("KerbalSimPit: Settings file couldn't be saved: {0}", e));
-        }
-
-        return false;
-    }
-
-    private void CreateDefaultSettings()
-    {
-        SerialPortNode defaultPort = new SerialPortNode("/dev/ttyS0", 115200);
-        SerialPorts.Add(defaultPort);
-        SaveSettings();
     }
 }
