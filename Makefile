@@ -17,10 +17,13 @@ else
 	ZIPNAME=KerbalSimPit.zip
 endif
 
-all:KerbalSimPit.dll
+all:KerbalSimPitSerial.dll KerbalSimPit.dll
 
 KerbalSimPit.dll:Properties/AssemblyInfo.cs
-	$(XBUILD) /p:Configuration=$(CONFIG)
+	$(XBUILD) /p:Configuration=$(CONFIG) Main.csproj
+
+KerbalSimPitSerial.dll:
+	$(XBUILD) /p:Configuration=$(CONFIG) Serial.csproj
 
 install:all
 	cp Bin/KerbalSimPit.dll $(INSTALLDIR)
@@ -28,7 +31,8 @@ install:all
 	cp Bin/Mono.Posix.dll $(INSTALLDIR)
 
 clean:
-	$(XBUILD) /p:Configuration=$(CONFIG) /t:Clean
+	$(XBUILD) /p:Configuration=$(CONFIG) /t:Clean Main.csproj
+	$(XBUILD) /p:Configuration=$(CONFIG) /t:Clean Serial.csproj
 	rm -f KerbalSimPit.version
 	rm -f Properties/AssemblyInfo.cs
 	rm -f *.zip

@@ -1,5 +1,6 @@
 # Ignore generated files/directories
 Bin/
+SerialBin/
 obj/
 *.zip
 KerbalSimPit.version

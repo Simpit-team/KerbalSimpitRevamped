@@ -19,32 +19,22 @@
       <HintPath>KSPResources\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Src\KerbalSimPit.cs" />
-    <Compile Include="Src\KSPSerialPort.cs" />
-    <Compile Include="Src\KerbalSimPitConfig.cs" />
-    <Compile Include="Src\KerbalSimPitPackets.cs" />
-    <Compile Include="Src\Providers\*.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <PropertyGroup>
-    <AssemblyName>KerbalSimPitSerial</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <OutputType>Library</OutputType>
-    <OutputPath>Bin\</OutputPath>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System">
-      <Private>False</Private>
+    <Reference Include="KerbalSimPit.IO.Ports">
+      <HintPath>SerialBin\KerbalSimPitSerial.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Mono.Posix">
+      <HintPath>SerialBin\Mono.Posix.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Src\KerbalSimPit.IO.Ports\*.cs" />
+    <Compile Include="KerbalSimPit\KerbalSimPit.cs" />
+    <Compile Include="KerbalSimPit\KSPSerialPort.cs" />
+    <Compile Include="KerbalSimPit\KerbalSimPitConfig.cs" />
+    <Compile Include="KerbalSimPit\KerbalSimPitPackets.cs" />
+    <Compile Include="KerbalSimPit\Providers\*.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
