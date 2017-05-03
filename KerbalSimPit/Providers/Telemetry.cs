@@ -45,9 +45,9 @@ namespace KerbalSimPit.Providers
                 Debug.Log("KerbalSimPit: AlternateResourcePanel not found. Resource providers WILL NOT WORK.");
             }
             KSPit.AddToDeviceHandler(AltitudeProvider);
-            altitudeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial4");
+            altitudeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial8");
             KSPit.AddToDeviceHandler(ApsidesProvider);
-            apsidesChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial5");
+            apsidesChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial9");
         }
 
         public void OnDestroy()
