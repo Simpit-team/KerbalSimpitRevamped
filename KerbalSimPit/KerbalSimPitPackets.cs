@@ -10,8 +10,8 @@ namespace KerbalSimPit
     public static class OutboundPackets
     {
         public static byte SceneChange = 3;
-        public static byte Altitude = 4;
-        public static byte Apsides = 5;
+        public static byte Altitude = 8;
+        public static byte Apsides = 9;
     }
 
     public static class InboundPackets
