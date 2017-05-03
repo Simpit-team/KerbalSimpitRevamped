@@ -9,11 +9,11 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System">
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Mono.Posix">
       <Private>True</Private>
+    </Reference>
+    <Reference Include="System">
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>

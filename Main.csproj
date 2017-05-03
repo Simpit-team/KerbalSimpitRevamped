@@ -24,7 +24,6 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Mono.Posix">
-      <HintPath>SerialBin\Mono.Posix.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>

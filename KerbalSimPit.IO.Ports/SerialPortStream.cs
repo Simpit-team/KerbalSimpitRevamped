@@ -33,8 +33,12 @@ namespace KerbalSimPit.IO.Ports
 			fd = open_serial (portName);
 			if (fd == -1)
 				ThrowIOException ();
-				
-			TryBaudRate (baudRate);
+
+			// TryBaudRate was attempting to use is_baud_rate_legal
+            // from Mono.PosixHelper. But that comes from serial.c in
+            // the mono source distribution, and doesn't seem to make
+            // its way to the KSP mono runtime. So we exclude it.
+			// TryBaudRate (baudRate);
 			
 			if (!set_attributes (fd, baudRate, parity, dataBits, stopBits, handshake))
 				ThrowIOException (); // Probably Win32Exc for compatibility
@@ -315,19 +319,6 @@ namespace KerbalSimPit.IO.Ports
 			string error_message = Marshal.PtrToStringAnsi (strerror (errnum));
 
 			throw new IOException (error_message);
-		}
-		
-		[DllImport ("MonoPosixHelper")]
-		static extern bool is_baud_rate_legal (int baud_rate);
-		
-		private void TryBaudRate (int baudRate)
-		{
-			if (!is_baud_rate_legal (baudRate))
-			{
-				// this kind of exception to be compatible with MSDN API
-				throw new ArgumentOutOfRangeException ("baudRate",
-					"Given baud rate is not supported on this platform.");
-			}			
 		}
 	}
 }
