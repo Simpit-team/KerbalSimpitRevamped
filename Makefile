@@ -22,7 +22,7 @@ all:KerbalSimPitSerial.dll KerbalSimPit.dll
 KerbalSimPit.dll:Properties/AssemblyInfo.cs
 	$(XBUILD) /p:Configuration=$(CONFIG) Main.csproj
 
-KerbalSimPitSerial.dll:
+KerbalSimPitSerial.dll:Properties/SerialAssemblyInfo.cs
 	$(XBUILD) /p:Configuration=$(CONFIG) Serial.csproj
 
 install:all
@@ -35,6 +35,7 @@ clean:
 	$(XBUILD) /p:Configuration=$(CONFIG) /t:Clean Serial.csproj
 	rm -f KerbalSimPit.version
 	rm -f Properties/AssemblyInfo.cs
+	rm -f Properties/SerialAssemblyInfo.cs
 	rm -f *.zip
 
 KerbalSimPit.version:KerbalSimPit.version.m4 version-info.m4
@@ -42,6 +43,9 @@ KerbalSimPit.version:KerbalSimPit.version.m4 version-info.m4
 
 Properties/AssemblyInfo.cs:Properties/AssemblyInfo.cs.m4 version-info.m4
 	m4 -DBUILDVER=$(BUILDVERSION) version-info.m4 Properties/AssemblyInfo.cs.m4 > Properties/AssemblyInfo.cs
+
+Properties/SerialAssemblyInfo.cs:Properties/SerialAssemblyInfo.cs.m4 version-info.m4
+	m4 -DBUILDVER=$(BUILDVERSION) version-info.m4 Properties/SerialAssemblyInfo.cs.m4 > Properties/SerialAssemblyInfo.cs
 
 package: all KerbalSimPit.version
 	mkdir -p $(PACKAGEDIR)

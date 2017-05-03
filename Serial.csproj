@@ -15,9 +15,14 @@
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>KSPResources\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KerbalSimPit.IO.Ports\*.cs" />
+    <Compile Include="Properties\SerialAssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
