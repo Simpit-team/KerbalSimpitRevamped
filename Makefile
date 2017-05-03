@@ -27,7 +27,7 @@ KerbalSimPitSerial.dll:
 
 install:all
 	cp Bin/KerbalSimPit.dll $(INSTALLDIR)
-	cp Bin/PsimaxSerial.dll $(INSTALLDIR)
+	cp Bin/KerbalSimPitSerial.dll $(INSTALLDIR)
 	cp Bin/Mono.Posix.dll $(INSTALLDIR)
 
 clean:
