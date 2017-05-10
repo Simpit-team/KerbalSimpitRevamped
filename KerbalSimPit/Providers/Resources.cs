@@ -61,40 +61,10 @@ namespace KerbalSimPit.Providers
 
         public void Update()
         {
-            if (ARPWrapper.KSPARP.VesselResources.ContainsKey(LiquidFuelID))
-            {
-                TotalLF.Max = (float)ARPWrapper.KSPARP.VesselResources[LiquidFuelID].MaxAmountValue;
-                TotalLF.Available = (float)ARPWrapper.KSPARP.VesselResources[LiquidFuelID].AmountValue;
-            } else {
-                TotalLF.Max = 0;
-                TotalLF.Available = 0;
-            }
-            if (ARPWrapper.KSPARP.LastStageResources.ContainsKey(LiquidFuelID))
-            {
-                StageLF.Max = (float)ARPWrapper.KSPARP.LastStageResources[LiquidFuelID].MaxAmountValue;
-                StageLF.Available = (float)ARPWrapper.KSPARP.LastStageResources[LiquidFuelID].AmountValue;
-            } else {
-                StageLF.Max = 0;
-                StageLF.Available = 0;
-            }
-
-            if (ARPWrapper.KSPARP.VesselResources.ContainsKey(OxidizerID))
-            {
-                TotalOx.Max = (float)ARPWrapper.KSPARP.VesselResources[OxidizerID].MaxAmountValue;
-                TotalOx.Available = (float)ARPWrapper.KSPARP.VesselResources[OxidizerID].AmountValue;
-            } else {
-                TotalOx.Max = 0;
-                TotalOx.Available = 0;
-            }
-
-            if (ARPWrapper.KSPARP.LastStageResources.ContainsKey(OxidizerID))
-            {
-                StageOx.Max = (float)ARPWrapper.KSPARP.LastStageResources[OxidizerID].MaxAmountValue;
-                StageOx.Available = (float)ARPWrapper.KSPARP.VesselResources[OxidizerID].AmountValue;
-            } else {
-                StageOx.Max = 0;
-                StageOx.Available = 0;
-            }
+            GetTotalResources(LiquidFuelID, ref TotalLF);
+            GetStageResources(LiquidFuelID, ref StageLF);
+            GetTotalResources(OxidizerID, ref TotalOx);
+            GetStageResources(OxidizerID, ref StageOx);
         }
 
         public void OnDestroy()
@@ -120,13 +90,11 @@ namespace KerbalSimPit.Providers
 
         public void LFProvider()
         {
-            Debug.Log(String.Format("KerbalSimPit: Sending Liquid Fuel max {0} cur {1}", TotalLF.Max, TotalLF.Available));
             if (LFChannel != null) LFChannel.Fire(OutboundPackets.LiquidFuel, TotalLF);
         }
 
         public void LFStageProvider()
         {
-            Debug.Log(String.Format("KerbalSimPit: Sending Liquid Fuel Stage max {0} cur{1}", StageLF.Max, StageLF.Available));
             if (LFStageChannel != null) LFStageChannel.Fire(OutboundPackets.LiquidFuelStage, StageLF);
         }
 
@@ -145,6 +113,34 @@ namespace KerbalSimPit.Providers
             PartResourceDefinition resource =
                 PartResourceLibrary.Instance.GetDefinition(resourceName);
             return resource.id;
+        }
+
+        private bool GetTotalResources(int ResourceID, ref ResourceStruct DestResourceStruct)
+        {
+            if (ARPWrapper.KSPARP.VesselResources.ContainsKey(ResourceID))
+            {
+                DestResourceStruct.Max = (float)ARPWrapper.KSPARP.VesselResources[ResourceID].MaxAmountValue;
+                DestResourceStruct.Available = (float)ARPWrapper.KSPARP.VesselResources[ResourceID].AmountValue;
+                return true;
+            } else {
+                DestResourceStruct.Max = 0;
+                DestResourceStruct.Available = 0;
+                return false;
+            }
+        }
+
+        private bool GetStageResources(int ResourceID, ref ResourceStruct DestResourceStruct)
+        {
+            if (ARPWrapper.KSPARP.LastStageResources.ContainsKey(ResourceID))
+            {
+                DestResourceStruct.Max = (float)ARPWrapper.KSPARP.LastStageResources[ResourceID].MaxAmountValue;
+                DestResourceStruct.Available = (float)ARPWrapper.KSPARP.LastStageResources[ResourceID].AmountValue;
+                return true;
+            } else {
+                DestResourceStruct.Max = 0;
+                DestResourceStruct.Available = 0;
+                return false;
+            }
         }
     }
 }
