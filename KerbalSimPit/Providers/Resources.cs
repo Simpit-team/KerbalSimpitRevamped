@@ -17,9 +17,9 @@ namespace KerbalSimPit.Providers
             public float Available;
         }
 
-        private ResourceStruct myTotalLF;
+        private ResourceStruct TotalLF, StageLF;
 
-        private EventData<byte, object> liquidFuelChannel;
+        private EventData<byte, object> LFChannel, LFStageChannel;
 
         // IDs of resources we care about
         private int LiquidFuelID;
@@ -38,14 +38,15 @@ namespace KerbalSimPit.Providers
         public void Start()
         {
             ARPWrapper.InitKSPARPWrapper();
-
-            KSPit.AddToDeviceHandler(LiquidFuelProvider);
-            liquidFuelChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial10");
-
             if (ARPWrapper.APIReady)
             {
-                Debug.Log(String.Format("ARPWrapperTest: {0} resources found",
-                                        ARPWrapper.KSPARP.VesselResources.Count));
+                KSPit.AddToDeviceHandler(LFProvider);
+                LFChannel =
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial10");
+                KSPit.AddToDeviceHandler(LFStageProvider);
+                LFStageChannel =
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial11");
+                ScanForResources();
             } else {
                 Debug.Log("KerbalSimPit: AlternateResourcePanel not found. Resource providers WILL NOT WORK.");
             }
@@ -56,17 +57,22 @@ namespace KerbalSimPit.Providers
         {
             if (ARPWrapper.KSPARP.VesselResources.ContainsKey(LiquidFuelID))
             {
-                myTotalLF.Max = (float)ARPWrapper.KSPARP.VesselResources[LiquidFuelID].MaxAmountValue;
-                myTotalLF.Available = (float)ARPWrapper.KSPARP.VesselResources[LiquidFuelID].AmountValue;
+                TotalLF.Max = (float)ARPWrapper.KSPARP.VesselResources[LiquidFuelID].MaxAmountValue;
+                TotalLF.Available = (float)ARPWrapper.KSPARP.VesselResources[LiquidFuelID].AmountValue;
+                StageLF.Max = (float)ARPWrapper.KSPARP.LastStageResources[LiquidFuelID].MaxAmountValue;
+                StageLF.Available = (float)ARPWrapper.KSPARP.LastStageResources[LiquidFuelID].AmountValue;
             } else {
-                myTotalLF.Max = 0;
-                myTotalLF.Available = 0;
+                TotalLF.Max = 0;
+                TotalLF.Available = 0;
+                StageLF.Max = 0;
+                StageLF.Available = 0;
             }
         }
 
         public void OnDestroy()
         {
-            KSPit.RemoveToDeviceHandler(LiquidFuelProvider);
+            KSPit.RemoveToDeviceHandler(LFProvider);
+            KSPit.RemoveToDeviceHandler(LFStageProvider);
         }
 
         public void ScanForResources()
@@ -82,10 +88,16 @@ namespace KerbalSimPit.Providers
             // AblatorID = GetResourceID("Ablator");
         }
 
-        public void LiquidFuelProvider()
+        public void LFProvider()
         {
-            Debug.Log(String.Format("KerbalSimPit: Sending Liquid Fuel max {0} cur {1}", myTotalLF.Max, myTotalLF.Available));
-            if (liquidFuelChannel != null) liquidFuelChannel.Fire(OutboundPackets.LiquidFuel, myTotalLF);
+            Debug.Log(String.Format("KerbalSimPit: Sending Liquid Fuel max {0} cur {1}", TotalLF.Max, TotalLF.Available));
+            if (LFChannel != null) LFChannel.Fire(OutboundPackets.LiquidFuel, TotalLF);
+        }
+
+        public void LFStageProvider()
+        {
+            Debug.Log(String.Format("KerbalSimPit: Sending Liquid Fuel Stage max {0} cur{1}", StageLF.Max, StageLF.Available));
+            if (LFStageChannel != null) LFStageChannel.Fire(OutboundPackets.LiquidFuelStage, StageLF);
         }
 
         private int GetResourceID(string resourceName)

@@ -13,6 +13,7 @@ namespace KerbalSimPit
         public static byte Altitude = 8;
         public static byte Apsides = 9;
         public static byte LiquidFuel = 10;
+        public static byte LiquidFuelStage = 11;
     }
 
     public static class InboundPackets
