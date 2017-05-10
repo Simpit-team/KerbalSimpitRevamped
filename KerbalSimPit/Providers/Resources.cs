@@ -118,7 +118,7 @@ namespace KerbalSimPit.Providers
             SolidFuelID = GetResourceID("SolidFuel");
             MonoPropellantID = GetResourceID("MonoPropellant");
             ElectricChargeID = GetResourceID("ElectricCharge");
-            EvaPropellantID = GetResourceID("EvaPropellant");
+            EvaPropellantID = GetResourceID("EVA Propellant");
             OreID = GetResourceID("Ore");
             AblatorID = GetResourceID("Ablator");
         }
