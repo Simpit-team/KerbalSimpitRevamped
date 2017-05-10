@@ -24,26 +24,12 @@ namespace KerbalSimPit.Providers
             public float apoapsis;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
-        public struct StagedResourceStruct
-        {
-            public float total;
-            public float stage;
-        }
-
         private AltitudeStruct myAlt;
         private ApsidesStruct myApsides;
-
-        private EventData<byte, object> altitudeChannel;
-        private EventData<byte, object> apsidesChannel;
+        private EventData<byte, object> altitudeChannel, apsidesChannel;
 
         public void Start()
         {
-            ARPWrapper.InitKSPARPWrapper();
-            if (!ARPWrapper.APIReady)
-            {
-                Debug.Log("KerbalSimPit: AlternateResourcePanel not found. Resource providers WILL NOT WORK.");
-            }
             KSPit.AddToDeviceHandler(AltitudeProvider);
             altitudeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial8");
             KSPit.AddToDeviceHandler(ApsidesProvider);
