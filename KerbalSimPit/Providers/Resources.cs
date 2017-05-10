@@ -16,25 +16,18 @@ namespace KerbalSimPit.Providers
             public float Available;
         }
 
-        private ResourceStruct TotalLF, StageLF, TotalOx, StageOx;
+        private ResourceStruct TotalLF, StageLF, TotalOx, StageOx,
+            TotalSF, StageSF;
 
         private EventData<byte, object> LFChannel, LFStageChannel,
-            OxChannel, OxStageChannel;
+            OxChannel, OxStageChannel, SFChannel, SFStageChannel;
 
         // IDs of resources we care about
-        private int LiquidFuelID, OxidizerID;
+        private int LiquidFuelID, OxidizerID, SolidFuelID;
         //private int LiquidFuelID, OxidizerID, SolidFuelID,
         //    MonoPropellantID, ElectricChargeID, EvaPropellantID,
         //    OreID, AblatorID;
 
-        /* Current plan for integrating ARP:
-           Look up the resources I care about in the
-           ResourceDefinitionLibrary, and store their IDs.
-           In Update, check for those IDs in the KSPARP properties
-           for the vessel and stage resources.
-           Should also subscribe to vessel change updates and use
-           those to refresh the ID cache.
-        */
         public void Start()
         {
             ARPWrapper.InitKSPARPWrapper();
@@ -52,6 +45,12 @@ namespace KerbalSimPit.Providers
                 KSPit.AddToDeviceHandler(OxStageProvider);
                 OxStageChannel =
                     GameEvents.FindEvent<EventData<byte, object>>("toSerial13");
+                KSPit.AddToDeviceHandler(SFProvider);
+                SFChannel =
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial14");
+                KSPit.AddToDeviceHandler(SFStageProvider);
+                SFStageChannel =
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial15");
 
                 ScanForResources();
             } else {
@@ -66,6 +65,8 @@ namespace KerbalSimPit.Providers
             GetStageResources(LiquidFuelID, ref StageLF);
             GetTotalResources(OxidizerID, ref TotalOx);
             GetStageResources(OxidizerID, ref StageOx);
+            GetTotalResources(SolidFuelID, ref TotalSF);
+            GetStageResources(SolidFuelID, ref StageSF);
         }
 
         public void OnDestroy()
@@ -74,6 +75,8 @@ namespace KerbalSimPit.Providers
             KSPit.RemoveToDeviceHandler(LFStageProvider);
             KSPit.RemoveToDeviceHandler(OxProvider);
             KSPit.RemoveToDeviceHandler(OxStageProvider);
+            KSPit.RemoveToDeviceHandler(SFProvider);
+            KSPit.RemoveToDeviceHandler(SFStageProvider);
         }
 
         public void ScanForResources()
@@ -81,7 +84,7 @@ namespace KerbalSimPit.Providers
             if(KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Vessel changed, scanning for resrouces.");
             LiquidFuelID = GetResourceID("LiquidFuel");
             OxidizerID = GetResourceID("Oxidizer");
-            // SolidFuelID = GetResourceID("SolidFuel");
+            SolidFuelID = GetResourceID("SolidFuel");
             // MonoPropellantID = GetResourceID("MonoPropellant");
             // ElectricChargeID = GetResourceID("ElectricCharge");
             // EvaPropellantID = GetResourceID("EvaPropellant");
@@ -107,6 +110,16 @@ namespace KerbalSimPit.Providers
         public void OxStageProvider()
         {
             if (OxStageChannel != null) OxStageChannel.Fire(OutboundPackets.OxidizerStage, StageOx);
+        }
+
+        public void SFProvider()
+        {
+            if (SFChannel != null) SFChannel.Fire(OutboundPackets.SolidFuel, TotalSF);
+        }
+
+        public void SFStageProvider()
+        {
+            if (SFStageChannel != null) SFStageChannel.Fire(OutboundPackets.SolidFuelStage, StageSF);
         }
 
         private int GetResourceID(string resourceName)

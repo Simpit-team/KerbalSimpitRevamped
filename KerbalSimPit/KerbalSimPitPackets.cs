@@ -16,6 +16,8 @@ namespace KerbalSimPit
         public static byte LiquidFuelStage = 11;
         public static byte Oxidizer = 12;
         public static byte OxidizerStage = 13;
+        public static byte SolidFuel = 14;
+        public static byte SolidFuelStage = 15;
     }
 
     public static class InboundPackets
