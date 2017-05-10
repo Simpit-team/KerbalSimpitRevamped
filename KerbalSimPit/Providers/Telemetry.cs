@@ -1,9 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
-using KSP.IO;
 using UnityEngine;
-
-using KerbalSimPit.External;
 
 namespace KerbalSimPit.Providers
 {
