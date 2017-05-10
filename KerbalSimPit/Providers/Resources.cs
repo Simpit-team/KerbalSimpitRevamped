@@ -49,6 +49,7 @@ namespace KerbalSimPit.Providers
                 KSPit.AddToDeviceHandler(OxProvider);
                 OxChannel =
                     GameEvents.FindEvent<EventData<byte, object>>("toSerial12");
+                KSPit.AddToDeviceHandler(OxStageProvider);
                 OxStageChannel =
                     GameEvents.FindEvent<EventData<byte, object>>("toSerial13");
 
