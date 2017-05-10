@@ -200,10 +200,11 @@ namespace KerbalSimPit
                     SerialPorts[portID].sendPacket(CommonPackets.Synchronisation, hs);
                     break;
                 case 0x02:
-                    string[] VersionString = new string[payload.Length-1];
-                    Array.Copy(payload, 1, VersionString, 0,
-                               (payload.Length - 1));
-                    Debug.Log(String.Format("KerbalSimPit: ACK received on port {0}. Handshake complete, Arduino library version {1}", SerialPorts[portID].PortName, VersionString));
+                    byte[] verarray = new byte[payload.Length-1];
+                    Array.Copy(payload, 1, verarray, 0,
+                               (payload.Length-1));
+                    string VersionString = System.Text.Encoding.UTF8.GetString(verarray);
+                    Debug.Log(String.Format("KerbalSimPit: ACK received on port {0}. Handshake complete, Arduino library version '{1}'.", SerialPorts[portID].PortName, VersionString));
                     break;
             }
         }
