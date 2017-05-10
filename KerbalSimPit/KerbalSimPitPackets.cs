@@ -18,6 +18,12 @@ namespace KerbalSimPit
         public static byte OxidizerStage = 13;
         public static byte SolidFuel = 14;
         public static byte SolidFuelStage = 15;
+        public static byte MonoPropellant = 16;
+        public static byte ElectricCharge = 17;
+        public static byte EvaPropellant = 18;
+        public static byte Ore = 19;
+        public static byte Ablator = 20;
+        public static byte AblatorStage = 21;
     }
 
     public static class InboundPackets

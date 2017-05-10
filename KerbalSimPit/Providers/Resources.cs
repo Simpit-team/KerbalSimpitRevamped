@@ -17,16 +17,18 @@ namespace KerbalSimPit.Providers
         }
 
         private ResourceStruct TotalLF, StageLF, TotalOx, StageOx,
-            TotalSF, StageSF;
+            TotalSF, StageSF, TotalMono, TotalElectric, TotalEva,
+            TotalOre, TotalAb, StageAb;
 
         private EventData<byte, object> LFChannel, LFStageChannel,
-            OxChannel, OxStageChannel, SFChannel, SFStageChannel;
+            OxChannel, OxStageChannel, SFChannel, SFStageChannel,
+            MonoChannel, ElectricChannel, EvaChannel, OreChannel,
+            AbChannel, AbStageChannel;
 
         // IDs of resources we care about
-        private int LiquidFuelID, OxidizerID, SolidFuelID;
-        //private int LiquidFuelID, OxidizerID, SolidFuelID,
-        //    MonoPropellantID, ElectricChargeID, EvaPropellantID,
-        //    OreID, AblatorID;
+        private int LiquidFuelID, OxidizerID, SolidFuelID,
+            MonoPropellantID, ElectricChargeID, EvaPropellantID,
+            OreID, AblatorID;
 
         public void Start()
         {
@@ -51,12 +53,29 @@ namespace KerbalSimPit.Providers
                 KSPit.AddToDeviceHandler(SFStageProvider);
                 SFStageChannel =
                     GameEvents.FindEvent<EventData<byte, object>>("toSerial15");
+                KSPit.AddToDeviceHandler(MonoProvider);
+                MonoChannel =
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial16");
+                KSPit.AddToDeviceHandler(ElectricProvider);
+                ElectricChannel =
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial17");
+                KSPit.AddToDeviceHandler(EvaProvider);
+                EvaChannel =
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial18");
+                KSPit.AddToDeviceHandler(OreProvider);
+                OreChannel =
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial19");
+                KSPit.AddToDeviceHandler(AbProvider);
+                AbChannel =
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial20");
+                KSPit.AddToDeviceHandler(AbStageProvider);
+                AbStageChannel =
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial21");
 
                 ScanForResources();
             } else {
                 Debug.Log("KerbalSimPit: AlternateResourcePanel not found. Resource providers WILL NOT WORK.");
             }
-            ScanForResources();
         }
 
         public void Update()
@@ -67,6 +86,12 @@ namespace KerbalSimPit.Providers
             GetStageResources(OxidizerID, ref StageOx);
             GetTotalResources(SolidFuelID, ref TotalSF);
             GetStageResources(SolidFuelID, ref StageSF);
+            GetTotalResources(MonoPropellantID, ref TotalMono);
+            GetTotalResources(ElectricChargeID, ref TotalElectric);
+            GetTotalResources(EvaPropellantID, ref TotalEva);
+            GetTotalResources(OreID, ref TotalOre);
+            GetTotalResources(AblatorID, ref TotalAb);
+            GetStageResources(AblatorID, ref StageAb);
         }
 
         public void OnDestroy()
@@ -77,6 +102,12 @@ namespace KerbalSimPit.Providers
             KSPit.RemoveToDeviceHandler(OxStageProvider);
             KSPit.RemoveToDeviceHandler(SFProvider);
             KSPit.RemoveToDeviceHandler(SFStageProvider);
+            KSPit.RemoveToDeviceHandler(MonoProvider);
+            KSPit.RemoveToDeviceHandler(ElectricProvider);
+            KSPit.RemoveToDeviceHandler(EvaProvider);
+            KSPit.RemoveToDeviceHandler(OreProvider);
+            KSPit.RemoveToDeviceHandler(AbProvider);
+            KSPit.RemoveToDeviceHandler(AbStageProvider);
         }
 
         public void ScanForResources()
@@ -85,11 +116,11 @@ namespace KerbalSimPit.Providers
             LiquidFuelID = GetResourceID("LiquidFuel");
             OxidizerID = GetResourceID("Oxidizer");
             SolidFuelID = GetResourceID("SolidFuel");
-            // MonoPropellantID = GetResourceID("MonoPropellant");
-            // ElectricChargeID = GetResourceID("ElectricCharge");
-            // EvaPropellantID = GetResourceID("EvaPropellant");
-            // OreID = GetResourceID("Ore");
-            // AblatorID = GetResourceID("Ablator");
+            MonoPropellantID = GetResourceID("MonoPropellant");
+            ElectricChargeID = GetResourceID("ElectricCharge");
+            EvaPropellantID = GetResourceID("EvaPropellant");
+            OreID = GetResourceID("Ore");
+            AblatorID = GetResourceID("Ablator");
         }
 
         public void LFProvider()
@@ -120,6 +151,36 @@ namespace KerbalSimPit.Providers
         public void SFStageProvider()
         {
             if (SFStageChannel != null) SFStageChannel.Fire(OutboundPackets.SolidFuelStage, StageSF);
+        }
+
+        public void MonoProvider()
+        {
+            if (MonoChannel != null) MonoChannel.Fire(OutboundPackets.MonoPropellant, TotalMono);
+        }
+
+        public void ElectricProvider()
+        {
+            if (ElectricChannel != null) ElectricChannel.Fire(OutboundPackets.ElectricCharge, TotalElectric);
+        }
+
+        public void EvaProvider()
+        {
+            if (EvaChannel != null) EvaChannel.Fire(OutboundPackets.EvaPropellant, TotalEva);
+        }
+
+        public void OreProvider()
+        {
+            if (OreChannel != null) OreChannel.Fire(OutboundPackets.Ore, TotalOre);
+        }
+
+        public void AbProvider()
+        {
+            if (AbChannel != null) AbChannel.Fire(OutboundPackets.Ablator, TotalAb);
+        }
+
+        public void AbStageProvider()
+        {
+            if (AbStageChannel != null) AbStageChannel.Fire(OutboundPackets.AblatorStage, StageAb);
         }
 
         private int GetResourceID(string resourceName)
