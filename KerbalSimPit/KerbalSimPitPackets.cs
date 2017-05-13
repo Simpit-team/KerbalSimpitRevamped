@@ -24,6 +24,7 @@ namespace KerbalSimPit
         public static byte Ore = 19;
         public static byte Ablator = 20;
         public static byte AblatorStage = 21;
+        public static byte Velocities = 22;
     }
 
     public static class InboundPackets
