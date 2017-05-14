@@ -32,11 +32,11 @@ namespace KerbalSimPit.Providers
             AGXPresent = AGXInstalled();
             if (KSPit.Config.Verbose) Debug.Log(String.Format("KerbalSimPit: ActionGroupsExtended installed: {0}", AGXPresent));
 
-            enableChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived6");
+            enableChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived10");
             if (enableChannel != null) enableChannel.Add(enableCAGCallback);
-            disableChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived7");
+            disableChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived11");
             if (disableChannel != null) disableChannel.Add(disableCAGCallback);
-            toggleChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived8");
+            toggleChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived12");
             if (toggleChannel != null) toggleChannel.Add(toggleCAGCallback);
         }
 
