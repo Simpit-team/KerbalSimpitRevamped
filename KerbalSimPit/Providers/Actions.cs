@@ -15,18 +15,22 @@ namespace KerbalSimPit.Providers
         // will attempt to send new packets between each Update(), and only
         // the last one will be affected. But it is unlikely, which is why
         // I'm not addressing it now.
-        private volatile byte activateBuffer, deactivateBuffer, toggleBuffer;
+        private volatile byte activateBuffer, deactivateBuffer,
+            toggleBuffer, currentStateBuffer;
 
         public void Start()
         {
             activateBuffer = 0;
             deactivateBuffer = 0;
             toggleBuffer = 0;
-        
+            currentStateBuffer = 0;
+
             AGActivateChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived9");
             if (AGActivateChannel != null) AGActivateChannel.Add(actionActivateCallback);
             AGDeactivateChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived10");
             if (AGDeactivateChannel != null) AGDeactivateChannel.Add(actionDeactivateCallback);
+
+            updateCurrentState();
         }
 
         public void OnDestroy()
@@ -41,121 +45,17 @@ namespace KerbalSimPit.Providers
             Vessel av = FlightGlobals.ActiveVessel;
             if (activateBuffer > 0)
             {
-                if ((activateBuffer & ActionGroupBits.StageBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Activating stage");
-                    av.ActionGroups.SetGroup(KSPActionGroup.Stage, true);
-                    StageManager.ActivateNextStage();
-                }
-                if ((activateBuffer & ActionGroupBits.GearBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Activating gear");
-                    av.ActionGroups.SetGroup(KSPActionGroup.Gear, true);
-                }
-                if ((activateBuffer & ActionGroupBits.LightBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Activating light");
-                    av.ActionGroups.SetGroup(KSPActionGroup.Light, true);
-                }
-                if ((activateBuffer & ActionGroupBits.RCSBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Activating RCS");
-                    av.ActionGroups.SetGroup(KSPActionGroup.RCS, true);
-                }
-                if ((activateBuffer & ActionGroupBits.SASBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Activating SAS");
-                    av.ActionGroups.SetGroup(KSPActionGroup.SAS, true);
-                }
-                if ((activateBuffer & ActionGroupBits.BrakesBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Activating brakes");
-                    av.ActionGroups.SetGroup(KSPActionGroup.Brakes, true);
-                }
-                if ((activateBuffer & ActionGroupBits.AbortBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Activating abort");
-                    av.ActionGroups.SetGroup(KSPActionGroup.Abort, true);
-                }
+                activateGroups(activateBuffer);
                 activateBuffer = 0;
             }
             if (deactivateBuffer > 0)
             {
-                if ((deactivateBuffer & ActionGroupBits.StageBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Deactivating stage");
-                    av.ActionGroups.SetGroup(KSPActionGroup.Stage, false);
-                }
-                if ((deactivateBuffer & ActionGroupBits.GearBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Deactivating gear");
-                    av.ActionGroups.SetGroup(KSPActionGroup.Gear, false);
-                }
-                if ((deactivateBuffer & ActionGroupBits.LightBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Deactivating light");
-                    av.ActionGroups.SetGroup(KSPActionGroup.Light, false);
-                }
-                if ((deactivateBuffer & ActionGroupBits.RCSBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Deactivating RCS");
-                    av.ActionGroups.SetGroup(KSPActionGroup.RCS, false);
-                }
-                if ((deactivateBuffer & ActionGroupBits.SASBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Deactivating SAS");
-                    av.ActionGroups.SetGroup(KSPActionGroup.SAS, false);
-                }
-                if ((deactivateBuffer & ActionGroupBits.BrakesBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Deactivating brakes");
-                    av.ActionGroups.SetGroup(KSPActionGroup.Brakes, false);
-                }
-                if ((deactivateBuffer & ActionGroupBits.AbortBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Deactivating abort");
-                    av.ActionGroups.SetGroup(KSPActionGroup.Abort, false);
-                }
+                deactivateGroups(deactivateBuffer);
                 deactivateBuffer = 0;
             }
             if (toggleBuffer > 0)
             {
-                if ((toggleBuffer & ActionGroupBits.StageBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Toggling stage");
-                    av.ActionGroups.ToggleGroup(KSPActionGroup.Stage);
-                    StageManager.ActivateNextStage();
-                }
-                if ((toggleBuffer & ActionGroupBits.GearBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Toggling gear");
-                    av.ActionGroups.ToggleGroup(KSPActionGroup.Gear);
-                }
-                if ((toggleBuffer & ActionGroupBits.LightBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Toggling light");
-                    av.ActionGroups.ToggleGroup(KSPActionGroup.Light);
-                }
-                if ((toggleBuffer & ActionGroupBits.RCSBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Toggling RCS");
-                    av.ActionGroups.ToggleGroup(KSPActionGroup.RCS);
-                }
-                if ((toggleBuffer & ActionGroupBits.SASBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Toggling SAS");
-                    av.ActionGroups.ToggleGroup(KSPActionGroup.SAS);
-                }
-                if ((toggleBuffer & ActionGroupBits.BrakesBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Toggling brakes");
-                    av.ActionGroups.ToggleGroup(KSPActionGroup.Brakes);
-                }
-                if ((toggleBuffer & ActionGroupBits.AbortBit) != 0)
-                {
-                    if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Toggling abort");
-                    av.ActionGroups.ToggleGroup(KSPActionGroup.Abort);
-                }
+                toggleGroups(toggleBuffer);
                 toggleBuffer = 0;
             }
         }
@@ -176,6 +76,171 @@ namespace KerbalSimPit.Providers
         {
             byte[] payload = (byte[])Data;
             toggleBuffer = payload[0];
+        }
+
+        private bool updateCurrentState()
+        {
+            byte newState = getGroups();
+            if (newState != currentStateBuffer)
+            {
+                // Send state
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        private void activateGroups(byte groups)
+        {
+            if ((groups & ActionGroupBits.StageBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Activating stage");
+                FlightGlobals.ActiveVessel.ActionGroups.SetGroup(KSPActionGroup.Stage, true);
+                StageManager.ActivateNextStage();
+            }
+            if ((groups & ActionGroupBits.GearBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Activating gear");
+                FlightGlobals.ActiveVessel.ActionGroups.SetGroup(KSPActionGroup.Gear, true);
+            }
+            if ((groups & ActionGroupBits.LightBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Activating light");
+                FlightGlobals.ActiveVessel.ActionGroups.SetGroup(KSPActionGroup.Light, true);
+            }
+            if ((groups & ActionGroupBits.RCSBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Activating RCS");
+                FlightGlobals.ActiveVessel.ActionGroups.SetGroup(KSPActionGroup.RCS, true);
+            }
+            if ((groups & ActionGroupBits.SASBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Activating SAS");
+                FlightGlobals.ActiveVessel.ActionGroups.SetGroup(KSPActionGroup.SAS, true);
+            }
+            if ((groups & ActionGroupBits.BrakesBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Activating brakes");
+                FlightGlobals.ActiveVessel.ActionGroups.SetGroup(KSPActionGroup.Brakes, true);
+            }
+            if ((groups & ActionGroupBits.AbortBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Activating abort");
+                FlightGlobals.ActiveVessel.ActionGroups.SetGroup(KSPActionGroup.Abort, true);
+            }
+        }
+
+        private void deactivateGroups(byte groups)
+        {
+            if ((groups & ActionGroupBits.StageBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Deactivating stage");
+                FlightGlobals.ActiveVessel.ActionGroups.SetGroup(KSPActionGroup.Stage, false);
+            }
+            if ((groups & ActionGroupBits.GearBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Deactivating gear");
+                FlightGlobals.ActiveVessel.ActionGroups.SetGroup(KSPActionGroup.Gear, false);
+            }
+            if ((groups & ActionGroupBits.LightBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Deactivating light");
+                FlightGlobals.ActiveVessel.ActionGroups.SetGroup(KSPActionGroup.Light, false);
+            }
+            if ((groups & ActionGroupBits.RCSBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Deactivating RCS");
+                FlightGlobals.ActiveVessel.ActionGroups.SetGroup(KSPActionGroup.RCS, false);
+            }
+            if ((groups & ActionGroupBits.SASBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Deactivating SAS");
+                FlightGlobals.ActiveVessel.ActionGroups.SetGroup(KSPActionGroup.SAS, false);
+            }
+            if ((groups & ActionGroupBits.BrakesBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Deactivating brakes");
+                FlightGlobals.ActiveVessel.ActionGroups.SetGroup(KSPActionGroup.Brakes, false);
+            }
+            if ((groups & ActionGroupBits.AbortBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Deactivating abort");
+                FlightGlobals.ActiveVessel.ActionGroups.SetGroup(KSPActionGroup.Abort, false);
+            }
+        }
+
+        private void toggleGroups(byte groups)
+        {
+            if ((groups & ActionGroupBits.StageBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Toggling stage");
+                FlightGlobals.ActiveVessel.ActionGroups.ToggleGroup(KSPActionGroup.Stage);
+                StageManager.ActivateNextStage();
+            }
+            if ((groups & ActionGroupBits.GearBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Toggling gear");
+                FlightGlobals.ActiveVessel.ActionGroups.ToggleGroup(KSPActionGroup.Gear);
+            }
+            if ((groups & ActionGroupBits.LightBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Toggling light");
+                FlightGlobals.ActiveVessel.ActionGroups.ToggleGroup(KSPActionGroup.Light);
+            }
+            if ((groups & ActionGroupBits.RCSBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Toggling RCS");
+                FlightGlobals.ActiveVessel.ActionGroups.ToggleGroup(KSPActionGroup.RCS);
+            }
+            if ((groups & ActionGroupBits.SASBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Toggling SAS");
+                FlightGlobals.ActiveVessel.ActionGroups.ToggleGroup(KSPActionGroup.SAS);
+            }
+            if ((groups & ActionGroupBits.BrakesBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Toggling brakes");
+                FlightGlobals.ActiveVessel.ActionGroups.ToggleGroup(KSPActionGroup.Brakes);
+            }
+            if ((groups & ActionGroupBits.AbortBit) != 0)
+            {
+                if (KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Toggling abort");
+                FlightGlobals.ActiveVessel.ActionGroups.ToggleGroup(KSPActionGroup.Abort);
+            }
+        }
+
+        private byte getGroups()
+        {
+            byte groups = 0;
+            if (FlightGlobals.ActiveVessel.ActionGroups[KSPActionGroup.Stage])
+            {
+                groups |= (byte)(1 << ActionGroupBits.StageBit);
+            }
+            if (FlightGlobals.ActiveVessel.ActionGroups[KSPActionGroup.Gear])
+            {
+                groups |= (byte)(1 << ActionGroupBits.GearBit);
+            }
+            if (FlightGlobals.ActiveVessel.ActionGroups[KSPActionGroup.Light])
+            {
+                groups |= (byte)(1 << ActionGroupBits.LightBit);
+            }
+            if (FlightGlobals.ActiveVessel.ActionGroups[KSPActionGroup.RCS])
+            {
+                groups |= (byte)(1 << ActionGroupBits.RCSBit);
+            }
+            if (FlightGlobals.ActiveVessel.ActionGroups[KSPActionGroup.SAS])
+            {
+                groups |= (byte)(1 << ActionGroupBits.SASBit);
+            }
+            if (FlightGlobals.ActiveVessel.ActionGroups[KSPActionGroup.Brakes])
+            {
+                groups |= (byte)(1 << ActionGroupBits.BrakesBit);
+            }
+            if (FlightGlobals.ActiveVessel.ActionGroups[KSPActionGroup.Abort])
+            {
+                groups |= (byte)(1 << ActionGroupBits.AbortBit);
+            }
+            return groups;
         }
     }
 }
