@@ -8,7 +8,12 @@ namespace KerbalSimPit.Providers
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class KerbalSimPitActionProvider : MonoBehaviour
     {
-        private EventData<byte, object> AGActivateChannel, AGDeactivateChannel;
+        // Inbound messages
+        private EventData<byte, object> AGActivateChannel, AGDeactivateChannel,
+            AGToggleChannel;
+
+        // Outbound messages
+        private EventData<byte, object> AGStateChannel;
 
         // TODO: Only using a single byte buffer for each of these is
         // technically unsafe. It's not impossible that multiple controllers
@@ -25,19 +30,21 @@ namespace KerbalSimPit.Providers
             toggleBuffer = 0;
             currentStateBuffer = 0;
 
-            AGActivateChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived9");
+            AGActivateChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived13");
             if (AGActivateChannel != null) AGActivateChannel.Add(actionActivateCallback);
-            AGDeactivateChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived10");
+            AGDeactivateChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived14");
             if (AGDeactivateChannel != null) AGDeactivateChannel.Add(actionDeactivateCallback);
+            AGToggleChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived15");
+            if (AGToggleChannel != null) AGToggleChannel.Add(actionToggleCallback);
 
-            updateCurrentState();
+            AGStateChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial23");
         }
 
         public void OnDestroy()
         {
-            //if (stageChannel != null) stageChannel.Remove(stageCallback);
             if (AGActivateChannel != null) AGActivateChannel.Remove(actionActivateCallback);
             if (AGDeactivateChannel != null) AGDeactivateChannel.Remove(actionDeactivateCallback);
+            if (AGToggleChannel != null) AGToggleChannel.Remove(actionToggleCallback);
         }
 
         public void Update()
@@ -58,6 +65,8 @@ namespace KerbalSimPit.Providers
                 toggleGroups(toggleBuffer);
                 toggleBuffer = 0;
             }
+
+            updateCurrentState();
         }
 
         public void actionActivateCallback(byte ID, object Data)
@@ -83,7 +92,7 @@ namespace KerbalSimPit.Providers
             byte newState = getGroups();
             if (newState != currentStateBuffer)
             {
-                // Send state
+                if (AGStateChannel != null) AGStateChannel.Fire(OutboundPackets.ActionGroups, newState);
                 return true;
             } else {
                 return false;

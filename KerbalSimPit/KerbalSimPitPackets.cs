@@ -25,18 +25,19 @@ namespace KerbalSimPit
         public static byte Ablator = 20;
         public static byte AblatorStage = 21;
         public static byte Velocities = 22;
+        public static byte ActionGroups = 23;
     }
 
     public static class InboundPackets
     {
         public static byte RegisterHandler = 8;
         public static byte DeregisterHandler = 9;
-        public static byte StageEvent = 10;
-        public static byte CAGEnable = 11;
-        public static byte CAGDisable = 12;
-        public static byte CAGToggle = 13;
-        public static byte ActionGroupActivate = 14;
-        public static byte ActionGroupDeactivate = 15;
+        public static byte CAGEnable = 10;
+        public static byte CAGDisable = 11;
+        public static byte CAGToggle = 12;
+        public static byte ActionGroupActivate = 13;
+        public static byte ActionGroupDeactivate = 14;
+        public static byte ActionGroupToggle = 15;
     }
 
     public static class ActionGroupBits
