@@ -1,5 +1,18 @@
 # Kerbal Sim Pit Changelog
 
+## v0.8 prerelease (2017-05-18)
+
+* Added channels for all stock resources. This is done by depending on the
+Alternate Resource Panel mod.
+* Added apsides channel (apoapsis and periapsis).
+* Added velocity channel (surface, orbital and vertical).
+* Added a channel that reports on action group status. The format is identical
+to the command channel for AGs.
+* Changed the underlying serial driver again. The library now includes its
+own driver, a straight fork of the System.IO.Ports class from mono. There's
+been a lot of internal restructuring to let this happen.
+* Build and deploy system has been overhauled.
+
 ## v0.7 prerelease (2017-05-01)
 
 Big focus on getting the KSPSerialPort class receiving properly on Windows.
