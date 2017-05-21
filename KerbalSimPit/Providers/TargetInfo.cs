@@ -5,17 +5,17 @@ using UnityEngine;
 namespace KerbalSimPit.Providers
 {
     [KSPAddon(KSPAddon.Startup.Flight, false)]
-    public class KerbalSimPitNodeProvider : MonoBehaviour
+    public class KerbalSimPitTargetProvider : MonoBehaviour
     {
-        public struct NodeStruct
+        public struct TargetStruct
         {
             public float distance;
             public float velocity;
         }
 
-        private NodeStruct myNodeInfo;
+        private TargetStruct myTargetInfo;
 
-        private EventData<byte, object> nodeChannel;
+        private EventData<byte, object> targetChannel;
 
         private bool ProviderActive;
 
@@ -23,8 +23,8 @@ namespace KerbalSimPit.Providers
         {
             ProviderActive = false;
 
-            KSPit.AddToDeviceHandler(NodeProvider);
-            nodeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial25");
+            KSPit.AddToDeviceHandler(TargetProvider);
+            targetChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial25");
         }
 
         public void Update()
@@ -36,13 +36,13 @@ namespace KerbalSimPit.Providers
             {
                 if (!ProviderActive)
                 {
-                    KSPit.AddToDeviceHandler(NodeProvider);
+                    KSPit.AddToDeviceHandler(TargetProvider);
                     ProviderActive = true;
                 }
             } else {
                 if (ProviderActive)
                 {
-                    KSPit.RemoveToDeviceHandler(NodeProvider);
+                    KSPit.RemoveToDeviceHandler(TargetProvider);
                     ProviderActive = false;
                 }
             }   
@@ -50,17 +50,16 @@ namespace KerbalSimPit.Providers
 
         public void OnDestroy()
         {
-            KSPit.RemoveToDeviceHandler(NodeProvider);
+            KSPit.RemoveToDeviceHandler(TargetProvider);
         }
 
-        public void NodeProvider()
+        public void TargetProvider()
         {
             if (FlightGlobals.fetch.VesselTarget != null)
             {
-                myNodeInfo.distance = (float)Vector3.Distance(FlightGlobals.fetch.VesselTarget.GetVessel().transform.position,
-                                                              FlightGlobals.ActiveVessel.transform.position);
-                myNodeInfo.velocity = (float)FlightGlobals.ship_tgtVelocity.magnitude;
-                if (nodeChannel != null) nodeChannel.Fire(OutboundPackets.NodeInfo, myNodeInfo);
+                myTargetInfo.distance = (float)Vector3.Distance(FlightGlobals.fetch.VesselTarget.GetVessel().transform.position, FlightGlobals.ActiveVessel.transform.position);
+                myTargetInfo.velocity = (float)FlightGlobals.ship_tgtVelocity.magnitude;
+                if (targetChannel != null) targetChannel.Fire(OutboundPackets.TargetInfo, myTargetInfo);
             }
         }
     }
