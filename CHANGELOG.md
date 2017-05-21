@@ -1,5 +1,21 @@
 # Kerbal Sim Pit Changelog
 
+## v0.9 prerelease (2017-05-22)
+
+Hopefully the last prerelease.
+
+* Hardcoded `Documentation` parameter in config file. The config class
+  keeps this paramater as static, pointing to a URL giving info on the
+  config file format.
+* RefreshRate parameter now exposed in the configuration. This is a
+  global parameter - every provider that wants to send data
+  periodically will send to all devices that want that provider's
+  data once per `RefreshRate` milliseconds.
+* New providers:
+  * `ApsidesTime` gives time to next apoapsis and periapsis, in seconds.
+  * `TargetInfo` gives information about any object the active vessel has
+    targetted. Both distance to target and relative velocity are sent.
+
 ## v0.8 prerelease (2017-05-18)
 
 * Added channels for all stock resources. This is done by depending on the
