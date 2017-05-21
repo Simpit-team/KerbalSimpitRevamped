@@ -7,7 +7,6 @@ INSTALLDIR=$(KSPDIR)/GameData/KerbalSimPit
 CONFIGDIR=$(INSTALLDIR)/PluginData/KerbalSimPit
 
 PACKAGEDIR=package/KerbalSimPit
-PACKAGECONFIGDIR=$(PACKAGEDIR/PluginData/KerbalSimPit
 
 ifdef PLUGINVERSION
 	BUILDVERSION=$(PLUGINVERSION)
@@ -51,6 +50,7 @@ package: all KerbalSimPit.version
 	mkdir -p $(PACKAGEDIR)
 	cp Bin/*.dll $(PACKAGEDIR)
 	cp KerbalSimPit.version $(PACKAGEDIR)
+	cp -r distrib/* $(PACKAGEDIR)
 	cd package; zip -r -9 ../$(ZIPNAME) KerbalSimPit
 	rm -r package
 

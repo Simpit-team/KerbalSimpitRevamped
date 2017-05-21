@@ -1,0 +1,10 @@
+KerbalSimPit
+{
+	Documentation = https://bitbucket.org/pjhardy/kerbalsimpit/wiki/edit/PluginConfiguration
+	Verbose = False
+	SerialPort
+	{
+		PortName = /dev/ttyS0
+		BaudRate = 115200
+	}
+}
