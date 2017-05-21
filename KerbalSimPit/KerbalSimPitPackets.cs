@@ -27,6 +27,7 @@ namespace KerbalSimPit
         public static byte Velocities = 22;
         public static byte ActionGroups = 23;
         public static byte ApsidesTime = 24;
+        public static byte NodeInfo = 25;
     }
 
     public static class InboundPackets
