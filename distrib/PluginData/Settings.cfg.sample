@@ -2,6 +2,7 @@ KerbalSimPit
 {
 	Documentation = https://bitbucket.org/pjhardy/kerbalsimpit/wiki/edit/PluginConfiguration
 	Verbose = False
+    RefreshRate = 80
 	SerialPort
 	{
 		PortName = /dev/ttyS0

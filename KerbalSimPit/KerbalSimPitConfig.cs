@@ -27,16 +27,19 @@ namespace KerbalSimPit.Config
 
     public class KerbalSimPitConfig
     {
+        public string DocoUrl = "https://bitbucket.org/pjhardy/kerbalsimpit/wiki/PluginConfiguration.md";
         // Settings in the config file are here:
         [Persistent]
-        public string Documentation = "https://bitbucket.org/pjhardy/kerbalsimpit/wiki/PluginConfiguration.md";
+        public string Documentation;
 
         [Persistent]
         public bool Verbose = false;
 
+        [Persistent]
+        public int RefreshRate = 80;
+
         // public members that aren't persisted in the config file:
         public int EventQueueSize = 32;
-        public int RefreshRate = 80;
 
         public List <SerialPortNode> SerialPorts = new List <SerialPortNode> {};
     
@@ -81,6 +84,10 @@ namespace KerbalSimPit.Config
                         ConfigNode.LoadObjectFromConfig(portNode, portNodes[i]);
                         SerialPorts.Add(portNode);
                     }
+                    // Rewrite Documentation parameter on every run,
+                    // so we know it's always pointing at what should
+                    // be the right place.
+                    Documentation = DocoUrl;
                     return true;
                 }
                 catch (Exception e)
