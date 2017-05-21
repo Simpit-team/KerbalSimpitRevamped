@@ -29,6 +29,9 @@ namespace KerbalSimPit.Config
     {
         // Settings in the config file are here:
         [Persistent]
+        public string Documentation = "https://bitbucket.org/pjhardy/kerbalsimpit/wiki/PluginConfiguration.md";
+
+        [Persistent]
         public bool Verbose = false;
 
         // public members that aren't persisted in the config file:
