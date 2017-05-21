@@ -26,6 +26,7 @@ namespace KerbalSimPit
         public static byte AblatorStage = 21;
         public static byte Velocities = 22;
         public static byte ActionGroups = 23;
+        public static byte ApsidesTime = 24;
     }
 
     public static class InboundPackets

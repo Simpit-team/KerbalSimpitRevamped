@@ -22,6 +22,13 @@ namespace KerbalSimPit.Providers
         }
 
         [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
+        public struct ApsidesTimeStruct
+        {
+            public int periapsis;
+            public int apoapsis;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
         public struct VelocityStruct
         {
             public float orbital;
@@ -31,10 +38,11 @@ namespace KerbalSimPit.Providers
 
         private AltitudeStruct myAlt;
         private ApsidesStruct myApsides;
+        private ApsidesTimeStruct myApsidesTime;
         private VelocityStruct myVelocity;
 
         private EventData<byte, object> altitudeChannel, apsidesChannel,
-            velocityChannel;
+            apsidesTimeChannel, velocityChannel;
 
         public void Start()
         {
@@ -42,6 +50,8 @@ namespace KerbalSimPit.Providers
             altitudeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial8");
             KSPit.AddToDeviceHandler(ApsidesProvider);
             apsidesChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial9");
+            KSPit.AddToDeviceHandler(ApsidesTimeProvider);
+            apsidesTimeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial24");
             KSPit.AddToDeviceHandler(VelocityProvider);
             velocityChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial22");
         }
@@ -50,6 +60,7 @@ namespace KerbalSimPit.Providers
         {
             KSPit.RemoveToDeviceHandler(AltitudeProvider);
             KSPit.RemoveToDeviceHandler(ApsidesProvider);
+            KSPit.RemoveToDeviceHandler(ApsidesTimeProvider);
             KSPit.RemoveToDeviceHandler(VelocityProvider);
         }
 
@@ -62,12 +73,17 @@ namespace KerbalSimPit.Providers
 
         public void ApsidesProvider()
         {
-            Orbit curOrbit = FlightGlobals.ActiveVessel.orbit;
-            myApsides.apoapsis = (float)curOrbit.ApA;
-            myApsides.periapsis = (float)curOrbit.PeA;
+            myApsides.apoapsis = (float)FlightGlobals.ActiveVessel.orbit.ApA;
+            myApsides.periapsis = (float)FlightGlobals.ActiveVessel.orbit.PeA;
             if (apsidesChannel != null) apsidesChannel.Fire(OutboundPackets.Apsides, myApsides);
         }
 
+        public void ApsidesTimeProvider()
+        {
+            myApsidesTime.apoapsis = (int)FlightGlobals.ActiveVessel.orbit.timeToAp;
+            myApsidesTime.periapsis = (int)FlightGlobals.ActiveVessel.orbit.timeToPe;
+            if (apsidesTimeChannel != null) apsidesTimeChannel.Fire(OutboundPackets.ApsidesTime, myApsidesTime);
+        }
         public void VelocityProvider()
         {
             Orbit curOrbit = FlightGlobals.ActiveVessel.orbit;
