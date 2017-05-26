@@ -6,10 +6,10 @@ using System.Threading;
 using KSP.IO;
 using UnityEngine;
 
-using KerbalSimPit.Config;
-using KerbalSimPit.Serial;
+using KerbalSimpit.Config;
+using KerbalSimpit.Serial;
 
-namespace KerbalSimPit
+namespace KerbalSimpit
 {
     public delegate void ToDeviceCallback();
 
@@ -32,7 +32,7 @@ namespace KerbalSimPit
             public byte Payload;
         }
 
-        public static KerbalSimPitConfig Config;
+        public static KerbalSimpitConfig Config;
 
         private static KSPSerialPort[] SerialPorts;
 
@@ -51,10 +51,10 @@ namespace KerbalSimPit
                 toSerialArray[i] = new EventData<byte, object>(String.Format("toSerial{0}", i));
             }
 
-            Config = new KerbalSimPitConfig();
+            Config = new KerbalSimpitConfig();
 
             SerialPorts = createPortList(Config);
-            if (Config.Verbose) Debug.Log(String.Format("KerbalSimPit: Found {0} serial ports", SerialPorts.Length));
+            if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Found {0} serial ports", SerialPorts.Length));
             OpenPorts();
 
             onSerialReceivedArray[CommonPackets.Synchronisation].Add(handshakeCallback);
@@ -65,7 +65,7 @@ namespace KerbalSimPit
             EventDispatchThread.Start();
             while (!EventDispatchThread.IsAlive);
 
-            Debug.Log("KerbalSimPit: Started.");
+            Debug.Log("KerbalSimpit: Started.");
         }
 
         public void OnDestroy()
@@ -73,7 +73,7 @@ namespace KerbalSimPit
             ClosePorts();
             Config.Save();
             DoEventDispatching = false;
-            Debug.Log("KerbalSimPit: Shutting down.");
+            Debug.Log("KerbalSimpit: Shutting down.");
         }
 
         public static void AddToDeviceHandler(ToDeviceCallback cb)
@@ -121,12 +121,12 @@ namespace KerbalSimPit
                 }
             };
             DoEventDispatching = true;
-            Debug.Log("KerbalSimPit: Starting event dispatch loop");
+            Debug.Log("KerbalSimpit: Starting event dispatch loop");
             while (DoEventDispatching)
             {
                 EventNotifier();
             }
-            Debug.Log("KerbalSimPit: Event dispatch loop exiting");
+            Debug.Log("KerbalSimpit: Event dispatch loop exiting");
         }
             
         private static void FlightReadyHandler()
@@ -149,7 +149,7 @@ namespace KerbalSimPit
             }
         }
 
-        private KSPSerialPort[] createPortList(KerbalSimPitConfig config)
+        private KSPSerialPort[] createPortList(KerbalSimpitConfig config)
         {
             List<KSPSerialPort> PortList = new List<KSPSerialPort>();
             int count = config.SerialPorts.Count;
@@ -168,9 +168,9 @@ namespace KerbalSimPit
             {
                 if (SerialPorts[i].open())
                 {
-                    if (Config.Verbose) Debug.Log(String.Format("KerbalSimPit: Opened {0}", SerialPorts[i].PortName));
+                    if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Opened {0}", SerialPorts[i].PortName));
                 } else {
-                    if (Config.Verbose) Debug.Log(String.Format("KerbalSimPit: Unable to open {0}", SerialPorts[i].PortName));
+                    if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Unable to open {0}", SerialPorts[i].PortName));
                 }
             }
         }
@@ -190,12 +190,12 @@ namespace KerbalSimPit
             switch(payload[0])
             {
                 case 0x00:
-                    if (Config.Verbose) Debug.Log(String.Format("KerbalSimPit: SYN received on port {0}. Replying.", SerialPorts[portID].PortName));
+                    if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: SYN received on port {0}. Replying.", SerialPorts[portID].PortName));
                     hs.HandShakeType = 0x01;
                     SerialPorts[portID].sendPacket(CommonPackets.Synchronisation, hs);
                     break;
                 case 0x01:
-                    if (Config.Verbose) Debug.Log(String.Format("KerbalSimPit: SYNACK received on port {0}. Replying.", SerialPorts[portID].PortName));
+                    if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: SYNACK received on port {0}. Replying.", SerialPorts[portID].PortName));
                     hs.HandShakeType = 0x02;
                     SerialPorts[portID].sendPacket(CommonPackets.Synchronisation, hs);
                     break;
@@ -204,7 +204,7 @@ namespace KerbalSimPit
                     Array.Copy(payload, 1, verarray, 0,
                                (payload.Length-1));
                     string VersionString = System.Text.Encoding.UTF8.GetString(verarray);
-                    Debug.Log(String.Format("KerbalSimPit: ACK received on port {0}. Handshake complete, Arduino library version '{1}'.", SerialPorts[portID].PortName, VersionString));
+                    Debug.Log(String.Format("KerbalSimpit: ACK received on port {0}. Handshake complete, Arduino library version '{1}'.", SerialPorts[portID].PortName, VersionString));
                     break;
             }
         }
@@ -218,7 +218,7 @@ namespace KerbalSimPit
                 idx = payload[i];
                 if (Config.Verbose)
                 {
-                    Debug.Log(String.Format("KerbalSimPit: Serial port {0} subscribing to channel {1}", portID, idx));
+                    Debug.Log(String.Format("KerbalSimpit: Serial port {0} subscribing to channel {1}", portID, idx));
                 }
                 toSerialArray[idx].Add(SerialPorts[portID].sendPacket);
             }

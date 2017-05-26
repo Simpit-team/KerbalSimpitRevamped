@@ -2,12 +2,12 @@ using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
-using KerbalSimPit.External;
+using KerbalSimpit.External;
 
-namespace KerbalSimPit.Providers
+namespace KerbalSimpit.Providers
 {
     [KSPAddon(KSPAddon.Startup.Flight, false)]
-    public class KerbalSimPitResourceProvider : MonoBehaviour
+    public class KerbalSimpitResourceProvider : MonoBehaviour
     {
         [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
         public struct ResourceStruct
@@ -74,7 +74,7 @@ namespace KerbalSimPit.Providers
 
                 ScanForResources();
             } else {
-                Debug.Log("KerbalSimPit: AlternateResourcePanel not found. Resource providers WILL NOT WORK.");
+                Debug.Log("KerbalSimpit: AlternateResourcePanel not found. Resource providers WILL NOT WORK.");
             }
         }
 
@@ -112,7 +112,7 @@ namespace KerbalSimPit.Providers
 
         public void ScanForResources()
         {
-            if(KSPit.Config.Verbose) Debug.Log("KerbalSimPit: Vessel changed, scanning for resrouces.");
+            if(KSPit.Config.Verbose) Debug.Log("KerbalSimpit: Vessel changed, scanning for resrouces.");
             LiquidFuelID = GetResourceID("LiquidFuel");
             OxidizerID = GetResourceID("Oxidizer");
             SolidFuelID = GetResourceID("SolidFuel");

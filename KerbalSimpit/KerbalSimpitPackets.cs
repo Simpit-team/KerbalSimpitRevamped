@@ -1,4 +1,4 @@
-namespace KerbalSimPit
+namespace KerbalSimpit
 {
     public static class CommonPackets
     {

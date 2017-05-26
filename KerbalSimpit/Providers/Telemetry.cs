@@ -2,10 +2,10 @@ using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
-namespace KerbalSimPit.Providers
+namespace KerbalSimpit.Providers
 {
     [KSPAddon(KSPAddon.Startup.Flight, false)]
-    public class KerbalSimPitTelemetryProvider : MonoBehaviour
+    public class KerbalSimpitTelemetryProvider : MonoBehaviour
     {
         [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
         public struct AltitudeStruct

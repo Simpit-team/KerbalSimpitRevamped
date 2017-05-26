@@ -8,9 +8,9 @@ using System.Threading;
 using KSP.IO;
 using UnityEngine;
 
-using KerbalSimPit.IO.Ports;
+using KerbalSimpit.IO.Ports;
 
-namespace KerbalSimPit.Serial
+namespace KerbalSimpit.Serial
 {
     public class KSPSerialPort
     {
@@ -80,10 +80,10 @@ namespace KerbalSimPit.Serial
             {
                 isWindows = true;
                 if (KSPit.Config.Verbose)
-                    Debug.Log(String.Format("KerbalSimPit: Using serial polling thread for {0}", pn));
+                    Debug.Log(String.Format("KerbalSimpit: Using serial polling thread for {0}", pn));
             } else {
                 if (KSPit.Config.Verbose)
-                    Debug.Log(String.Format("KerbalSimPit: Using async reader thread for {0}", pn));
+                    Debug.Log(String.Format("KerbalSimpit: Using async reader thread for {0}", pn));
             }
         }
 
@@ -105,7 +105,7 @@ namespace KerbalSimPit.Serial
                 }
                 catch (Exception e)
                 {
-                    Debug.Log(String.Format("KerbalSimPit: Error opening serial port {0}: {1}", PortName, e.Message));
+                    Debug.Log(String.Format("KerbalSimpit: Error opening serial port {0}: {1}", PortName, e.Message));
                 }
             }
             return Port.IsOpen;
@@ -121,7 +121,7 @@ namespace KerbalSimPit.Serial
             }
         }
 
-        // Send a KerbalSimPit packet
+        // Send a KerbalSimpit packet
         public void sendPacket(byte Type, object Data)
         {
             // Note that header sizes are hardcoded here:
@@ -213,12 +213,12 @@ namespace KerbalSimPit.Serial
                 }
                 catch(System.IO.IOException exc)
                 {
-                    Debug.Log(String.Format("KerbalSimPit: IOException in serial worker for {0}: {1}", PortName, exc.ToString()));
+                    Debug.Log(String.Format("KerbalSimpit: IOException in serial worker for {0}: {1}", PortName, exc.ToString()));
                 }
                 Thread.Sleep(10); // TODO: Tune this.
             };
             DoSerialRead = true;
-            Debug.Log(String.Format("KerbalSimPit: Starting poll thread for port {0}", PortName));
+            Debug.Log(String.Format("KerbalSimpit: Starting poll thread for port {0}", PortName));
             while (DoSerialRead)
             {
                 SerialRead();
@@ -243,18 +243,18 @@ namespace KerbalSimPit.Serial
                             }
                             catch(System.IO.IOException exc)
                             {
-                                Debug.Log(String.Format("KerbalSimPit: IOException in serial worker for {0}: {1}", PortName, exc.ToString()));
+                                Debug.Log(String.Format("KerbalSimpit: IOException in serial worker for {0}: {1}", PortName, exc.ToString()));
                             }
                         }, null);
                 }
                 catch (InvalidOperationException)
                 {
-                    Debug.Log(String.Format("KerbalSimPit: Trying to read port {0} that isn't open, sleeping", PortName));
+                    Debug.Log(String.Format("KerbalSimpit: Trying to read port {0} that isn't open, sleeping", PortName));
                     Thread.Sleep(500);
                 }
             };
             DoSerialRead = true;
-            Debug.Log(String.Format("KerbalSimPit: Starting async read thread for port {0}", PortName));
+            Debug.Log(String.Format("KerbalSimpit: Starting async read thread for port {0}", PortName));
             while (DoSerialRead)
             {
                 SerialRead();

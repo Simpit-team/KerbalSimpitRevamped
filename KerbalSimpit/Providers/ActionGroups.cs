@@ -3,10 +3,10 @@ using System.Reflection;
 using KSP.IO;
 using UnityEngine;
 
-namespace KerbalSimPit.Providers
+namespace KerbalSimpit.Providers
 {
     [KSPAddon(KSPAddon.Startup.Flight, false)]
-    public class KerbalSimPitCAGProvider : MonoBehaviour
+    public class KerbalSimpitCAGProvider : MonoBehaviour
     {
         private EventData<byte, object> enableChannel, disableChannel,
             toggleChannel;
@@ -30,7 +30,7 @@ namespace KerbalSimPit.Providers
         public void Start()
         {
             AGXPresent = AGXInstalled();
-            if (KSPit.Config.Verbose) Debug.Log(String.Format("KerbalSimPit: ActionGroupsExtended installed: {0}", AGXPresent));
+            if (KSPit.Config.Verbose) Debug.Log(String.Format("KerbalSimpit: ActionGroupsExtended installed: {0}", AGXPresent));
 
             enableChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived10");
             if (enableChannel != null) enableChannel.Add(enableCAGCallback);

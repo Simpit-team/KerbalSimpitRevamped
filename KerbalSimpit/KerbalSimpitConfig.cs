@@ -5,7 +5,7 @@ using System.Reflection;
 
 using UnityEngine;
 
-namespace KerbalSimPit.Config
+namespace KerbalSimpit.Config
 {
     public class SerialPortNode
     {
@@ -25,7 +25,7 @@ namespace KerbalSimPit.Config
         }
     }
 
-    public class KerbalSimPitConfig
+    public class KerbalSimpitConfig
     {
         public string DocoUrl = "https://bitbucket.org/pjhardy/kerbalsimpit/wiki/PluginConfiguration.md";
         // Settings in the config file are here:
@@ -44,22 +44,22 @@ namespace KerbalSimPit.Config
         public List <SerialPortNode> SerialPorts = new List <SerialPortNode> {};
     
         // Other internal fields follow
-        private const string SettingsNodeName = "KerbalSimPit";
+        private const string SettingsNodeName = "KerbalSimpit";
         private const string SettingsFile = "PluginData/Settings.cfg";
 
         private string FullSettingsPath;
 
-        public KerbalSimPitConfig()
+        public KerbalSimpitConfig()
         {
             FullSettingsPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), SettingsFile).Replace("\\", "/");
 
             if (LoadSettings())
             {
-                Debug.Log("KerbalSimPit: Settings loaded.");
+                Debug.Log("KerbalSimpit: Settings loaded.");
             }
             else
             {
-                Debug.Log("KerbalSimPit: Creating default settings.");
+                Debug.Log("KerbalSimpit: Creating default settings.");
                 CreateDefaultSettings();
             }
         }
@@ -92,10 +92,10 @@ namespace KerbalSimPit.Config
                 }
                 catch (Exception e)
                 {
-                    Debug.Log(String.Format("KerbalSimPit: Settings file couldn't be read: {0}", e));
+                    Debug.Log(String.Format("KerbalSimpit: Settings file couldn't be read: {0}", e));
                 }
             } else {
-                Debug.Log(String.Format("KerbalSimPit: Settings file not found: {0}", FullSettingsPath));
+                Debug.Log(String.Format("KerbalSimpit: Settings file not found: {0}", FullSettingsPath));
             }
 
             return false;
@@ -121,7 +121,7 @@ namespace KerbalSimPit.Config
             }
             catch (Exception e)
             {
-                Debug.Log(String.Format("KerbalSimPit: Settings file couldn't be saved: {0}", e));
+                Debug.Log(String.Format("KerbalSimpit: Settings file couldn't be saved: {0}", e));
             }
 
             return false;

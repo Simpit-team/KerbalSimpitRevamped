@@ -2,10 +2,10 @@ using System;
 using KSP.IO;
 using UnityEngine;
 
-namespace KerbalSimPit.Providers
+namespace KerbalSimpit.Providers
 {
     [KSPAddon(KSPAddon.Startup.Flight, false)]
-    public class KerbalSimPitTargetProvider : MonoBehaviour
+    public class KerbalSimpitTargetProvider : MonoBehaviour
     {
         public struct TargetStruct
         {

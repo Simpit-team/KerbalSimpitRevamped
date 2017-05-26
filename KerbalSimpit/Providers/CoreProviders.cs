@@ -2,10 +2,10 @@ using System;
 using KSP.IO;
 using UnityEngine;
 
-namespace KerbalSimPit.Providers
+namespace KerbalSimpit.Providers
 {
     [KSPAddon(KSPAddon.Startup.Flight, false)]
-    public class KerbalSimPitEchoProvider : MonoBehaviour
+    public class KerbalSimpitEchoProvider : MonoBehaviour
     {
         private EventData<byte, object> echoRequestEvent;
         private EventData<byte, object> echoReplyEvent;
@@ -26,13 +26,13 @@ namespace KerbalSimPit.Providers
 
         public void EchoRequestCallback(byte ID, object Data)
         {
-            if (KSPit.Config.Verbose) Debug.Log(String.Format("KerbalSimPit: Echo request on port {0}. Replying.", ID));
+            if (KSPit.Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Echo request on port {0}. Replying.", ID));
             KSPit.SendToSerialPort(ID, CommonPackets.EchoResponse, Data);
         }
 
         public void EchoReplyCallback(byte ID, object Data)
         {
-            Debug.Log(String.Format("KerbalSimPit: Echo reply received on port {0}.", ID));
+            Debug.Log(String.Format("KerbalSimpit: Echo reply received on port {0}.", ID));
         }
     }
 }
