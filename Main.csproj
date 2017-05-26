@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build"
          xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <AssemblyName>KerbalSimPit</AssemblyName>
+    <AssemblyName>KerbalSimpit</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <OutputType>Library</OutputType>
     <OutputPath>Bin\</OutputPath>
@@ -19,8 +19,8 @@
       <HintPath>KSPResources\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="KerbalSimPit.IO.Ports">
-      <HintPath>SerialBin\KerbalSimPitSerial.dll</HintPath>
+    <Reference Include="KerbalSimpit.IO.Ports">
+      <HintPath>SerialBin\KerbalSimpitSerial.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Mono.Posix">
@@ -28,12 +28,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="KerbalSimPit\KerbalSimPit.cs" />
-    <Compile Include="KerbalSimPit\KSPSerialPort.cs" />
-    <Compile Include="KerbalSimPit\KerbalSimPitConfig.cs" />
-    <Compile Include="KerbalSimPit\KerbalSimPitPackets.cs" />
-    <Compile Include="KerbalSimPit\External\ARPWrapper.cs" />
-    <Compile Include="KerbalSimPit\Providers\*.cs" />
+    <Compile Include="KerbalSimpit\KerbalSimpit.cs" />
+    <Compile Include="KerbalSimpit\KSPSerialPort.cs" />
+    <Compile Include="KerbalSimpit\KerbalSimpitConfig.cs" />
+    <Compile Include="KerbalSimpit\KerbalSimpitPackets.cs" />
+    <Compile Include="KerbalSimpit\External\ARPWrapper.cs" />
+    <Compile Include="KerbalSimpit\Providers\*.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
