@@ -1,5 +1,9 @@
 # Kerbal Sim Pit Changelog
 
+## v0.10 prerelease (2017-05-26)
+
+Built against KSP 1.3. Update metadata to only support 1.3.
+
 ## v0.9 prerelease (2017-05-22)
 
 Hopefully the last prerelease.
