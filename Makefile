@@ -3,42 +3,42 @@ XBUILD=xbuild
 CONFIG=Release
 
 KSPDIR=/Users/peter/Library/Application\ Support/Steam/steamapps/common/Kerbal\ Space\ Program
-INSTALLDIR=$(KSPDIR)/GameData/KerbalSimPit
-CONFIGDIR=$(INSTALLDIR)/PluginData/KerbalSimPit
+INSTALLDIR=$(KSPDIR)/GameData/KerbalSimpit
+CONFIGDIR=$(INSTALLDIR)/PluginData/KerbalSimpit
 
-PACKAGEDIR=package/KerbalSimPit
+PACKAGEDIR=package/KerbalSimpit
 
 ifdef PLUGINVERSION
 	BUILDVERSION=$(PLUGINVERSION)
-	ZIPNAME=KerbalSimPit-$(PLUGINVERSION).zip
+	ZIPNAME=KerbalSimpit-$(PLUGINVERSION).zip
 else
 	BUILDVERSION=0
-	ZIPNAME=KerbalSimPit.zip
+	ZIPNAME=KerbalSimpit.zip
 endif
 
-all:KerbalSimPitSerial.dll KerbalSimPit.dll
+all:KerbalSimpitSerial.dll KerbalSimpit.dll
 
-KerbalSimPit.dll:Properties/AssemblyInfo.cs
+KerbalSimpit.dll:Properties/AssemblyInfo.cs
 	$(XBUILD) /p:Configuration=$(CONFIG) Main.csproj
 
-KerbalSimPitSerial.dll:Properties/SerialAssemblyInfo.cs
+KerbalSimpitSerial.dll:Properties/SerialAssemblyInfo.cs
 	$(XBUILD) /p:Configuration=$(CONFIG) Serial.csproj
 
 install:all
-	cp Bin/KerbalSimPit.dll $(INSTALLDIR)
-	cp Bin/KerbalSimPitSerial.dll $(INSTALLDIR)
+	cp Bin/KerbalSimpit.dll $(INSTALLDIR)
+	cp Bin/KerbalSimpitSerial.dll $(INSTALLDIR)
 	cp Bin/Mono.Posix.dll $(INSTALLDIR)
 
 clean:
 	$(XBUILD) /p:Configuration=$(CONFIG) /t:Clean Main.csproj
 	$(XBUILD) /p:Configuration=$(CONFIG) /t:Clean Serial.csproj
-	rm -f KerbalSimPit.version
+	rm -f KerbalSimpit.version
 	rm -f Properties/AssemblyInfo.cs
 	rm -f Properties/SerialAssemblyInfo.cs
 	rm -f *.zip
 
-KerbalSimPit.version:KerbalSimPit.version.m4 version-info.m4
-	m4 -DBUILDVER=$(BUILDVERSION) version-info.m4 KerbalSimPit.version.m4 > KerbalSimPit.version
+KerbalSimpit.version:KerbalSimpit.version.m4 version-info.m4
+	m4 -DBUILDVER=$(BUILDVERSION) version-info.m4 KerbalSimpit.version.m4 > KerbalSimpit.version
 
 Properties/AssemblyInfo.cs:Properties/AssemblyInfo.cs.m4 version-info.m4
 	m4 -DBUILDVER=$(BUILDVERSION) version-info.m4 Properties/AssemblyInfo.cs.m4 > Properties/AssemblyInfo.cs
@@ -46,11 +46,11 @@ Properties/AssemblyInfo.cs:Properties/AssemblyInfo.cs.m4 version-info.m4
 Properties/SerialAssemblyInfo.cs:Properties/SerialAssemblyInfo.cs.m4 version-info.m4
 	m4 -DBUILDVER=$(BUILDVERSION) version-info.m4 Properties/SerialAssemblyInfo.cs.m4 > Properties/SerialAssemblyInfo.cs
 
-package: all KerbalSimPit.version
+package: all KerbalSimpit.version
 	mkdir -p $(PACKAGEDIR)
 	cp Bin/*.dll $(PACKAGEDIR)
-	cp KerbalSimPit.version $(PACKAGEDIR)
+	cp KerbalSimpit.version $(PACKAGEDIR)
 	cp -r distrib/* $(PACKAGEDIR)
-	cd package; zip -r -9 ../$(ZIPNAME) KerbalSimPit
+	cd package; zip -r -9 ../$(ZIPNAME) KerbalSimpit
 	rm -r package
 
