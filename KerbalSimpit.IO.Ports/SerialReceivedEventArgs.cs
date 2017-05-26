@@ -1,6 +1,6 @@
 using System;
 
-namespace KerbalSimPit.IO.Ports 
+namespace KerbalSimpit.IO.Ports 
 {
 	public class SerialDataReceivedEventArgs : EventArgs
 	{

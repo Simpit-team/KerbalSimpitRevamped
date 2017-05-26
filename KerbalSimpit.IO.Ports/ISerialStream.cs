@@ -9,7 +9,7 @@
 
 using System;
 
-namespace KerbalSimPit.IO.Ports
+namespace KerbalSimpit.IO.Ports
 {
     interface ISerialStream : IDisposable
     {

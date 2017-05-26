@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build"
          xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <AssemblyName>KerbalSimPitSerial</AssemblyName>
+    <AssemblyName>KerbalSimpitSerial</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <OutputType>Library</OutputType>
     <OutputPath>SerialBin\</OutputPath>
@@ -21,7 +21,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="KerbalSimPit.IO.Ports\*.cs" />
+    <Compile Include="KerbalSimpit.IO.Ports\*.cs" />
     <Compile Include="Properties\SerialAssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

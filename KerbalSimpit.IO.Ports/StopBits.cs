@@ -7,7 +7,7 @@
 // (c) Copyright 2006 Novell, Inc. (http://www.novell.com)
 //
 
-namespace KerbalSimPit.IO.Ports 
+namespace KerbalSimpit.IO.Ports 
 {
     public enum StopBits 
     {

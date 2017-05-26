@@ -23,7 +23,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
-namespace KerbalSimPit.IO.Ports
+namespace KerbalSimpit.IO.Ports
 {
     [MonitoringDescription ("")]
     public class SerialPort : Component

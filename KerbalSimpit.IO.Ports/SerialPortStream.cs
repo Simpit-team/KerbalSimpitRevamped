@@ -14,7 +14,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace KerbalSimPit.IO.Ports
+namespace KerbalSimpit.IO.Ports
 {
     class SerialPortStream : Stream, ISerialStream, IDisposable
     {
