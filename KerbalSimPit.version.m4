@@ -1,6 +1,6 @@
 {
-  "NAME": "Kerbal Sim Pit",
-  "URL": "https://hardy.dropbear.id.au/KerbalSimPit/KerbalSimPit.version",
+  "NAME": "Kerbal Simpit",
+  "URL": "https://hardy.dropbear.id.au/KerbalSimpit/KerbalSimpit.version",
   "DOWNLOAD": "https://hardy.dropbear.id.au/KerbalSimPit/pool/KerbalSimPit-BUILDVER.zip",
   "VERSION": {
     "MAJOR": MAJORVER,
