@@ -1,4 +1,4 @@
-# Kerbal Sim Pit
+# Kerbal Simpit
 
 This is a [Kerbal Space Program](https://kerbalspaceprogram.com/) plugin
 to enable communication with devices over a serial connection.

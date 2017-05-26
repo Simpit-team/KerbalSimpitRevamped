@@ -1,4 +1,4 @@
-# Kerbal Sim Pit Changelog
+# Kerbal Simpit Changelog
 
 ## v0.10 prerelease (2017-05-26)
 
