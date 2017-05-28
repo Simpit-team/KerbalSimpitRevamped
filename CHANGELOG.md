@@ -1,5 +1,10 @@
 # Kerbal Simpit Changelog
 
+## v1.0 (2017-05-28)
+
+First stable release. Changed names across both this and the Arduino
+projects to be consistent.
+
 ## v0.10 prerelease (2017-05-26)
 
 Built against KSP 1.3. Update metadata to only support 1.3.
