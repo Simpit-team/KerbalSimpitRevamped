@@ -30,11 +30,14 @@ namespace KerbalSimpit.Providers
             MonoPropellantID, ElectricChargeID, EvaPropellantID,
             OreID, AblatorID;
 
+        private bool ARPPresent;
+
         public void Start()
         {
             ARPWrapper.InitKSPARPWrapper();
             if (ARPWrapper.APIReady)
             {
+                ARPPresent = true;
                 KSPit.AddToDeviceHandler(LFProvider);
                 LFChannel =
                     GameEvents.FindEvent<EventData<byte, object>>("toSerial10");
@@ -74,24 +77,28 @@ namespace KerbalSimpit.Providers
 
                 ScanForResources();
             } else {
+                ARPPresent = false;
                 Debug.Log("KerbalSimpit: AlternateResourcePanel not found. Resource providers WILL NOT WORK.");
             }
         }
 
         public void Update()
         {
-            GetTotalResources(LiquidFuelID, ref TotalLF);
-            GetStageResources(LiquidFuelID, ref StageLF);
-            GetTotalResources(OxidizerID, ref TotalOx);
-            GetStageResources(OxidizerID, ref StageOx);
-            GetTotalResources(SolidFuelID, ref TotalSF);
-            GetStageResources(SolidFuelID, ref StageSF);
-            GetTotalResources(MonoPropellantID, ref TotalMono);
-            GetTotalResources(ElectricChargeID, ref TotalElectric);
-            GetTotalResources(EvaPropellantID, ref TotalEva);
-            GetTotalResources(OreID, ref TotalOre);
-            GetTotalResources(AblatorID, ref TotalAb);
-            GetStageResources(AblatorID, ref StageAb);
+            if (ARPPresent)
+            {
+                GetTotalResources(LiquidFuelID, ref TotalLF);
+                GetStageResources(LiquidFuelID, ref StageLF);
+                GetTotalResources(OxidizerID, ref TotalOx);
+                GetStageResources(OxidizerID, ref StageOx);
+                GetTotalResources(SolidFuelID, ref TotalSF);
+                GetStageResources(SolidFuelID, ref StageSF);
+                GetTotalResources(MonoPropellantID, ref TotalMono);
+                GetTotalResources(ElectricChargeID, ref TotalElectric);
+                GetTotalResources(EvaPropellantID, ref TotalEva);
+                GetTotalResources(OreID, ref TotalOre);
+                GetTotalResources(AblatorID, ref TotalAb);
+                GetStageResources(AblatorID, ref StageAb);
+            }
         }
 
         public void OnDestroy()

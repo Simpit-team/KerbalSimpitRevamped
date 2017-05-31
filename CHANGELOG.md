@@ -1,5 +1,10 @@
 # Kerbal Simpit Changelog
 
+## Current development
+
+* Fix nullrefs from the resource provider when Alternate Resource Panel
+  is not installed.
+
 ## v1.0 (2017-05-28)
 
 First stable release. Changed names across both this and the Arduino
