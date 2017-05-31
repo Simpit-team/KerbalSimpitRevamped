@@ -40,6 +40,9 @@ clean:
 KerbalSimpit.version:KerbalSimpit.version.m4 version-info.m4
 	m4 -DBUILDVER=$(BUILDVERSION) version-info.m4 KerbalSimpit.version.m4 > KerbalSimpit.version
 
+validate:KerbalSimpit.version
+	jq '.' KerbalSimpit.version > /dev/null
+
 Properties/AssemblyInfo.cs:Properties/AssemblyInfo.cs.m4 version-info.m4
 	m4 -DBUILDVER=$(BUILDVERSION) version-info.m4 Properties/AssemblyInfo.cs.m4 > Properties/AssemblyInfo.cs
 
