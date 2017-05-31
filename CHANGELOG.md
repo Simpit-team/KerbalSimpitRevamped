@@ -4,6 +4,7 @@
 
 * Fix nullrefs from the resource provider when Alternate Resource Panel
   is not installed.
+* Add channel for SoI of active vessel.
 
 ## v1.0 (2017-05-28)
 
