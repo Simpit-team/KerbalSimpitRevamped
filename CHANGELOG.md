@@ -1,6 +1,6 @@
 # Kerbal Simpit Changelog
 
-## Current development
+## v1.1 (2017-06-01)
 
 * Fix nullrefs from the resource provider when Alternate Resource Panel
   is not installed.
