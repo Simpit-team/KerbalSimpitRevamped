@@ -28,6 +28,7 @@ namespace KerbalSimpit
         public static byte ActionGroups = 23;
         public static byte ApsidesTime = 24;
         public static byte TargetInfo = 25;
+        public static byte SoIInfo = 26;
     }
 
     public static class InboundPackets

@@ -42,7 +42,7 @@ namespace KerbalSimpit.Providers
         private VelocityStruct myVelocity;
 
         private EventData<byte, object> altitudeChannel, apsidesChannel,
-            apsidesTimeChannel, velocityChannel;
+            apsidesTimeChannel, velocityChannel, soiChannel;
 
         public void Start()
         {
@@ -54,6 +54,8 @@ namespace KerbalSimpit.Providers
             apsidesTimeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial24");
             KSPit.AddToDeviceHandler(VelocityProvider);
             velocityChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial22");
+            KSPit.AddToDeviceHandler(SoIProvider);
+            soiChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial26");
         }
 
         public void OnDestroy()
@@ -62,6 +64,7 @@ namespace KerbalSimpit.Providers
             KSPit.RemoveToDeviceHandler(ApsidesProvider);
             KSPit.RemoveToDeviceHandler(ApsidesTimeProvider);
             KSPit.RemoveToDeviceHandler(VelocityProvider);
+            KSPit.RemoveToDeviceHandler(SoIProvider);
         }
 
         public void AltitudeProvider()
@@ -84,13 +87,19 @@ namespace KerbalSimpit.Providers
             myApsidesTime.periapsis = (int)FlightGlobals.ActiveVessel.orbit.timeToPe;
             if (apsidesTimeChannel != null) apsidesTimeChannel.Fire(OutboundPackets.ApsidesTime, myApsidesTime);
         }
+
         public void VelocityProvider()
         {
-            Orbit curOrbit = FlightGlobals.ActiveVessel.orbit;
             myVelocity.orbital = (float)FlightGlobals.ActiveVessel.obt_speed;
             myVelocity.surface = (float)FlightGlobals.ActiveVessel.srfSpeed;
             myVelocity.vertical = (float)FlightGlobals.ActiveVessel.verticalSpeed;
             if (velocityChannel != null) velocityChannel.Fire(OutboundPackets.Velocities, myVelocity);
+        }
+
+        public void SoIProvider()
+        {
+            string name = FlightGlobals.ActiveVessel.orbit.referenceBody.bodyName;
+            Debug.Log(String.Format("KerbalSimPit: SoI is {0}", name));
         }
     }
 }
