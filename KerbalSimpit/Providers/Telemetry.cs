@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
 using UnityEngine;
 
 namespace KerbalSimpit.Providers
@@ -44,6 +45,8 @@ namespace KerbalSimpit.Providers
         private EventData<byte, object> altitudeChannel, apsidesChannel,
             apsidesTimeChannel, velocityChannel, soiChannel;
 
+        private string CurrentSoI;
+
         public void Start()
         {
             KSPit.AddToDeviceHandler(AltitudeProvider);
@@ -54,7 +57,8 @@ namespace KerbalSimpit.Providers
             apsidesTimeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial24");
             KSPit.AddToDeviceHandler(VelocityProvider);
             velocityChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial22");
-            KSPit.AddToDeviceHandler(SoIProvider);
+
+            CurrentSoI = "";
             soiChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial26");
         }
 
@@ -64,7 +68,18 @@ namespace KerbalSimpit.Providers
             KSPit.RemoveToDeviceHandler(ApsidesProvider);
             KSPit.RemoveToDeviceHandler(ApsidesTimeProvider);
             KSPit.RemoveToDeviceHandler(VelocityProvider);
-            KSPit.RemoveToDeviceHandler(SoIProvider);
+        }
+
+        public void Update()
+        {
+            if (soiChannel != null)
+            {
+                if (FlightGlobals.ActiveVessel.orbit.referenceBody.bodyName != CurrentSoI)
+                {
+                    CurrentSoI = FlightGlobals.ActiveVessel.orbit.referenceBody.bodyName;
+                    soiChannel.Fire(OutboundPackets.SoIName, Encoding.ASCII.GetBytes(CurrentSoI));
+                }
+            }
         }
 
         public void AltitudeProvider()
@@ -94,12 +109,6 @@ namespace KerbalSimpit.Providers
             myVelocity.surface = (float)FlightGlobals.ActiveVessel.srfSpeed;
             myVelocity.vertical = (float)FlightGlobals.ActiveVessel.verticalSpeed;
             if (velocityChannel != null) velocityChannel.Fire(OutboundPackets.Velocities, myVelocity);
-        }
-
-        public void SoIProvider()
-        {
-            string name = FlightGlobals.ActiveVessel.orbit.referenceBody.bodyName;
-            Debug.Log(String.Format("KerbalSimPit: SoI is {0}", name));
         }
     }
 }
