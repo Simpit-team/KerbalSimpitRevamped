@@ -223,31 +223,31 @@ namespace KerbalSimpit.Providers
             byte groups = 0;
             if (FlightGlobals.ActiveVessel.ActionGroups[KSPActionGroup.Stage])
             {
-                groups |= (byte)(1 << ActionGroupBits.StageBit);
+                groups = (byte)(groups | ActionGroupBits.StageBit);
             }
             if (FlightGlobals.ActiveVessel.ActionGroups[KSPActionGroup.Gear])
             {
-                groups |= (byte)(1 << ActionGroupBits.GearBit);
+                groups = (byte)(groups | ActionGroupBits.GearBit);
             }
             if (FlightGlobals.ActiveVessel.ActionGroups[KSPActionGroup.Light])
             {
-                groups |= (byte)(1 << ActionGroupBits.LightBit);
+                groups = (byte)(groups | ActionGroupBits.LightBit);
             }
             if (FlightGlobals.ActiveVessel.ActionGroups[KSPActionGroup.RCS])
             {
-                groups |= (byte)(1 << ActionGroupBits.RCSBit);
+                groups = (byte)(groups | ActionGroupBits.RCSBit);
             }
             if (FlightGlobals.ActiveVessel.ActionGroups[KSPActionGroup.SAS])
             {
-                groups |= (byte)(1 << ActionGroupBits.SASBit);
+                groups = (byte)(groups | ActionGroupBits.SASBit);
             }
             if (FlightGlobals.ActiveVessel.ActionGroups[KSPActionGroup.Brakes])
             {
-                groups |= (byte)(1 << ActionGroupBits.BrakesBit);
+                groups = (byte)(groups | ActionGroupBits.BrakesBit);
             }
             if (FlightGlobals.ActiveVessel.ActionGroups[KSPActionGroup.Abort])
             {
-                groups |= (byte)(1 << ActionGroupBits.AbortBit);
+                groups = (byte)(groups | ActionGroupBits.AbortBit);
             }
             return groups;
         }
