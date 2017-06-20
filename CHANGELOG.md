@@ -1,5 +1,9 @@
 # Kerbal Simpit Changelog
 
+## v1.1.1 (2017-06-20)
+
+* Fix action group status sending.
+
 ## v1.1 (2017-06-01)
 
 * Fix nullrefs from the resource provider when Alternate Resource Panel
