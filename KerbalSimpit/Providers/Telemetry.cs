@@ -37,13 +37,21 @@ namespace KerbalSimpit.Providers
             public float vertical;
         }
 
+        [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
+        public struct AirspeedStruct
+        {
+            public float IAS;
+            public float MachNumber;
+        }
+
         private AltitudeStruct myAlt;
         private ApsidesStruct myApsides;
         private ApsidesTimeStruct myApsidesTime;
         private VelocityStruct myVelocity;
+        private AirspeedStruct myAirspeed;
 
         private EventData<byte, object> altitudeChannel, apsidesChannel,
-            apsidesTimeChannel, velocityChannel, soiChannel;
+            apsidesTimeChannel, velocityChannel, soiChannel, airspeedChannel;
 
         private string CurrentSoI;
 
@@ -57,9 +65,12 @@ namespace KerbalSimpit.Providers
             apsidesTimeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial24");
             KSPit.AddToDeviceHandler(VelocityProvider);
             velocityChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial22");
-
+            // We fire one SoI packet when SoI changes. So no need to use the
+            // periodic DeviceHandler infrastructure.
             CurrentSoI = "";
             soiChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial26");
+            KSPit.AddToDeviceHandler(AirspeedProvider);
+            airspeedChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial27");
         }
 
         public void OnDestroy()
@@ -68,6 +79,7 @@ namespace KerbalSimpit.Providers
             KSPit.RemoveToDeviceHandler(ApsidesProvider);
             KSPit.RemoveToDeviceHandler(ApsidesTimeProvider);
             KSPit.RemoveToDeviceHandler(VelocityProvider);
+            KSPit.RemoveToDeviceHandler(AirspeedProvider);
         }
 
         public void Update()
@@ -109,6 +121,13 @@ namespace KerbalSimpit.Providers
             myVelocity.surface = (float)FlightGlobals.ActiveVessel.srfSpeed;
             myVelocity.vertical = (float)FlightGlobals.ActiveVessel.verticalSpeed;
             if (velocityChannel != null) velocityChannel.Fire(OutboundPackets.Velocities, myVelocity);
+        }
+
+        public void AirspeedProvider()
+        {
+            myAirspeed.IAS = (float)FlightGlobals.ActiveVessel.indicatedAirSpeed;
+            myAirspeed.MachNumber = (float)FlightGlobals.ActiveVessel.mach;
+            if (airspeedChannel != null) airspeedChannel.Fire(OutboundPackets.Airspeed, myAirspeed);
         }
     }
 }
