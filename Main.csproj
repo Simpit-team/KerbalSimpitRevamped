@@ -34,6 +34,7 @@
     <Compile Include="KerbalSimpit\KerbalSimpitPackets.cs" />
     <Compile Include="KerbalSimpit\External\ARPWrapper.cs" />
     <Compile Include="KerbalSimpit\Providers\*.cs" />
+    <Compile Include="KerbalSimpit\Utilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
