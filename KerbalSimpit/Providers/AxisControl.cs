@@ -109,15 +109,15 @@ namespace KerbalSimPit.Providers
                 // yaw = 4
                 if ((myRotation.mask & (byte)1) > 0)
                 {
-                    fcs.pitch = myRotation.pitch;
+                    fcs.pitch = (float)myRotation.pitch/32767;
                 }
                 if ((myRotation.mask & (byte)2) > 0)
                 {
-                    fcs.roll = myRotation.roll;
+                    fcs.roll = (float)myRotation.roll/32767;
                 }
                 if ((myRotation.mask & (byte)4) > 0)
                 {
-                    fcs.yaw = myRotation.yaw;
+                    fcs.yaw = (float)myRotation.yaw/32767;
                 }
                 myRotationFlag = false;
             }
@@ -129,15 +129,15 @@ namespace KerbalSimPit.Providers
                 // Z = 4
                 if ((myTranslation.mask & (byte)1) > 0)
                 {
-                    fcs.X = myTranslation.X;
+                    fcs.X = (float)myTranslation.X/32767;
                 }
                 if ((myTranslation.mask & (byte)2) > 0)
                 {
-                    fcs.Y = myTranslation.Y;
+                    fcs.Y = (float)myTranslation.Y/32767;
                 }
                 if ((myTranslation.mask & (byte)4) > 0)
                 {
-                    fcs.Z = myTranslation.Z;
+                    fcs.Z = (float)myTranslation.Z/32767;
                 }
                 myTranslationFlag = false;
             }
@@ -145,17 +145,17 @@ namespace KerbalSimPit.Providers
             {
                 if ((myWheel.mask & (byte)1) > 0)
                 {
-                    fcs.wheelSteer = myWheel.steer;
+                    fcs.wheelSteer = (float)myWheel.steer/32767;
                 }
                 if ((myWheel.mask & (byte)2) > 0)
                 {
-                    fcs.wheelThrottle = myWheel.throttle;
+                    fcs.wheelThrottle = (float)myWheel.throttle/32767;
                 }
                 myWheelFlag = false;
             }
             if (myThrottleFlag)
             {
-                fcs.mainThrottle = myThrottle;
+                fcs.mainThrottle = (float)myThrottle/32767;
                 myThrottleFlag = false;
             }
         }
