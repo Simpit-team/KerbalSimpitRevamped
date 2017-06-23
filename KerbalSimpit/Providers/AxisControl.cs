@@ -55,6 +55,9 @@ namespace KerbalSimPit.Providers
             if (RotationChannel != null) RotationChannel.Add(vesselRotationCallback);
             TranslationChannel = GameEvents.FindEvent<EventData<byte, object>>("OnSerialReceived17");
             if (TranslationChannel != null) TranslationChannel.Add(vesselTranslationCallback);
+            WheelChannel = GameEvents.FindEvent<EventData<byte, object>>("OnSerialReceived18");
+            if (WheelChannel != null) WheelChannel.Add(wheelCallback);
+
             FlightGlobals.ActiveVessel.OnPostAutopilotUpdate += AutopilotUpdater;
         }
 
@@ -62,6 +65,8 @@ namespace KerbalSimPit.Providers
         {
             if (RotationChannel != null) RotationChannel.Remove(vesselRotationCallback);
             if (TranslationChannel != null) TranslationChannel.Remove(vesselTranslationCallback);
+            if (WheelChannel != null) WheelChannel.Remove(wheelCallback);
+
             FlightGlobals.ActiveVessel.OnPostAutopilotUpdate -= AutopilotUpdater;
         }
 
@@ -75,6 +80,12 @@ namespace KerbalSimPit.Providers
         {
             myTranslation = KerbalSimpitUtils.ByteArrayToStructure<TranslationalStruct>((byte[])Data);
             myTranslationFlag = true;
+        }
+
+        public void wheelCallback(byte ID, object Data)
+        {
+            myWheel = KerbalSimpitUtils.ByteArrayToStructure<WheelStruct>((byte[])Data);
+            myWheelFlag = true;
         }
 
         public void AutopilotUpdater(FlightCtrlState fcs)
@@ -118,6 +129,18 @@ namespace KerbalSimPit.Providers
                     fcs.Z = myTranslation.Z;
                 }
                 myTranslationFlag = false;
+            }
+            if (myWheelFlag)
+            {
+                if ((myWheel.mask & (byte)1) > 0)
+                {
+                    fcs.wheelSteer = myWheel.steer;
+                }
+                if ((myWheel.mask & (byte)2) > 0)
+                {
+                    fcs.wheelThrottle = myWheel.throttle;
+                }
+                myWheelFlag = false;
             }
         }
     }

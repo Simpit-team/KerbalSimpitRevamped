@@ -44,6 +44,7 @@ namespace KerbalSimpit
         public static byte ActionGroupToggle = 15;
         public static byte VesselRotation = 16;
         public static byte VesselTranslation = 17;
+        public static byte WheelControl = 18;
     }
 
     public static class ActionGroupBits
