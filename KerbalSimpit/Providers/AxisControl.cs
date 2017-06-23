@@ -10,59 +10,85 @@ namespace KerbalSimPit.Providers
     public class KerbalSimpitAxisController : MonoBehaviour
     {
         [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
-        public struct ThreeAxisStruct
+        public struct RotationalStruct
         {
             public short pitch;
             public short roll;
             public short yaw;
             public byte mask;
         }
+        [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
+        public struct TranslationalStruct
+        {
+            public short X;
+            public short Y;
+            public short Z;
+            public byte mask;
+        }
+        [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
+        public struct WheelStruct
+        {
+            public short steer;
+            public short throttle;
+            public byte mask;
+        }
+
         // Inbound messages
-        private EventData<byte, object> VesselAttitudeChannel;
+        private EventData<byte, object> RotationChannel, TranslationChannel,
+            WheelChannel, ThrottleChannel;
 
-        private ThreeAxisStruct myControls;
-        private volatile bool myControlsFlag;
+        private RotationalStruct myRotation;
+        private volatile bool myRotationFlag;
 
+        private TranslationalStruct myTranslation;
+        private volatile bool myTranslationFlag;
+
+        private WheelStruct myWheel;
+        private volatile bool myWheelFlag;
+
+        private short myThrottle;
+        private volatile bool myThrottleFlag;
+        
         public void Start()
         {
-            VesselAttitudeChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived16");
-            if (VesselAttitudeChannel != null) VesselAttitudeChannel.Add(vesselAttitudeCallback);
+            RotationChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived16");
+            if (RotationChannel != null) RotationChannel.Add(vesselAttitudeCallback);
             FlightGlobals.ActiveVessel.OnPostAutopilotUpdate += AutopilotUpdater;
         }
 
         public void OnDestroy()
         {
-            if (VesselAttitudeChannel != null) VesselAttitudeChannel.Add(vesselAttitudeCallback);
+            if (RotationChannel != null) RotationChannel.Add(vesselAttitudeCallback);
             FlightGlobals.ActiveVessel.OnPostAutopilotUpdate -= AutopilotUpdater;
         }
 
         public void vesselAttitudeCallback(byte ID, object Data)
         {
-            myControls = KerbalSimpitUtils.ByteArrayToStructure<ThreeAxisStruct>((byte[])Data);
-            myControlsFlag = true;
+            myRotation = KerbalSimpitUtils.ByteArrayToStructure<RotationalStruct>((byte[])Data);
+            myRotationFlag = true;
         }
 
         public void AutopilotUpdater(FlightCtrlState fcs)
         {
-            if (myControlsFlag)
+            if (myRotationFlag)
             {
                 // Note to future Peter: You documented the bit fields here:
                 // pitch = 1
                 // roll = 2
                 // yaw = 4
-                if ((myControls.mask & (byte)1) > 0)
+                if ((myRotation.mask & (byte)1) > 0)
                 {
-                    fcs.pitch = myControls.pitch;
+                    fcs.pitch = myRotation.pitch;
                 }
-                if ((myControls.mask & (byte)2) > 0)
+                if ((myRotation.mask & (byte)2) > 0)
                 {
-                    fcs.roll = myControls.roll;
+                    fcs.roll = myRotation.roll;
                 }
-                if ((myControls.mask & (byte)4) > 0)
+                if ((myRotation.mask & (byte)4) > 0)
                 {
-                    fcs.yaw = myControls.yaw;
+                    fcs.yaw = myRotation.yaw;
                 }
-                myControlsFlag = false;
+                myRotationFlag = false;
             }
         }
     }
