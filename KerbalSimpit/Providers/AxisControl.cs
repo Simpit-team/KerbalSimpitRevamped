@@ -52,20 +52,29 @@ namespace KerbalSimPit.Providers
         public void Start()
         {
             RotationChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived16");
-            if (RotationChannel != null) RotationChannel.Add(vesselAttitudeCallback);
+            if (RotationChannel != null) RotationChannel.Add(vesselRotationCallback);
+            TranslationChannel = GameEvents.FindEvent<EventData<byte, object>>("OnSerialReceived17");
+            if (TranslationChannel != null) TranslationChannel.Add(vesselTranslationCallback);
             FlightGlobals.ActiveVessel.OnPostAutopilotUpdate += AutopilotUpdater;
         }
 
         public void OnDestroy()
         {
-            if (RotationChannel != null) RotationChannel.Add(vesselAttitudeCallback);
+            if (RotationChannel != null) RotationChannel.Remove(vesselRotationCallback);
+            if (TranslationChannel != null) TranslationChannel.Remove(vesselTranslationCallback);
             FlightGlobals.ActiveVessel.OnPostAutopilotUpdate -= AutopilotUpdater;
         }
 
-        public void vesselAttitudeCallback(byte ID, object Data)
+        public void vesselRotationCallback(byte ID, object Data)
         {
             myRotation = KerbalSimpitUtils.ByteArrayToStructure<RotationalStruct>((byte[])Data);
             myRotationFlag = true;
+        }
+
+        public void vesselTranslationCallback(byte ID, object Data)
+        {
+            myTranslation = KerbalSimpitUtils.ByteArrayToStructure<TranslationalStruct>((byte[])Data);
+            myTranslationFlag = true;
         }
 
         public void AutopilotUpdater(FlightCtrlState fcs)
@@ -89,6 +98,26 @@ namespace KerbalSimPit.Providers
                     fcs.yaw = myRotation.yaw;
                 }
                 myRotationFlag = false;
+            }
+            if (myTranslationFlag)
+            {
+                // Again, future Peter: Bit fields:
+                // X = 1
+                // Y = 2
+                // Z = 4
+                if ((myTranslation.mask & (byte)1) > 0)
+                {
+                    fcs.X = myTranslation.X;
+                }
+                if ((myTranslation.mask & (byte)2) > 0)
+                {
+                    fcs.Y = myTranslation.Y;
+                }
+                if ((myTranslation.mask & (byte)4) > 0)
+                {
+                    fcs.Z = myTranslation.Z;
+                }
+                myTranslationFlag = false;
             }
         }
     }
