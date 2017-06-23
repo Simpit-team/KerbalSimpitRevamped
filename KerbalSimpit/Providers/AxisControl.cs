@@ -57,6 +57,8 @@ namespace KerbalSimPit.Providers
             if (TranslationChannel != null) TranslationChannel.Add(vesselTranslationCallback);
             WheelChannel = GameEvents.FindEvent<EventData<byte, object>>("OnSerialReceived18");
             if (WheelChannel != null) WheelChannel.Add(wheelCallback);
+            ThrottleChannel = GameEvents.FindEvent<EventData<byte, object>>("OnSerialReceived19");
+            if (ThrottleChannel != null) ThrottleChannel.Add(throttleCallback);
 
             FlightGlobals.ActiveVessel.OnPostAutopilotUpdate += AutopilotUpdater;
         }
@@ -66,6 +68,7 @@ namespace KerbalSimPit.Providers
             if (RotationChannel != null) RotationChannel.Remove(vesselRotationCallback);
             if (TranslationChannel != null) TranslationChannel.Remove(vesselTranslationCallback);
             if (WheelChannel != null) WheelChannel.Remove(wheelCallback);
+            if (ThrottleChannel!= null) ThrottleChannel.Remove(throttleCallback);
 
             FlightGlobals.ActiveVessel.OnPostAutopilotUpdate -= AutopilotUpdater;
         }
@@ -86,6 +89,14 @@ namespace KerbalSimPit.Providers
         {
             myWheel = KerbalSimpitUtils.ByteArrayToStructure<WheelStruct>((byte[])Data);
             myWheelFlag = true;
+        }
+
+        public void throttleCallback(byte ID, object Data)
+        {
+            // TODO: check length and the like here. Also everywhere else?
+            // Actually let me add that to my Trello board.
+            myThrottle = (short)Data;
+            myThrottleFlag = true;
         }
 
         public void AutopilotUpdater(FlightCtrlState fcs)
@@ -141,6 +152,11 @@ namespace KerbalSimPit.Providers
                     fcs.wheelThrottle = myWheel.throttle;
                 }
                 myWheelFlag = false;
+            }
+            if (myThrottleFlag)
+            {
+                fcs.mainThrottle = myThrottle;
+                myThrottleFlag = false;
             }
         }
     }
