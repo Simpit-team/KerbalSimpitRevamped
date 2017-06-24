@@ -1,5 +1,13 @@
 # Kerbal Simpit Changelog
 
+## v1.2.0 (2017-05-24)
+
+* Added new channels for flight control state handling:
+  * Rotation of active vessel
+  * Translation of active vessel
+  * Wheel steer and throttle of active vessel
+  * Main throttle of active vessel
+
 ## v1.1.1 (2017-06-20)
 
 * Fix action group status sending.
