@@ -37,14 +37,11 @@ namespace KerbalSimPit.Providers
         private EventData<byte, object> RotationChannel, TranslationChannel,
             WheelChannel, ThrottleChannel;
 
-        private RotationalStruct myRotation;
-        private volatile bool myRotationFlag;
+        private RotationalStruct myRotation, newRotation;
 
-        private TranslationalStruct myTranslation;
-        private volatile bool myTranslationFlag;
+        private TranslationalStruct myTranslation, newTranslation;
 
-        private WheelStruct myWheel;
-        private volatile bool myWheelFlag;
+        private WheelStruct myWheel, newWheel;
 
         private short myThrottle;
         private volatile bool myThrottleFlag;
@@ -75,20 +72,61 @@ namespace KerbalSimPit.Providers
 
         public void vesselRotationCallback(byte ID, object Data)
         {
-            myRotation = KerbalSimpitUtils.ByteArrayToStructure<RotationalStruct>((byte[])Data);
-            myRotationFlag = true;
+            
+            newRotation = KerbalSimpitUtils.ByteArrayToStructure<RotationalStruct>((byte[])Data);
+            // Bit fields:
+            // pitch = 1
+            // roll = 2
+            // yaw = 4
+            if ((newRotation.mask & (byte)1) > 0)
+            {
+                myRotation.pitch = newRotation.pitch;
+            }
+            if ((newRotation.mask & (byte)2) > 0)
+            {
+                myRotation.roll = newRotation.roll;
+            }
+            if ((newRotation.mask & (byte)4) > 0)
+            {
+                myRotation.yaw = newRotation.yaw;
+            }
         }
 
         public void vesselTranslationCallback(byte ID, object Data)
         {
-            myTranslation = KerbalSimpitUtils.ByteArrayToStructure<TranslationalStruct>((byte[])Data);
-            myTranslationFlag = true;
+            newTranslation = KerbalSimpitUtils.ByteArrayToStructure<TranslationalStruct>((byte[])Data);
+            // Bit fields:
+            // X = 1
+            // Y = 2
+            // Z = 4
+            if ((newTranslation.mask & (byte)1) > 0)
+            {
+                myTranslation.X = newTranslation.X;
+            }
+            if ((newTranslation.mask & (byte)2) > 0)
+            {
+                myTranslation.Y = newTranslation.Y;
+            }
+            if ((newTranslation.mask & (byte)4) > 0)
+            {
+                myTranslation.Z = newTranslation.Z;
+            }
         }
 
         public void wheelCallback(byte ID, object Data)
         {
-            myWheel = KerbalSimpitUtils.ByteArrayToStructure<WheelStruct>((byte[])Data);
-            myWheelFlag = true;
+            newWheel = KerbalSimpitUtils.ByteArrayToStructure<WheelStruct>((byte[])Data);
+            // Bit fields
+            // steer = 1
+            // throttle = 2
+            if ((newWheel.mask & (byte)1) > 0)
+            {
+                myWheel.steer = newWheel.steer;
+            }
+            if ((newWheel.mask & (byte)2) > 0)
+            {
+                myWheel.throttle = newWheel.throttle;
+            }
         }
 
         public void throttleCallback(byte ID, object Data)
@@ -101,62 +139,44 @@ namespace KerbalSimPit.Providers
 
         public void AutopilotUpdater(FlightCtrlState fcs)
         {
-            if (myRotationFlag)
+            if (myRotation.pitch != 0)
             {
-                // Note to future Peter: You documented the bit fields here:
-                // pitch = 1
-                // roll = 2
-                // yaw = 4
-                if ((myRotation.mask & (byte)1) > 0)
-                {
-                    fcs.pitch = (float)myRotation.pitch/32767;
-                }
-                if ((myRotation.mask & (byte)2) > 0)
-                {
-                    fcs.roll = (float)myRotation.roll/32767;
-                }
-                if ((myRotation.mask & (byte)4) > 0)
-                {
-                    fcs.yaw = (float)myRotation.yaw/32767;
-                }
-                myRotationFlag = false;
+                fcs.pitch = (float)myRotation.pitch/32767;
             }
-            if (myTranslationFlag)
+            if (myRotation.roll != 0)
             {
-                // Again, future Peter: Bit fields:
-                // X = 1
-                // Y = 2
-                // Z = 4
-                if ((myTranslation.mask & (byte)1) > 0)
-                {
-                    fcs.X = (float)myTranslation.X/32767;
-                }
-                if ((myTranslation.mask & (byte)2) > 0)
-                {
-                    fcs.Y = (float)myTranslation.Y/32767;
-                }
-                if ((myTranslation.mask & (byte)4) > 0)
-                {
-                    fcs.Z = (float)myTranslation.Z/32767;
-                }
-                myTranslationFlag = false;
+                fcs.roll = (float)myRotation.roll/32767;
             }
-            if (myWheelFlag)
+            if (myRotation.yaw != 0)
             {
-                if ((myWheel.mask & (byte)1) > 0)
-                {
-                    fcs.wheelSteer = (float)myWheel.steer/32767;
-                }
-                if ((myWheel.mask & (byte)2) > 0)
-                {
-                    fcs.wheelThrottle = (float)myWheel.throttle/32767;
-                }
-                myWheelFlag = false;
+                fcs.yaw = (float)myRotation.yaw/32767;
             }
+
+            if (myTranslation.X != 0)
+            {
+                fcs.X = (float)myTranslation.X/32767;
+            }
+            if (myTranslation.Y != 0)
+            {
+                fcs.Y = (float)myTranslation.Y/32767;
+            }
+            if (myTranslation.Z != 0)
+            {
+                fcs.Z = (float)myTranslation.Z/32767;
+            }
+
+            if (myWheel.steer != 0)
+            {
+                fcs.wheelSteer = (float)myWheel.steer/32767;
+            }
+            if (myWheel.throttle != 0)
+            {
+                fcs.wheelThrottle = (float)myWheel.throttle/32767;
+            }
+
             if (myThrottleFlag)
             {
                 fcs.mainThrottle = (float)myThrottle/32767;
-                myThrottleFlag = false;
             }
         }
     }
