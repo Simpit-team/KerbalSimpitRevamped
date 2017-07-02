@@ -2,10 +2,10 @@ KerbalSimpit
 {
 	Documentation = https://bitbucket.org/pjhardy/kerbalsimpit/wiki/edit/PluginConfiguration
 	Verbose = False
-    RefreshRate = 80
+	RefreshRate = 125
 	SerialPort
 	{
-		PortName = /dev/ttyS0
+		PortName = COM1
 		BaudRate = 115200
 	}
 }

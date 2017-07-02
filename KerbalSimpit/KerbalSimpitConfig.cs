@@ -36,7 +36,7 @@ namespace KerbalSimpit.Config
         public bool Verbose = false;
 
         [Persistent]
-        public int RefreshRate = 80;
+        public int RefreshRate = 125;
 
         // public members that aren't persisted in the config file:
         public int EventQueueSize = 32;
