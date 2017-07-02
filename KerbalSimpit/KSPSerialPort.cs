@@ -248,6 +248,7 @@ namespace KerbalSimpit.Serial
             {
                 SerialWrite();
             }
+            Debug.Log(String.Format("KerbalSimpit: Write thread for port {0} exiting.", PortName));
         }
 
         private void SerialPollingWorker()
@@ -275,6 +276,7 @@ namespace KerbalSimpit.Serial
             {
                 SerialRead();
             }
+            Debug.Log(String.Format("KerbalSimpit: Poll thread for port {0} exiting.", PortName));
         }
 
         // This method spawns a new thread to read data from the serial connection
@@ -310,6 +312,7 @@ namespace KerbalSimpit.Serial
             {
                 SerialRead();
             }
+            Debug.Log(String.Format("KerbalSimpit: async read thread for port {0} exiting.", PortName));
         }
 
         // Handle data read in worker thread
