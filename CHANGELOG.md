@@ -1,6 +1,12 @@
 # Kerbal Simpit Changelog
 
-## v1.2.0 (2017-05-24)
+## v1.2.1 (2017-07-03)
+
+* Serial port wrapper now uses an internal queue, to prevent multiple
+  threads trying to write to the port. Should prevent TimeoutExceptions.
+* Increased default RefreshRate to 125.
+
+## v1.2.0 (2017-06-24)
 
 * Added new channels for flight control state handling:
   * Rotation of active vessel
