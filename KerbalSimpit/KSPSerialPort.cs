@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -12,11 +13,19 @@ using KerbalSimpit.IO.Ports;
 
 namespace KerbalSimpit.Serial
 {
+    /* KSPSerialPort
+       This class includes a threadsafe queue implementation based on
+       https://stackoverflow.com/questions/12375339/threadsafe-fifo-queue-buffer
+    */
+
     public class KSPSerialPort
     {
         public string PortName;
         private int BaudRate;
         public  byte ID;
+
+        private readonly object queueLock = new object();
+        private Queue<byte[]> packetQueue = new Queue<byte[]>();
 
         private SerialPort Port;
     
@@ -43,8 +52,8 @@ namespace KerbalSimpit.Serial
         private byte CurrentBytesRead;
         private byte[] PayloadBuffer = new byte[255];
         // Semaphore to indicate whether the reader worker should do work
-        private volatile bool DoSerialRead;
-        private Thread SerialThread;
+        private volatile bool DoSerial;
+        private Thread SerialReadThread, SerialWriteThread;
 
         // If we're opening a COM serial port, assume we're running on Windows.
         private bool isWindows = false;
@@ -65,7 +74,7 @@ namespace KerbalSimpit.Serial
             BaudRate = br;
             ID = idx;
 
-            DoSerialRead = false;
+            DoSerial = false;
             // Note that we initialise the packet buffer once, and reuse it.
             // I don't know if that's acceptable C# or not.
             // But I hope it's faster.
@@ -94,14 +103,17 @@ namespace KerbalSimpit.Serial
                 try
                 {
                     Port.Open();
+                    SerialWriteThread = new Thread(SerialWriteQueueRunner);
                     if (isWindows)
                     {
-                        SerialThread = new Thread(SerialPollingWorker);
+                        SerialReadThread = new Thread(SerialPollingWorker);
                     } else {
-                        SerialThread = new Thread(AsyncReaderWorker);
+                        SerialReadThread = new Thread(AsyncReaderWorker);
                     }
-                    SerialThread.Start();
-                    while (!SerialThread.IsAlive);
+                    DoSerial = true;
+                    SerialReadThread.Start();
+                    SerialWriteThread.Start();
+                    while (!SerialReadThread.IsAlive || !SerialWriteThread.IsAlive);
                 }
                 catch (Exception e)
                 {
@@ -115,13 +127,15 @@ namespace KerbalSimpit.Serial
         public void close() {
             if (Port.IsOpen)
             {
-                DoSerialRead = false;
+                DoSerial = false;
                 Thread.Sleep(500);
                 Port.Close();
             }
         }
 
-        // Send a KerbalSimpit packet
+        // Construct a KerbalSimpit packet, and enqueue it.
+        // Note that callers of this method are rarely in the main
+        // game thread, hence using a threadsafe queue implementation.
         public void sendPacket(byte Type, object Data)
         {
             // Note that header sizes are hardcoded here:
@@ -138,13 +152,17 @@ namespace KerbalSimpit.Serial
                 buf = ObjectToByteArray(Data);
             }
             byte PayloadSize = (byte)Math.Min(buf.Length, (MaxPacketSize-4));
-            byte PacketSize = (byte)(PayloadSize + 4);
+            // Hopefully just using the length of the array is enough and
+            // we don't need this any more. Fallback: Put it in the first
+            // byte of the outbountpacketbuffer.
+            //byte PacketSize = (byte)(PayloadSize + 4);
             OutboundPacketBuffer[2] = PayloadSize;
             OutboundPacketBuffer[3] = Type;
             Array.Copy(buf, 0, OutboundPacketBuffer, 4, PayloadSize);
-            if (Port.IsOpen)
+            lock(queueLock)
             {
-                Port.Write(OutboundPacketBuffer, 0, PacketSize);
+                packetQueue.Enqueue(OutboundPacketBuffer);
+                Monitor.PulseAll(queueLock);
             }
         }
 
@@ -197,6 +215,41 @@ namespace KerbalSimpit.Serial
             return arr;
         }
 
+        private void SerialWriteQueueRunner()
+        {
+            Action SerialWrite = null;
+            SerialWrite = delegate {
+                byte[] dequeued = null;
+                lock(queueLock)
+                {
+                    // If the queue is empty and serial is still running,
+                    // use Monitor to wait until we're told it changed.
+                    if (packetQueue.Count == 0)
+                    {
+                        Monitor.Wait(queueLock);
+                    }
+
+                    // Check if there's anything in the queue.
+                    // Note that the queue might still be empty if we
+                    // were waiting and serial has stopped.
+                    if (packetQueue.Count > 0)
+                    {
+                        dequeued = packetQueue.Dequeue();
+                    }
+                }
+                if (dequeued != null && Port.IsOpen)
+                {
+                    Port.Write(dequeued, 0, dequeued.Length);
+                    dequeued = null;
+                }
+            };
+            Debug.Log(String.Format("KerbalSimpit: Starting write thread for port {0}", PortName));
+            while (DoSerial)
+            {
+                SerialWrite();
+            }
+        }
+
         private void SerialPollingWorker()
         {
             Action SerialRead = null;
@@ -217,9 +270,8 @@ namespace KerbalSimpit.Serial
                 }
                 Thread.Sleep(10); // TODO: Tune this.
             };
-            DoSerialRead = true;
             Debug.Log(String.Format("KerbalSimpit: Starting poll thread for port {0}", PortName));
-            while (DoSerialRead)
+            while (DoSerial)
             {
                 SerialRead();
             }
@@ -253,9 +305,8 @@ namespace KerbalSimpit.Serial
                     Thread.Sleep(500);
                 }
             };
-            DoSerialRead = true;
             Debug.Log(String.Format("KerbalSimpit: Starting async read thread for port {0}", PortName));
-            while (DoSerialRead)
+            while (DoSerial)
             {
                 SerialRead();
             }
