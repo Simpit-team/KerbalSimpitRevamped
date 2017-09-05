@@ -1,5 +1,9 @@
 # Kerbal Simpit Changelog
 
+## v1.2.2 (2017-09-06)
+
+Built against KSP 1.3.1 prerelease.
+
 ## v1.2.1 (2017-07-03)
 
 * Serial port wrapper now uses an internal queue, to prevent multiple
