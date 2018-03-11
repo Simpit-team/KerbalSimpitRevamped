@@ -11,9 +11,9 @@ export KSPLIBDIR=${KSPDIR}/KSP_Data/Managed
 # assorted things. But Bamboo does not have a good way to
 # manually set this, so it's been reset across a couple of
 # rebuilds. Use an epoch to increment it manually:
-if [ -v bamboo.buildNumber ]; then
+if [ -v bamboo_buildNumber ]; then
     BAMBOOEPOCH=40
-    let PLUGINVERSION=$BAMBOOEPOCH+${bamboo.buildNumber}
+    let PLUGINVERSION=$BAMBOOEPOCH+${bamboo_buildNumber}
     export PLUGINVERSION
 fi
 
