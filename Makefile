@@ -2,7 +2,9 @@ export PATH := /usr/local/bin:$(PATH)
 XBUILD=xbuild
 CONFIG=Release
 
-KSPDIR=/Users/peter/Library/Application\ Support/Steam/steamapps/common/Kerbal\ Space\ Program
+ifndef KSPDIR
+	KSPDIR=/Users/peter/Library/Application\ Support/Steam/steamapps/common/Kerbal\ Space\ Program
+endif
 INSTALLDIR=$(KSPDIR)/GameData/KerbalSimpit
 CONFIGDIR=$(INSTALLDIR)/PluginData/KerbalSimpit
 
