@@ -17,4 +17,4 @@ if [ -v bamboo.buildNumber ]; then
     export PLUGINVERSION
 fi
 
-make
+make package
