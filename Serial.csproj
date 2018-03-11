@@ -16,7 +16,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>KSPResources\Assembly-CSharp.dll</HintPath>
+      <HintPath>$(KSPLIBDIR)/Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

@@ -1,12 +1,40 @@
-export PATH := /usr/local/bin:$(PATH)
+######################################################################
+#
+# Kerbal SimPit Makefile
+#
+######################################################################
+
+# Configurable paths
+
+# KSPDIR
+# This should be the path to a valid Kerbal Space Program installation.
+# Defining KSPDIR in the environment will override this.
+ifndef KSPDIR
+	KSPDIR=/Users/peter/KerbalSpaceProgram
+endif
+
+# KSPLIBDIR
+# Path to the KSP managed libraries. Again, setting KSPLIBDIR in
+# the environment will overwrite this.
+ifndef KSPLIBDIR
+	# This default works for macOS
+	KSPLIBDIR=$(KSPDIR)/KSP.app/Contents/Resources/Data/Managed
+	# On Linux, comment out the above line and try this
+	# KSPLIBDIR=$(KSPDIR)/KSP_Data/Managed
+endif
+
+# Things less likely to need configuring:
+
+# INSTALLDIR
+# Where to install the plugin
+INSTALLDIR=$(KSPDIR)/GameData/KerbalSimpit
+# CONFIGDIR
+# Where the plugin's configuration files are stored
+CONFIGDIR=$(INSTALLDIR)/PluginData/KerbalSimpit
+
+# Shouldn't need to change variables below here
 XBUILD=xbuild
 CONFIG=Release
-
-ifndef KSPDIR
-	KSPDIR=/Users/peter/Library/Application\ Support/Steam/steamapps/common/Kerbal\ Space\ Program
-endif
-INSTALLDIR=$(KSPDIR)/GameData/KerbalSimpit
-CONFIGDIR=$(INSTALLDIR)/PluginData/KerbalSimpit
 
 PACKAGEDIR=package/KerbalSimpit
 
@@ -17,6 +45,9 @@ else
 	BUILDVERSION=0
 	ZIPNAME=KerbalSimpit.zip
 endif
+
+export KSPDIR
+export KSPLIBDIR
 
 all:KerbalSimpitSerial.dll KerbalSimpit.dll
 

@@ -12,15 +12,15 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>KSPResources\Assembly-CSharp.dll</HintPath>
+      <HintPath>$(KSPLIBDIR)/Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>KSPResources\UnityEngine.dll</HintPath>
+      <HintPath>$(KSPLIBDIR)/UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="KerbalSimpit.IO.Ports">
-      <HintPath>SerialBin\KerbalSimpitSerial.dll</HintPath>
+      <HintPath>SerialBin/KerbalSimpitSerial.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Mono.Posix">
@@ -38,4 +38,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="FakeBuild">
+    <Message Text="Using $(KSPLIBDIR)/UnityEngine.dll"/>
+  </Target>
 </Project>
