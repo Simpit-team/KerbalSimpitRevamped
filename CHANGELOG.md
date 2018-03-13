@@ -1,5 +1,9 @@
 # Kerbal Simpit Changelog
 
+## v1.2.4 (20218-03-14)
+
+Built against KSP 1.4.1.
+
 ## v1.2.3 (2018-03-11)
 
 Built against KSP 1.4.
