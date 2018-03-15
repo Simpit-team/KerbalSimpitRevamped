@@ -1,6 +1,15 @@
 # Kerbal Simpit Changelog
 
-## v1.2.4 (20218-03-14)
+## v1.2.5 (2018-03-16)
+
+* Partial fix for broken throttle handler. The receive handler is
+  set up properly now, but it looks like it's still getting buggy
+  values.
+* Added debug logging around the throttle handler. With verbose
+  set to true in the config file, all decoded throttle packets
+  are logged.
+
+## v1.2.4 (2018-03-14)
 
 Built against KSP 1.4.1.
 

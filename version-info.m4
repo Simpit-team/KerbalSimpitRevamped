@@ -1,6 +1,6 @@
 define(`MAJORVER', `1')dnl
 define(`MINORVER', `2')dnl
-define(`PATCHVER', `4')dnl
+define(`PATCHVER', `5')dnl
 dnl
 define(`SERIALMAJORVER', `1')dnl
 define(`SERIALMINORVER', `0')dnl
