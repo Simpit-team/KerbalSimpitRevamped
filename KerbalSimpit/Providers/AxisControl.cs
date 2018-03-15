@@ -178,7 +178,7 @@ namespace KerbalSimPit.Providers
             if (myThrottleFlag)
             {
 		if(KSPit.Config.Debug) {
-		    Debug.Log(String.Format("KerbalSimpit: Setting throttle to {0}/32767": {0}));
+		    Debug.Log(String.Format("KerbalSimpit: Setting throttle to {0}/32767", {0}));
 		}
                 fcs.mainThrottle = (float)myThrottle/32767;
             }
