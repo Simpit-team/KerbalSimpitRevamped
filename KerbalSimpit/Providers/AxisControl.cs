@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
+using KerbalSimpit;
 using KerbalSimpit.Utilities;
 
 namespace KerbalSimPit.Providers
@@ -176,6 +177,9 @@ namespace KerbalSimPit.Providers
 
             if (myThrottleFlag)
             {
+		if(KSPit.Config.Debug) {
+		    Debug.Log(String.Format("KerbalSimpit: Setting throttle to {0}/32767": {0}));
+		}
                 fcs.mainThrottle = (float)myThrottle/32767;
             }
         }
