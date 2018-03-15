@@ -134,7 +134,7 @@ namespace KerbalSimPit.Providers
         {
             // TODO: check length and the like here. Also everywhere else?
             // Actually let me add that to my Trello board.
-            myThrottle = KerbalSimpitUtils.ByteArrayToStructure<short>((byte[])Data);
+            myThrottle = BitConverter.ToInt16((byte[])Data, 0);
             myThrottleFlag = true;
         }
 
