@@ -50,11 +50,11 @@ namespace KerbalSimPit.Providers
         {
             RotationChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived16");
             if (RotationChannel != null) RotationChannel.Add(vesselRotationCallback);
-            TranslationChannel = GameEvents.FindEvent<EventData<byte, object>>("OnSerialReceived17");
+            TranslationChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived17");
             if (TranslationChannel != null) TranslationChannel.Add(vesselTranslationCallback);
-            WheelChannel = GameEvents.FindEvent<EventData<byte, object>>("OnSerialReceived18");
+            WheelChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived18");
             if (WheelChannel != null) WheelChannel.Add(wheelCallback);
-            ThrottleChannel = GameEvents.FindEvent<EventData<byte, object>>("OnSerialReceived19");
+            ThrottleChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived19");
             if (ThrottleChannel != null) ThrottleChannel.Add(throttleCallback);
 
             FlightGlobals.ActiveVessel.OnPostAutopilotUpdate += AutopilotUpdater;
