@@ -1,5 +1,9 @@
 # Kerbal Simpit Changelog
 
+## v1.2.6 (2018-03-29)
+
+Built against KSP 1.4.2.
+
 ## v1.2.5 (2018-03-16)
 
 * Partial fix for broken throttle handler. The receive handler is
