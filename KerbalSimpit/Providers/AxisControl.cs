@@ -36,7 +36,7 @@ namespace KerbalSimPit.Providers
 
         // Inbound messages
         private EventData<byte, object> RotationChannel, TranslationChannel,
-            WheelChannel, ThrottleChannel;
+            WheelChannel, ThrottleChannel, AutopilotChannel;
 
         private RotationalStruct myRotation, newRotation;
 
@@ -46,7 +46,10 @@ namespace KerbalSimPit.Providers
 
         private short myThrottle;
         private volatile bool myThrottleFlag;
-        
+
+        private byte mySASMode;
+        private Vessel myActiveVessel;
+
         public void Start()
         {
             RotationChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived16");
@@ -57,6 +60,8 @@ namespace KerbalSimPit.Providers
             if (WheelChannel != null) WheelChannel.Add(wheelCallback);
             ThrottleChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived19");
             if (ThrottleChannel != null) ThrottleChannel.Add(throttleCallback);
+            AutopilotChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived28");
+            if (AutopilotChannel != null) AutopilotChannel.Add(autopilotModeCallback);
 
             FlightGlobals.ActiveVessel.OnPostAutopilotUpdate += AutopilotUpdater;
         }
@@ -67,13 +72,14 @@ namespace KerbalSimPit.Providers
             if (TranslationChannel != null) TranslationChannel.Remove(vesselTranslationCallback);
             if (WheelChannel != null) WheelChannel.Remove(wheelCallback);
             if (ThrottleChannel!= null) ThrottleChannel.Remove(throttleCallback);
+            if (AutopilotChannel!= null) AutopilotChannel.Remove(autopilotModeCallback);
 
             FlightGlobals.ActiveVessel.OnPostAutopilotUpdate -= AutopilotUpdater;
         }
 
         public void vesselRotationCallback(byte ID, object Data)
         {
-            
+
             newRotation = KerbalSimpitUtils.ByteArrayToStructure<RotationalStruct>((byte[])Data);
             // Bit fields:
             // pitch = 1
@@ -138,6 +144,20 @@ namespace KerbalSimPit.Providers
             myThrottleFlag = true;
         }
 
+        public void autopilotModeCallback(byte ID, object Data)
+        {
+            myActiveVessel = FlightGlobals.ActiveVessel;
+            byte[] payload = (byte[])Data;
+
+            mySASMode = payload[0];
+            myActiveVessel.Autopilot.SetMode((VesselAutopilot.AutopilotMode)mySASMode);
+            if(KSPit.Config.Verbose)
+            {
+                Debug.Log(String.Format("KerbalSimpit: payload is {0}", mySASMode));
+                Debug.Log(String.Format("KerbalSimpit: SAS mode is {0}", myActiveVessel.Autopilot.Mode));
+            }
+        }
+
         public void AutopilotUpdater(FlightCtrlState fcs)
         {
             if (myRotation.pitch != 0)
@@ -177,12 +197,12 @@ namespace KerbalSimPit.Providers
 
             if (myThrottleFlag)
             {
-		if(KSPit.Config.Verbose) {
-		    Debug.Log(String.Format("KerbalSimpit: Setting throttle to {0}/32767", myThrottle));
-		}
+            		if(KSPit.Config.Verbose)
+                {
+            		    Debug.Log(String.Format("KerbalSimpit: Setting throttle to {0}/32767", myThrottle));
+            		}
                 fcs.mainThrottle = (float)myThrottle/32767;
             }
         }
     }
 }
-
