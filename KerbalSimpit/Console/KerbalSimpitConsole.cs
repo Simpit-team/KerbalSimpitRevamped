@@ -1,6 +1,7 @@
 ﻿using KSP.UI.Screens.DebugToolbar;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -21,11 +22,13 @@ using UnityEngine;
 // Namespace for all console code
 namespace KerbalSimpit.Console
 {
-    class KerbalSimpitConsole : MonoBehaviour
+
+    [KSPAddon(KSPAddon.Startup.Instantly, false)]
+    public class KerbalSimpitConsole : MonoBehaviour
     {
         internal const string SIMPIT_IDENTIFIER = "sim";
         internal const string SIMPIT_COMMAND = null;
-        private const string SIMPIT_HELP = "Commands for assisting the usage of Kerbal Simpit";
+        private readonly string SIMPIT_HELP = string.Format("Commands for assisting the usage of Kerbal Simpit. Try \"/{0} help\" for a list of commands", SIMPIT_IDENTIFIER);
         private const string SIMPIT_USAGE = null;
 
         private static bool commands_initialised = false;
@@ -36,6 +39,7 @@ namespace KerbalSimpit.Console
         };
 
 
+        
         private void Start()
         {
             // If the commands have already been initialised
@@ -47,40 +51,52 @@ namespace KerbalSimpit.Console
             commands_initialised = true;
         }
 
+        private void AddDebugConsoleCommand()
+        {
+            // Does this do anything? Was in example?
+        }
+
+
         // What to do when the command is called
 
         private void OnCommand(string simpit_arg_string)
         {
-
+            Debug.Log("Called Sim Command");
             // Gets the commands passed in one string, into an array
             string[] simpit_command_arg_array = Simpit_Parse_Commands(simpit_arg_string);
-
+           // Debug.Log("Parsed Command");
+         //   Debug.Log(simpit_command_arg_array[0]);
+           // Debug.Log("Before Check Length");
             // If the command array has a length of 1, set the command array to have the value of the SIMPIT_HELP message
             if(simpit_command_arg_array.Length == 0) simpit_command_arg_array = new string[] { SIMPIT_HELP };
-
+            Debug.Log(simpit_command_arg_array[0]);
+            Debug.Log("After check for length of one");
             // Sets the first command to the first entry in the array. 
             // If this is a Simpit Command, this should be the identifier "sim"
-            string simpit_identifier = simpit_command_arg_array[0];
-
+            //string simpit_identifier = simpit_command_arg_array[0];
+            Debug.Log("Get possible identifier");
             // Init a list, that has a length one less than that of the command array, accounting for the leading identifier
             string[] simpit_command_args = new string[simpit_command_arg_array.Length - 1];
-
-            for(int i = 0; i < simpit_command_args.Length; ++i)
+            Debug.Log("Created new List");
+            for(int i = 0; i < simpit_command_args.Length; i++)
             {
                 simpit_command_args[i] = simpit_command_arg_array[i + 1];
             }
 
+            Debug.Log("Populated Argument List");
 
-            for(int i = 0; i < SIMPIT_COMMANDS.Length; ++i)
+            for(int i = 0; i < SIMPIT_COMMANDS.Length; i ++)
             {
-                if(SIMPIT_COMMANDS[i].Simpit_Identifier == simpit_identifier)
-                {
-                    if(simpit_command_args.Length == 1 && simpit_command_args[0] == SIMPIT_IDENTIFIER)
+                //if(SIMPIT_COMMANDS[i].Simpit_Identifier == simpit_identifier)
+               //{
+                    if(simpit_command_args.Length == 1 && simpit_command_args[0] == SIMPIT_COMMANDS[0].Simpit_Command)
                     {
-
+                        Debug.Log(SIMPIT_HELP);
                     }
-                }
+                //}
             }
+
+            Debug.Log("Should have printed help");
 
         }
 
