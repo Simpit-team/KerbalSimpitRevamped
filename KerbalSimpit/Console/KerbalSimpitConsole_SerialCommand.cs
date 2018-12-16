@@ -14,6 +14,8 @@ namespace KerbalSimpit.Console
         public KerbalSimpitConsole_SerialCommand() : base(SERIAL_COMMAND, SERIAL_HELP, SERIAL_USAGE) { }
 
 
+        // Place holder code, yet to implement anything
+
         public override void Simpit_Command_Call(string[] simpit_command_args)
         {
             throw new NotImplementedException();

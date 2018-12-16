@@ -23,24 +23,25 @@ using static KSP.UI.Screens.MessageSystem;
 // Namespace for all console code
 namespace KerbalSimpit.Console
 {
-
+    // When this thing is to be started
     [KSPAddon(KSPAddon.Startup.Instantly, false)]
     public class KerbalSimpitConsole : MonoBehaviour
     {
         internal const string SIMPIT_IDENTIFIER = "sim";
         internal const string SIMPIT_COMMAND = null;
-        private readonly string SIMPIT_HELP = string.Format("Commands for assisting the usage of Kerbal Simpit. Try \"/{0} help\" for a list of commands", SIMPIT_IDENTIFIER);
+        private readonly string SIMPIT_HELP = string.Format("Commands for assisting the usage of Kerbal Simpit. Try \"/{0} help\" for a full list of commands", SIMPIT_IDENTIFIER);
         private readonly string SIMPIT_USAGE = null;
 
+        // Have the commands been initialised yet
         private static bool commands_initialised = false;
-        internal static readonly SimpitConsoleCommand[] SIMPIT_COMMANDS = {
 
+        // Array with instances of the commands
+        internal static readonly SimpitConsoleCommand[] SIMPIT_COMMANDS = {
             new KerbalSimpitConsole_HelpCommand(),
             new KerbalSimpitConsole_SerialCommand()
         };
 
-
-        
+        // Start method, standard unity thingy
         private void Start()
         {
             // If the commands have already been initialised
@@ -59,63 +60,61 @@ namespace KerbalSimpit.Console
 
 
         // What to do when the command is called
-
         private void OnCommand(string simpit_arg_string)
         {
             // Gets the commands passed in one string, into an array
             string[] read_in_commands = Simpit_Parse_Commands(simpit_arg_string);
-            Debug.Log("Parsed Commands");
-            // Variable storing the command to be processed
-            //string simpit_command = simpit_command_arg_array[0];
-            Debug.Log("Stored Command");
-
+            
+            // Initialises a blank list to recieve command arguments if required
             string[] command_arguments = new string[0];
-            Debug.Log("Init args list");
+
             // If the command array has a length of 0, print the help message, and return
             if (read_in_commands.Length == 0)
             {
-
+                // Print help message, then return
                 Debug.Log(SIMPIT_HELP);
                 return;
-
             }
 
+            // If more than just "/sim" was entered into the terminal, do the following
             else if(read_in_commands.Length > 1)
             {
-                Debug.Log("Read in commands greater than 1");
                 // Init a list, that has a length one less than that of the argument array, accounting for the leading command
                 command_arguments = new string[read_in_commands.Length - 1];
+
                 // Populates the list with the argument values, without the command
-                Debug.Log("Before Populating arguments list");
                 for (int i = 0; i < read_in_commands.Length - 1; i++)
                 {
+                    // Sets the command arguments, to the value of the provided input, offset by one
+                    // Offset allows for the fact a command word will be present, before the arguments
                     command_arguments[i] = read_in_commands[i + 1];
                 }
-                Debug.Log("Initialised arg list");
 
             }
 
-            //
+            // Cycles through the commands, until a command matches up and is then passed the arguments
             for(int i = 0; i < SIMPIT_COMMANDS.Length; i ++)
             {
                
-                    if(read_in_commands[0] == SIMPIT_COMMANDS[0].Simpit_Command && command_arguments.Length == 0)
-                    {
-                    Debug.Log("Read in only help command");
-                        SIMPIT_COMMANDS[0].Simpit_Command_Call(new string[0]);
-                        return;
-                    }
-                    else if(read_in_commands[0] == SIMPIT_COMMANDS[0].Simpit_Command)
-                    {
-                    Debug.Log("Read in more than help command");
-                        SIMPIT_COMMANDS[0].Simpit_Command_Call(command_arguments);
-                        return;
-                    }
+                // IF the read in command is help, and there are no arguments
+                if(read_in_commands[0] == SIMPIT_COMMANDS[0].Simpit_Command && command_arguments.Length == 0)
+                {
+                    // Call the help command, and pass it an empty string array
+                    SIMPIT_COMMANDS[0].Simpit_Command_Call(new string[0]);
+                    return;
+                }
+                // Else if the read in command is help, and there are arguments present
+                else if(read_in_commands[0] == SIMPIT_COMMANDS[0].Simpit_Command)
+                {
+                    // Call the help command, passing the arguments that have been read in
+                    SIMPIT_COMMANDS[0].Simpit_Command_Call(command_arguments);
+                    return;
+                }
             }
-
 
         }
 
+        // Method to convert a string containing the command and possible argument/s, into an array
         private static string[] Simpit_Parse_Commands(string simpit_arg_string)
         {
 
@@ -136,13 +135,17 @@ namespace KerbalSimpit.Console
         }
 
 
-        // Base class for all Kerbal Simpit Commands
+        /// <summary>
+        ///  Base class for all Kerbal Simpit Commands
+        /// </summary>
         internal abstract class SimpitConsoleCommand
         {
+
             private readonly string simpit_command;
             private readonly string simpit_help;
             private readonly string simpit_usage;
 
+            // Constructor to set values for a command
             protected SimpitConsoleCommand( string simpit_command ,string simpit_help, string simpit_usage = null)
             {
                 this.simpit_command = simpit_command;
@@ -166,12 +169,21 @@ namespace KerbalSimpit.Console
             }
 
 
+            /// <summary>
+            /// Abstract placeholder for the unique command call methods in each command class
+            /// </summary>
+            /// <remarks>
+            /// Note this MUST be expanded on in any deriving class, as this does not work in the parent
+            /// </remarks>
             public abstract void Simpit_Command_Call(string[] simpit_command_args);
 
             // Exception for the command instance calling it
 
             protected Simpit_Console_Exception GetException(string message)
             {
+                ///<returns>
+                /// Returns new Simpit Console Exception
+                ///</returns>
                 return new Simpit_Console_Exception(simpit_command, message);
             }
 
@@ -185,16 +197,19 @@ namespace KerbalSimpit.Console
             // The command that an error has occured on
             private readonly string errored_command;
 
+            // Constructor that takes the errored command, and an error message
             public Simpit_Console_Exception(string errored_command, string message) : base(message)
             {
                 this.errored_command = errored_command;
             }
 
+            // Constructor that takes the errored command, error message, and the cause of the exception
             public Simpit_Console_Exception(string errored_command, string message, Exception cause) : base(message, cause)
             {
                 this.errored_command = errored_command;
             }
 
+            // Was in the example, so I have it here. Dunno if needed.
             public string Command
             {
                 get { return errored_command; }
@@ -202,10 +217,6 @@ namespace KerbalSimpit.Console
 
         }
             
-            
-            
-
-
 
     }
 }
