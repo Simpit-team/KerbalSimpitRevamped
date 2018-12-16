@@ -46,7 +46,7 @@ namespace KerbalSimpit
         public static byte VesselTranslation = 17;
         public static byte WheelControl = 18;
         public static byte VesselThrottle = 19;
-        public static byte AutopilotMode = 28;
+        public static byte AutopilotMode = 20;
     }
 
     public static class ActionGroupBits
