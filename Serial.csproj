@@ -9,9 +9,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mono.Posix">
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
@@ -19,9 +16,17 @@
       <HintPath>$(KSPLIBDIR)/Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+	 <Reference Include="UnityEngine">
+      <HintPath>$(KSPLIBDIR)/UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+	<Reference Include="Mono.Posix">
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KerbalSimpit.IO.Ports\*.cs" />
+	<Compile Include="KerbalSimpit\Console\*.cs"/>
     <Compile Include="Properties\SerialAssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
