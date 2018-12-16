@@ -47,7 +47,7 @@ namespace KerbalSimPit.Providers
         private short myThrottle;
         private volatile bool myThrottleFlag;
 
-        private byte mySASMode;
+        private VesselAutopilot.AutopilotMode mySASMode;
         private Vessel myActiveVessel;
 
         public void Start()
@@ -146,16 +146,20 @@ namespace KerbalSimPit.Providers
 
         public void autopilotModeCallback(byte ID, object Data)
         {
-            myActiveVessel = FlightGlobals.ActiveVessel;
             byte[] payload = (byte[])Data;
+	    mySASMode = (VesselAutopilot.AutopilotMode)(payload[0]);
+	    myActiveVessel = FlightGlobals.ActiveVessel;
 
-            mySASMode = payload[0];
-            myActiveVessel.Autopilot.SetMode((VesselAutopilot.AutopilotMode)mySASMode);
-            if(KSPit.Config.Verbose)
-            {
-                Debug.Log(String.Format("KerbalSimpit: payload is {0}", mySASMode));
-                Debug.Log(String.Format("KerbalSimpit: SAS mode is {0}", myActiveVessel.Autopilot.Mode));
-            }
+	    if (myActiveVessel.Autopilot.CanSetMode(mySASMode)) {
+		myActiveVessel.Autopilot.SetMode((VesselAutopilot.AutopilotMode)mySASMode);
+		if(KSPit.Config.Verbose)
+		{
+		    Debug.Log(String.Format("KerbalSimpit: payload is {0}", mySASMode));
+		    Debug.Log(String.Format("KerbalSimpit: SAS mode is {0}", myActiveVessel.Autopilot.Mode.ToString()));
+		}
+	    } else {
+		Debug.Log(String.Format("KerbalSimpit: Unable to set SAS mode to {0}", mySASMode.ToString()));
+	    }
         }
 
         public void AutopilotUpdater(FlightCtrlState fcs)
