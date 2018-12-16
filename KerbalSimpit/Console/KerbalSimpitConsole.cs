@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using static KSP.UI.Screens.MessageSystem;
 
 
 // Code inspired by: https://github.com/KSPSnark/IndicatorLights/blob/master/src/Console/DebugConsole.cs
@@ -29,13 +30,13 @@ namespace KerbalSimpit.Console
         internal const string SIMPIT_IDENTIFIER = "sim";
         internal const string SIMPIT_COMMAND = null;
         private readonly string SIMPIT_HELP = string.Format("Commands for assisting the usage of Kerbal Simpit. Try \"/{0} help\" for a list of commands", SIMPIT_IDENTIFIER);
-        private const string SIMPIT_USAGE = null;
+        private readonly string SIMPIT_USAGE = null;
 
         private static bool commands_initialised = false;
         internal static readonly SimpitConsoleCommand[] SIMPIT_COMMANDS = {
 
-            new KerbalSimpitConsole_HelpCommand()
-
+            new KerbalSimpitConsole_HelpCommand(),
+            new KerbalSimpitConsole_SerialCommand()
         };
 
 
@@ -53,7 +54,7 @@ namespace KerbalSimpit.Console
 
         private void AddDebugConsoleCommand()
         {
-            // Does this do anything? Was in example?
+            // Does this do anything/meant to? Was in the example.
         }
 
 
@@ -61,42 +62,57 @@ namespace KerbalSimpit.Console
 
         private void OnCommand(string simpit_arg_string)
         {
-            Debug.Log("Called Sim Command");
             // Gets the commands passed in one string, into an array
-            string[] simpit_command_arg_array = Simpit_Parse_Commands(simpit_arg_string);
-           // Debug.Log("Parsed Command");
-         //   Debug.Log(simpit_command_arg_array[0]);
-           // Debug.Log("Before Check Length");
-            // If the command array has a length of 1, set the command array to have the value of the SIMPIT_HELP message
-            if(simpit_command_arg_array.Length == 0) simpit_command_arg_array = new string[] { SIMPIT_HELP };
-            Debug.Log(simpit_command_arg_array[0]);
-            Debug.Log("After check for length of one");
-            // Sets the first command to the first entry in the array. 
-            // If this is a Simpit Command, this should be the identifier "sim"
-            //string simpit_identifier = simpit_command_arg_array[0];
-            Debug.Log("Get possible identifier");
-            // Init a list, that has a length one less than that of the command array, accounting for the leading identifier
-            string[] simpit_command_args = new string[simpit_command_arg_array.Length - 1];
-            Debug.Log("Created new List");
-            for(int i = 0; i < simpit_command_args.Length; i++)
+            string[] read_in_commands = Simpit_Parse_Commands(simpit_arg_string);
+            Debug.Log("Parsed Commands");
+            // Variable storing the command to be processed
+            //string simpit_command = simpit_command_arg_array[0];
+            Debug.Log("Stored Command");
+
+            string[] command_arguments = new string[0];
+            Debug.Log("Init args list");
+            // If the command array has a length of 0, print the help message, and return
+            if (read_in_commands.Length == 0)
             {
-                simpit_command_args[i] = simpit_command_arg_array[i + 1];
+
+                Debug.Log(SIMPIT_HELP);
+                return;
+
             }
 
-            Debug.Log("Populated Argument List");
+            else if(read_in_commands.Length > 1)
+            {
+                Debug.Log("Read in commands greater than 1");
+                // Init a list, that has a length one less than that of the argument array, accounting for the leading command
+                command_arguments = new string[read_in_commands.Length - 1];
+                // Populates the list with the argument values, without the command
+                Debug.Log("Before Populating arguments list");
+                for (int i = 0; i < read_in_commands.Length - 1; i++)
+                {
+                    command_arguments[i] = read_in_commands[i + 1];
+                }
+                Debug.Log("Initialised arg list");
 
+            }
+
+            //
             for(int i = 0; i < SIMPIT_COMMANDS.Length; i ++)
             {
-                //if(SIMPIT_COMMANDS[i].Simpit_Identifier == simpit_identifier)
-               //{
-                    if(simpit_command_args.Length == 1 && simpit_command_args[0] == SIMPIT_COMMANDS[0].Simpit_Command)
+               
+                    if(read_in_commands[0] == SIMPIT_COMMANDS[0].Simpit_Command && command_arguments.Length == 0)
                     {
-                        Debug.Log(SIMPIT_HELP);
+                    Debug.Log("Read in only help command");
+                        SIMPIT_COMMANDS[0].Simpit_Command_Call(new string[0]);
+                        return;
                     }
-                //}
+                    else if(read_in_commands[0] == SIMPIT_COMMANDS[0].Simpit_Command)
+                    {
+                    Debug.Log("Read in more than help command");
+                        SIMPIT_COMMANDS[0].Simpit_Command_Call(command_arguments);
+                        return;
+                    }
             }
 
-            Debug.Log("Should have printed help");
 
         }
 
@@ -123,22 +139,15 @@ namespace KerbalSimpit.Console
         // Base class for all Kerbal Simpit Commands
         internal abstract class SimpitConsoleCommand
         {
-            private readonly string simpit_identifier;
             private readonly string simpit_command;
             private readonly string simpit_help;
             private readonly string simpit_usage;
 
-            protected SimpitConsoleCommand(string simpit_identifier, string simpit_command ,string simpit_help, string simpit_usage = null)
+            protected SimpitConsoleCommand( string simpit_command ,string simpit_help, string simpit_usage = null)
             {
-                this.simpit_identifier = simpit_identifier;
                 this.simpit_command = simpit_command;
                 this.simpit_help = simpit_help;
                 this.simpit_usage = simpit_usage;
-            }
-
-            public string Simpit_Identifier
-            {
-                get { return simpit_identifier; }
             }
 
             public string Simpit_Command
@@ -159,7 +168,44 @@ namespace KerbalSimpit.Console
 
             public abstract void Simpit_Command_Call(string[] simpit_command_args);
 
+            // Exception for the command instance calling it
+
+            protected Simpit_Console_Exception GetException(string message)
+            {
+                return new Simpit_Console_Exception(simpit_command, message);
+            }
+
         }
+
+
+        // Class for managing the creation of exceptions
+        internal class Simpit_Console_Exception : Exception
+        {
+
+            // The command that an error has occured on
+            private readonly string errored_command;
+
+            public Simpit_Console_Exception(string errored_command, string message) : base(message)
+            {
+                this.errored_command = errored_command;
+            }
+
+            public Simpit_Console_Exception(string errored_command, string message, Exception cause) : base(message, cause)
+            {
+                this.errored_command = errored_command;
+            }
+
+            public string Command
+            {
+                get { return errored_command; }
+            }
+
+        }
+            
+            
+            
+
+
 
     }
 }
