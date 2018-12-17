@@ -29,7 +29,7 @@ endif
 INSTALLDIR=$ install
 # CONFIGDIR
 # Where the plugin's configuration files are stored
-CONFIGDIR=$ (KSPDIR)/PluginData/KerbalSimpit
+CONFIGDIR=$ (KSPDIR)/GameData/KerbalSimpit/PluginData
 
 # Shouldn't need to change variables below here
 XBUILD=xbuild
