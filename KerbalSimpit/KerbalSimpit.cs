@@ -16,6 +16,7 @@ namespace KerbalSimpit
     [KSPAddon(KSPAddon.Startup.Instantly, true)]
     public class KSPit : MonoBehaviour
     {
+        
         // To receive events from serial devices on channel i,
         // register a callback for onSerialReceivedArray[i].
         public static EventData<byte, object>[] onSerialReceivedArray =
@@ -43,6 +44,7 @@ namespace KerbalSimpit
     
         public void Start()
         {
+            Debug.Log("KerbalSimpit Has put a message into the console!");
             DontDestroyOnLoad(this);
 
             for (int i=254; i>=0; i--)
