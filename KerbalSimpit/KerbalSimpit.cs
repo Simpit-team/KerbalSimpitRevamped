@@ -34,6 +34,7 @@ namespace KerbalSimpit
         }
 
         public static KerbalSimpitConfig Config;
+        
 
         private static KSPSerialPort[] SerialPorts;
 
@@ -41,7 +42,29 @@ namespace KerbalSimpit
             new List<ToDeviceCallback>(255);
         private bool DoEventDispatching = false;
         private Thread EventDispatchThread;
-    
+
+        // Variables added for terminal commands
+
+        public static Dictionary<string, bool> serial_ports = new Dictionary<string, bool>();
+
+        //[StructLayout(LayoutKind.Sequential, Pack =1)][Serializable]
+       // public struct serial_port_status
+       // {
+        //    public string serial_port;
+       //     public bool port_connection_status;
+
+        //    public serial_port_status(string ser_port, bool connected)
+         //   {
+         //       serial_port = ser_port;
+        //        port_connection_status = connected;
+        //    }
+       // }
+
+       // public static List<serial_port_status> port_status = new List<serial_port_status>();
+
+        // End Variables for commands
+
+
         public void Start()
         {
             Debug.Log("KerbalSimpit Has put a message into the console!");
@@ -57,6 +80,7 @@ namespace KerbalSimpit
 
             SerialPorts = createPortList(Config);
             if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Found {0} serial ports", SerialPorts.Length));
+
             OpenPorts();
 
             onSerialReceivedArray[CommonPackets.Synchronisation].Add(handshakeCallback);
@@ -80,7 +104,7 @@ namespace KerbalSimpit
 
         public static void AddToDeviceHandler(ToDeviceCallback cb)
         {
-            RegularEventList.Add(cb);
+            RegularEventList.Add(cb); 
         }
 
         public static bool RemoveToDeviceHandler(ToDeviceCallback cb)
@@ -166,14 +190,19 @@ namespace KerbalSimpit
         }
 
         private void OpenPorts() {
+            bool connected_status = false;
             for (int i = SerialPorts.Length-1; i>=0; i--)
             {
+                
                 if (SerialPorts[i].open())
                 {
+                    connected_status = true;
                     if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Opened {0}", SerialPorts[i].PortName));
                 } else {
                     if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Unable to open {0}", SerialPorts[i].PortName));
+                    connected_status = false;
                 }
+                serial_ports.Add(SerialPorts[i].PortName, connected_status);
             }
         }
 
