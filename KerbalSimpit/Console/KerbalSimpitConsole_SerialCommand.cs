@@ -16,7 +16,7 @@ namespace KerbalSimpit.Console
 
         // Place holder code, yet to implement anything
 
-        public override void Simpit_Command_Call(string[] simpit_command_args)
+        public override void Simpit_Command_Call(KerbalSimpitConsole.Command_Arguments command_args)
         {
             throw new NotImplementedException();
         }
