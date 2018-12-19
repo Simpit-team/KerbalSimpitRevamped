@@ -50,14 +50,17 @@ namespace KerbalSimpit.Console
         };
 
 
-        // Dictionary to store command instances
+        // Dictionary to store command instances, using enum as the key
         internal static Dictionary<Simpit_Command_Codes, SimpitConsoleCommand> simpit_commands = new Dictionary<Simpit_Command_Codes, SimpitConsoleCommand>();
        
+
         // Structure to pass values to commands
 
         internal struct Command_Arguments
         {
+            // The command that is being passed, if present/needed - mainly for help code
             internal SimpitConsoleCommand command_passed;
+            // The arguments being passed. 
             internal string[] arguments;
 
             internal Command_Arguments(SimpitConsoleCommand command, string[] args)
@@ -67,8 +70,6 @@ namespace KerbalSimpit.Console
             }
         }
         
-        // Array with instances of the commands
-       
         // Start method, standard unity thingy
         private void Start()
         {
@@ -128,7 +129,7 @@ namespace KerbalSimpit.Console
 
 
             // Source of getting key from value: https://stackoverflow.com/questions/2444033/get-dictionary-key-by-value/2444064
-
+            // Gets the enum key of the dictionary entry with the value of read_in_commands[0]
             var command_switch = simpit_commands.FirstOrDefault(x => x.Value.Simpit_Command == read_in_commands[0]).Key;
 
            
@@ -149,14 +150,10 @@ namespace KerbalSimpit.Console
                         break;
                     }
                     
-                
-
             }
-                // IF the read in command is help, and there are no arguments
                 
 
         }
-
 
 
 

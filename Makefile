@@ -60,6 +60,7 @@ install:all
 	cp Bin/KerbalSimpit.dll $(INSTALLDIR)
 	cp Bin/KerbalSimpitSerial.dll $(INSTALLDIR)
 	cp Bin/Mono.Posix.dll $(INSTALLDIR)
+	cp Localisation/*.cfg $(INSTALLDIR)
 
 clean:
 	$(XBUILD) /p:Configuration=$(CONFIG) /t:Clean Main.csproj

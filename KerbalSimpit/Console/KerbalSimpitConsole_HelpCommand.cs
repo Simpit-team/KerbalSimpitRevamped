@@ -38,29 +38,14 @@ namespace KerbalSimpit.Console
             // if there is an argument present after the help command, do the following
             if (command_vals.arguments.Length == 1)
             {
-                /*
-                // If the passed arguments fall in the allowed length range, the corrisponding help method is printed out
-                for (int i = 0; i < KerbalSimpitConsole.SIMPIT_COMMANDS.Length; i++)
-                {
-                    // If the command in the list matches the command it is being compared against,
-                    // generate the help message for that command
-                    if (simpit_command_args[0] == KerbalSimpitConsole.SIMPIT_COMMANDS[i].Simpit_Command)
-                    {
-                        
-                        // The first index in help to print, is set to the generated help string for
-                        // the passed command
-                        help_to_print[0] = Help_String_Generation(KerbalSimpitConsole.SIMPIT_COMMANDS[i]);
-
-                        // Print the created and stored help message
-                        print_help_messages(help_to_print);
-                        return;
-                    }
-                }
-                */
 
                 // Prints out help message if an argument is present
+                // Gets key of passed commands dictionary entry. Here because the second command after the first is in string form
                 var argument_command = KerbalSimpitConsole.simpit_commands.FirstOrDefault(x => x.Value.Simpit_Command == command_vals.arguments[0]).Key;
+
+                // Request help string and store
                 help_to_print[0] = Help_String_Generation(KerbalSimpitConsole.simpit_commands[argument_command]);
+                // Print help message
                 print_help_messages(help_to_print);
                 return;
 
@@ -72,6 +57,7 @@ namespace KerbalSimpit.Console
             {
                 // Help to print is set to the size of the number of commands
                 help_to_print = new string[KerbalSimpitConsole.simpit_commands.Count];
+                // Temp var
                 int i = 0;
                 // For the number of commands, run through the following
                 foreach(KeyValuePair<KerbalSimpitConsole.Simpit_Command_Codes, KerbalSimpitConsole.SimpitConsoleCommand> entry in KerbalSimpitConsole.simpit_commands)
