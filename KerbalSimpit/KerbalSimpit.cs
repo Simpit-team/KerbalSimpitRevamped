@@ -47,21 +47,6 @@ namespace KerbalSimpit
 
         public static Dictionary<string, bool> serial_ports = new Dictionary<string, bool>();
 
-        //[StructLayout(LayoutKind.Sequential, Pack =1)][Serializable]
-       // public struct serial_port_status
-       // {
-        //    public string serial_port;
-       //     public bool port_connection_status;
-
-        //    public serial_port_status(string ser_port, bool connected)
-         //   {
-         //       serial_port = ser_port;
-        //        port_connection_status = connected;
-        //    }
-       // }
-
-       // public static List<serial_port_status> port_status = new List<serial_port_status>();
-
         // End Variables for commands
 
 
