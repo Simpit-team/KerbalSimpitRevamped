@@ -22,7 +22,7 @@ namespace KerbalSimpit.Console
         /// <param name="simpit_command_args"> String array, contains arguments of help command</param>
         /// <exception cref="KerbalSimpitConsole.Simpit_Console_Exception">
         /// Thrown when the number of passed arguments, exceededs what the help command can process</exception>
-        public override void Simpit_Command_Call(string[] simpit_command_args)
+        public override void Simpit_Command_Call(KerbalSimpitConsole.Command_Arguments command_vals)
         {
             
             // Blank string array, used to store the help values that are to be printed
@@ -30,15 +30,15 @@ namespace KerbalSimpit.Console
 
             // If the number of arguments that are passed for the help command is above
             // 1, then an exception is thrown
-            if(simpit_command_args.Length > 1)
+            if(command_vals.arguments.Length > 1)
             {
                 throw GetException("Argument Overload");
             }
 
             // if there is an argument present after the help command, do the following
-            if (simpit_command_args.Length == 1)
+            if (command_vals.arguments.Length == 1)
             {
-
+                /*
                 // If the passed arguments fall in the allowed length range, the corrisponding help method is printed out
                 for (int i = 0; i < KerbalSimpitConsole.SIMPIT_COMMANDS.Length; i++)
                 {
@@ -56,19 +56,29 @@ namespace KerbalSimpit.Console
                         return;
                     }
                 }
+                */
+
+                // Prints out help message if an argument is present
+                var argument_command = KerbalSimpitConsole.simpit_commands.FirstOrDefault(x => x.Value.Simpit_Command == command_vals.arguments[0]).Key;
+                help_to_print[0] = Help_String_Generation(KerbalSimpitConsole.simpit_commands[argument_command]);
+                print_help_messages(help_to_print);
+                return;
+
+                   
             }
 
             // Else if there is no argument following the command
             else
             {
                 // Help to print is set to the size of the number of commands
-                help_to_print = new string[KerbalSimpitConsole.SIMPIT_COMMANDS.Length];
-
+                help_to_print = new string[KerbalSimpitConsole.simpit_commands.Count];
+                int i = 0;
                 // For the number of commands, run through the following
-                for(int i = 0; i < KerbalSimpitConsole.SIMPIT_COMMANDS.Length; i++)
+                foreach(KeyValuePair<KerbalSimpitConsole.Simpit_Command_Codes, KerbalSimpitConsole.SimpitConsoleCommand> entry in KerbalSimpitConsole.simpit_commands)
                 {
                     // Create the help string for each command, and add it to the list
-                    help_to_print[i] = Help_String_Generation(KerbalSimpitConsole.SIMPIT_COMMANDS[i]);
+                    help_to_print[i] = Help_String_Generation(entry.Value);
+                    i++;
                 }
 
                 // Print the list of help strings
