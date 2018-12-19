@@ -1,6 +1,7 @@
 ﻿using KSP.UI.Screens.DebugToolbar;
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Text.RegularExpressions;
 using System.Linq;
 using System.Text;
@@ -31,19 +32,52 @@ namespace KerbalSimpit.Console
         internal const string SIMPIT_COMMAND = null;
         private readonly string SIMPIT_HELP = string.Format("Commands for assisting the usage of Kerbal Simpit. Try \"/{0} help\" for a full list of commands", SIMPIT_IDENTIFIER);
         private readonly string SIMPIT_USAGE = null;
-
+        
         // Have the commands been initialised yet
         private static bool commands_initialised = false;
 
-        // Array with instances of the commands
-        internal static readonly SimpitConsoleCommand[] SIMPIT_COMMANDS = {
-            new KerbalSimpitConsole_HelpCommand(),
-            new KerbalSimpitConsole_SerialCommand()
+        // Enum to refer to dictionary keys. This is here so that the values of the commands can be changed without breaking the code
+        // In theory, allows for possible localisation of the commands to the language of the game? Maybe?
+        // Sorta using the tactic I used in Java when modding minecraft, so that language files could be used for localising the mod, without messing up the code
+        // due to the code using the values assigned ingame to refer to various things. Or was I using a static class containing the values?
+
+        // Also keeps the key/name of each command in one place
+
+        public enum Simpit_Command_Codes
+        {
+            HELP = 1,
+            SERIAL = 2
         };
 
+
+        // Dictionary to store command instances
+        internal static Dictionary<Simpit_Command_Codes, SimpitConsoleCommand> simpit_commands = new Dictionary<Simpit_Command_Codes, SimpitConsoleCommand>();
+       
+        // Structure to pass values to commands
+
+        internal struct Command_Arguments
+        {
+            internal SimpitConsoleCommand command_passed;
+            internal string[] arguments;
+
+            internal Command_Arguments(SimpitConsoleCommand command, string[] args)
+            {
+                command_passed = command;
+                arguments = args;
+            }
+        }
+        
+        // Array with instances of the commands
+       
         // Start method, standard unity thingy
         private void Start()
         {
+            
+            // Add commands to the command dictionary
+            simpit_commands.Add(Simpit_Command_Codes.HELP, new KerbalSimpitConsole_HelpCommand());
+            simpit_commands.Add(Simpit_Command_Codes.SERIAL, new KerbalSimpitConsole_SerialCommand());
+
+
             // If the commands have already been initialised
             if (commands_initialised) return;
             // Adds the command to the game
@@ -92,27 +126,39 @@ namespace KerbalSimpit.Console
 
             }
 
-            // Cycles through the commands, until a command matches up and is then passed the arguments
-            for(int i = 0; i < SIMPIT_COMMANDS.Length; i ++)
+
+            // Source of getting key from value: https://stackoverflow.com/questions/2444033/get-dictionary-key-by-value/2444064
+
+            var command_switch = simpit_commands.FirstOrDefault(x => x.Value.Simpit_Command == read_in_commands[0]).Key;
+
+           
+            switch (command_switch)
             {
-               
-                // IF the read in command is help, and there are no arguments
-                if(read_in_commands[0] == SIMPIT_COMMANDS[0].Simpit_Command && command_arguments.Length == 0)
-                {
-                    // Call the help command, and pass it an empty string array
-                    SIMPIT_COMMANDS[0].Simpit_Command_Call(new string[0]);
-                    return;
-                }
-                // Else if the read in command is help, and there are arguments present
-                else if(read_in_commands[0] == SIMPIT_COMMANDS[0].Simpit_Command)
-                {
-                    // Call the help command, passing the arguments that have been read in
-                    SIMPIT_COMMANDS[0].Simpit_Command_Call(command_arguments);
-                    return;
-                }
+                case Simpit_Command_Codes.HELP:
+                    if (command_arguments.Length == 0)
+                    {
+                        // Call the help command, and pass it an empty string array
+                        simpit_commands[Simpit_Command_Codes.HELP].Simpit_Command_Call(new Command_Arguments(simpit_commands[Simpit_Command_Codes.HELP],new string[0]));
+                        break;
+                    }
+                    // Else if the read in command is help, and there are arguments present
+                    else 
+                    {
+                        // Call the help command, passing the arguments that have been read in
+                        simpit_commands[Simpit_Command_Codes.HELP].Simpit_Command_Call(new Command_Arguments(simpit_commands[Simpit_Command_Codes.HELP], command_arguments));
+                        break;
+                    }
+                    
+                
+
             }
+                // IF the read in command is help, and there are no arguments
+                
 
         }
+
+
+
 
         // Method to convert a string containing the command and possible argument/s, into an array
         private static string[] Simpit_Parse_Commands(string simpit_arg_string)
@@ -175,7 +221,7 @@ namespace KerbalSimpit.Console
             /// <remarks>
             /// Note this MUST be expanded on in any deriving class, as this does not work in the parent
             /// </remarks>
-            public abstract void Simpit_Command_Call(string[] simpit_command_args);
+            public abstract void Simpit_Command_Call(Command_Arguments args);
 
             // Exception for the command instance calling it
 
