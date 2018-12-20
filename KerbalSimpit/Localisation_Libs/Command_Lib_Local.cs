@@ -24,7 +24,7 @@ namespace KerbalSimpit.Localisation_Libs
         private static readonly Dictionary<string, string> command_default_tags = new Dictionary<string, string>()
         {
             {SIM_SIM_COMMAND_ID, "#autoLOC_SIM_DEF_001" },
-            {SIM_HELP_COMMAND_ID, "#autoLOC_SIM_DEF_002," },
+            {SIM_HELP_COMMAND_ID, "#autoLOC_SIM_DEF_002" },
             {SIM_SERIAL_COMMAND_ID, "#autoLOC_SIM_DEF_003" }
         };
 
