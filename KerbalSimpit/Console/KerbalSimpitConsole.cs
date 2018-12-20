@@ -75,8 +75,8 @@ namespace KerbalSimpit.Console
         // Start method, standard unity thingy
         private void Start()
         {
-            
-            // Add commands to the command dictionary
+
+            // Add commands to the command dictionary      
             simpit_commands.Add(Simpit_Command_Codes.HELP, new KerbalSimpitConsole_HelpCommand());
             simpit_commands.Add(Simpit_Command_Codes.SERIAL, new KerbalSimpitConsole_SerialCommand());
 
