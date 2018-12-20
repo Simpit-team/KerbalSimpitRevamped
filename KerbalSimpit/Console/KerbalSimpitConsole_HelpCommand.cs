@@ -1,8 +1,10 @@
-﻿using System;
+﻿using KSP.Localization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using Command_Lib = KerbalSimpit.Localisation_Libs.Command_Lib_Local;
 
 namespace KerbalSimpit.Console
 {
@@ -11,9 +13,9 @@ namespace KerbalSimpit.Console
     /// </summary>
     class KerbalSimpitConsole_HelpCommand : KerbalSimpitConsole.SimpitConsoleCommand
     {
-        private const string HELP_COMMAND = "help";
-        private const string HELP_HELP = "Help command to recieve assistance for KSP Simpit commands";
-        private static readonly string HELP_USAGE = string.Format("Usage: \"/{0} {1} <command>\"", KerbalSimpitConsole.SIMPIT_IDENTIFIER, HELP_COMMAND);
+        private static readonly string HELP_COMMAND = Localizer.GetStringByTag(Command_Lib.command_default_tag(Command_Lib.SIM_HELP_COMMAND_ID));
+        private static readonly string HELP_HELP = Localizer.GetStringByTag(Command_Lib.command_help_tag(Command_Lib.SIM_HELP_COMMAND_ID));
+        private static readonly string HELP_USAGE = Localizer.Format(Command_Lib.command_usage_tag(Command_Lib.SIM_HELP_COMMAND_ID), KerbalSimpitConsole.SIMPIT_IDENTIFIER, HELP_COMMAND);
         public KerbalSimpitConsole_HelpCommand() : base(HELP_COMMAND, HELP_HELP, HELP_USAGE) { }
 
         /// <summary>
@@ -32,7 +34,7 @@ namespace KerbalSimpit.Console
             // 1, then an exception is thrown
             if(command_vals.arguments.Length > 1)
             {
-                throw GetException("Argument Overload");
+                throw GetException(Localizer.GetStringByTag(Command_Lib.help_extra_value("sim_help_arg_over")));
             }
 
             // if there is an argument present after the help command, do the following
@@ -98,7 +100,7 @@ namespace KerbalSimpit.Console
             // Print a seperation line of dashes
             Debug.Log(String.Concat(Enumerable.Repeat("-", 50).ToArray()));
             // Print the header
-            Debug.Log("Kerbal Simpit Commands:");
+            Debug.Log(Localizer.GetStringByTag(Command_Lib.help_extra_value("sim_help_list_head")));
             // For each of the enteries on the list, print it out to the terminal
             for(int i = 0; i < help_to_print.Length; i++)
             {

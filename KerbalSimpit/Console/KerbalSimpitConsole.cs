@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using static KSP.UI.Screens.MessageSystem;
+using KSP.Localization;
+using Command_Lib = KerbalSimpit.Localisation_Libs.Command_Lib_Local;
 
 
 // Code inspired by: https://github.com/KSPSnark/IndicatorLights/blob/master/src/Console/DebugConsole.cs
@@ -28,10 +30,10 @@ namespace KerbalSimpit.Console
     [KSPAddon(KSPAddon.Startup.Instantly, false)]
     public class KerbalSimpitConsole : MonoBehaviour
     {
-        internal const string SIMPIT_IDENTIFIER = "sim";
+        internal static readonly string SIMPIT_IDENTIFIER = Localizer.GetStringByTag(Command_Lib.command_default_tag(Command_Lib.SIM_SIM_COMMAND_ID));
         internal const string SIMPIT_COMMAND = null;
-        private readonly string SIMPIT_HELP = string.Format("Commands for assisting the usage of Kerbal Simpit. Try \"/{0} help\" for a full list of commands", SIMPIT_IDENTIFIER);
-        private readonly string SIMPIT_USAGE = null;
+        private readonly string SIMPIT_HELP = Localizer.Format(Command_Lib.command_help_tag(Command_Lib.SIM_SIM_COMMAND_ID), SIMPIT_IDENTIFIER, Command_Lib.command_default_tag(Command_Lib.SIM_HELP_COMMAND_ID));
+        private readonly string SIMPIT_USAGE = Localizer.Format(Command_Lib.command_usage_tag(Command_Lib.SIM_SIM_COMMAND_ID), SIMPIT_IDENTIFIER);
         
         // Have the commands been initialised yet
         private static bool commands_initialised = false;
@@ -107,7 +109,7 @@ namespace KerbalSimpit.Console
             if (read_in_commands.Length == 0)
             {
                 // Print help message, then return
-                Debug.Log(SIMPIT_HELP);
+                Debug.Log(string.Format("{0} - {1}" ,SIMPIT_USAGE, SIMPIT_HELP));
                 return;
             }
 
