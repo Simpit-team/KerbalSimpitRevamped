@@ -14,9 +14,19 @@ namespace KerbalSimpit.Console
     class KerbalSimpitConsole_HelpCommand : KerbalSimpitConsole.SimpitConsoleCommand
     {
         private static readonly string HELP_COMMAND = Localizer.GetStringByTag(Command_Lib.command_default_tag(Command_Lib.SIM_HELP_COMMAND_ID));
+        //private static bool message_tricking = stage_mess("Got help command tag");
         private static readonly string HELP_HELP = Localizer.GetStringByTag(Command_Lib.command_help_tag(Command_Lib.SIM_HELP_COMMAND_ID));
+        //private static bool message_tricking_2 = stage_mess("Got help help tag");
         private static readonly string HELP_USAGE = Localizer.Format(Command_Lib.command_usage_tag(Command_Lib.SIM_HELP_COMMAND_ID), KerbalSimpitConsole.SIMPIT_IDENTIFIER, HELP_COMMAND);
+        //private static bool message_tricking_3 = stage_mess("Got help usage tag");
         public KerbalSimpitConsole_HelpCommand() : base(HELP_COMMAND, HELP_HELP, HELP_USAGE) { }
+
+
+        private static bool stage_mess(string mess)
+        {
+            Debug.Log(mess);
+            return true;
+        }
 
         /// <summary>
         /// The method that is called when a help command is read in
