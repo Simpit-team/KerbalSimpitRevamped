@@ -30,6 +30,7 @@ namespace KerbalSimpit.Console
     [KSPAddon(KSPAddon.Startup.Instantly, false)]
     public class KerbalSimpitConsole : MonoBehaviour
     {
+        // Values used for help messages and comamnds
         internal static readonly string SIMPIT_IDENTIFIER = Localizer.GetStringByTag(Command_Lib.command_default_tag(Command_Lib.SIM_SIM_COMMAND_ID));
         internal const string SIMPIT_COMMAND = null;
         private readonly string SIMPIT_HELP = Localizer.Format(Command_Lib.command_help_tag(Command_Lib.SIM_SIM_COMMAND_ID), SIMPIT_IDENTIFIER, Command_Lib.command_default_tag(Command_Lib.SIM_HELP_COMMAND_ID));
@@ -135,9 +136,12 @@ namespace KerbalSimpit.Console
             var command_switch = simpit_commands.FirstOrDefault(x => x.Value.Simpit_Command == read_in_commands[0]).Key;
 
            
+            // Switch to call the appropriate commands, based upon their enum, and what was read in
             switch (command_switch)
             {
+                // If the command is found to align to the help enum value
                 case Simpit_Command_Codes.HELP:
+                    // If their were no arguments for the command
                     if (command_arguments.Length == 0)
                     {
                         // Call the help command, and pass it an empty string array
@@ -152,7 +156,9 @@ namespace KerbalSimpit.Console
                         break;
                     }
 
+                // If the command is a serial command, call the serial command
                 case Simpit_Command_Codes.SERIAL:
+                    // Call the serial command, and pass it the entered arguments
                     simpit_commands[Simpit_Command_Codes.SERIAL].Simpit_Command_Call(new Command_Arguments(simpit_commands[Simpit_Command_Codes.SERIAL], command_arguments));
                     break;
             }
@@ -196,11 +202,13 @@ namespace KerbalSimpit.Console
             // Constructor to set values for a command
             protected SimpitConsoleCommand( string simpit_command ,string simpit_help, string simpit_usage = null)
             {
+                // Sets the new instances variables to the passed values
                 this.simpit_command = simpit_command;
                 this.simpit_help = simpit_help;
                 this.simpit_usage = simpit_usage;
             }
 
+            // Gets and returns the different values as required
             public string Simpit_Command
             {
                 get { return simpit_command; }
@@ -257,7 +265,7 @@ namespace KerbalSimpit.Console
                 this.errored_command = errored_command;
             }
 
-            // Was in the example, so I have it here. Dunno if needed.
+            // Was in the example, so I have it here. Dunno if needed. Or may be able to be implemented later?
             public string Command
             {
                 get { return errored_command; }
