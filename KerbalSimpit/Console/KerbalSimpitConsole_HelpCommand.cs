@@ -13,9 +13,13 @@ namespace KerbalSimpit.Console
     /// </summary>
     class KerbalSimpitConsole_HelpCommand : KerbalSimpitConsole.SimpitConsoleCommand
     {
+        
+        // Command values and the like, sourced from the localisation file
         private static readonly string HELP_COMMAND = Localizer.GetStringByTag(Command_Lib.command_default_tag(Command_Lib.SIM_HELP_COMMAND_ID));
         private static readonly string HELP_HELP = Localizer.GetStringByTag(Command_Lib.command_help_tag(Command_Lib.SIM_HELP_COMMAND_ID));
         private static readonly string HELP_USAGE = Localizer.Format(Command_Lib.command_usage_tag(Command_Lib.SIM_HELP_COMMAND_ID), KerbalSimpitConsole.SIMPIT_IDENTIFIER, HELP_COMMAND);
+
+        // Calls the constructor of the class this one was derived from
         public KerbalSimpitConsole_HelpCommand() : base(HELP_COMMAND, HELP_HELP, HELP_USAGE) { }
 
 
@@ -51,8 +55,7 @@ namespace KerbalSimpit.Console
                 // Print help message
                 print_help_messages(help_to_print);
                 return;
-
-                   
+                  
             }
 
             // Else if there is no argument following the command
