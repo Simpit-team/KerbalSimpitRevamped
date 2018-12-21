@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Original contribution of this code by: @LRTNZ
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -30,8 +32,8 @@ namespace KerbalSimpit.Console
         private static readonly string SERIAL_PORT_DISCONNECTED = Localizer.GetStringByTag(Command_Lib.serial_misc_tag(Command_Lib.SIM_SERIAL_MISC_DISCONNECTED_CAPS));
 
         // Status Messages
-        private static readonly string SERIAL_STATUS_HEADER = Localizer.GetStringByTag(Command_Lib.serial_status_tag(Command_Lib.SIM_SERIAL_OUTPUT_HEADER));
-        private static readonly string SERIAL_STATUS_MESSAGE = Localizer.GetStringByTag(Command_Lib.serial_status_tag(Command_Lib.SIM_SERIAL_OUTPUT_STATUS));
+        private static readonly string SERIAL_STATUS_HEADER = Localizer.GetStringByTag(Command_Lib.serial_output_tag(Command_Lib.SIM_SERIAL_OUTPUT_HEADER));
+        private static readonly string SERIAL_STATUS_MESSAGE = Localizer.GetStringByTag(Command_Lib.serial_output_tag(Command_Lib.SIM_SERIAL_OUTPUT_STATUS));
 
         // KerbalSimpit Instance
 
