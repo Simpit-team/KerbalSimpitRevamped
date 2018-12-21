@@ -1,4 +1,6 @@
-﻿using KSP.Localization;
+﻿// Original contribution of this code by: @LRTNZ
+
+using KSP.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;

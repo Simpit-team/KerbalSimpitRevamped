@@ -1,4 +1,6 @@
-﻿using KSP.UI.Screens.DebugToolbar;
+﻿// Original contribution of this code by: @LRTNZ
+
+using KSP.UI.Screens.DebugToolbar;
 using System;
 using System.Collections.Generic;
 using System.Collections;
