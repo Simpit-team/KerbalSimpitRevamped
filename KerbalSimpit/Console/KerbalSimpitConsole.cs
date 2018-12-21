@@ -1,4 +1,5 @@
 ﻿// Original contribution of this code by: @LRTNZ
+// Contributions from: 
 
 using KSP.UI.Screens.DebugToolbar;
 using System;
