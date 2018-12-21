@@ -10,6 +10,7 @@ using KSP.IO;
 using UnityEngine;
 
 using KerbalSimpit.IO.Ports;
+using KerbalSimpit.Console;
 
 namespace KerbalSimpit.Serial
 {
@@ -365,7 +366,8 @@ namespace KerbalSimpit.Serial
             byte[] buf = new byte[Size];
             Array.Copy(Payload, buf, Size);
 
-            KSPit.onSerialReceivedArray[Type].Fire(ID, buf);
+            // Changed to refer to the instance of KSPit the plugin is using
+            KerbalSimpitConsole_SerialCommand.get_kspit.onSerialReceivedArray[Type].Fire(ID, buf);
         }
     }
 }
