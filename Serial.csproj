@@ -26,9 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KerbalSimpit.IO.Ports\*.cs" />
-	  <Compile Include="KerbalSimpit\Console\*.cs"/>
     <Compile Include="Properties\SerialAssemblyInfo.cs" />
-    <Compile Include="KerbalSimpit\Localisation_Libs\*.cs"/>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

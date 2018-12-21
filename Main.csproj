@@ -36,6 +36,8 @@
     <Compile Include="KerbalSimpit\Providers\*.cs" />
     <Compile Include="KerbalSimpit\Utilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="KerbalSimpit\Console\*.cs"/>
+    <Compile Include="KerbalSimpit\Localisation_Libs\*.cs"/>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="FakeBuild">
