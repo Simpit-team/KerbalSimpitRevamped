@@ -16,12 +16,18 @@ namespace KerbalSimpit
     //[KSPAddon(KSPAddon.Startup.Instantly, true)]
     public class KSPit : MonoBehaviour
     {
+
+
+        // Variable to store the instance of this class that is being used
         public KSPit kpit;
+
+        // Constructor to set the variable
         public KSPit()
         {
             kpit = this;
         }
 
+        // Returns this instances instance of this class
         public KSPit k_pit
         {
             get { return this.kpit; }
@@ -55,13 +61,19 @@ namespace KerbalSimpit
 
         // Variables added for terminal commands
 
+        // Dictionary to store the serial ports, and their individual statuses
         public static Dictionary<string, port_data> serial_ports = new Dictionary<string, port_data>();
 
+        // Structure to store the name of the port, and its status. Just makes extracting the name of each port easier
+        // As you do not need to try get it from the key of the entry that is being currently observed.
         public struct port_data
         {
+            // Name of the port
             public string port_name;
+            // Ports connection status
             public bool port_connected;
 
+            // Set the above values
             public port_data(string port, bool status)
             {
                 this.port_name = port;
@@ -70,25 +82,37 @@ namespace KerbalSimpit
 
         }
 
+        // Variable to store the instance of the class that is used to start the serial port (Solves static/non-static incompatabilities
+        // nonsense. Can probally be made cleaner
         private static port_start_trickery port_start_trick;
         
+        // If the connection to the ports has been run before. Just to prevent the start command from erroring out.
+        // Start command errors out if the dictionary with the ports and their statuses has not been filled out, which requires starting
+        // the connections to them to do.
         public static bool run_connect = false;
         // End Variables for commands
 
 
         public void Start()
         {
+            // Simple log message to check that this was actually running
             Debug.Log("KerbalSimpit Has put a message into the console!");
             DontDestroyOnLoad(this);
 
-
+            // Init the ports when an instance of this class is created
             init_ports(this.kpit);
         }
 
+        // Class whos sole purpose in life, is to solve some fiddly static to non-static irks
         class port_start_trickery{
 
+            // Constructor that runs the code to start a new connection
             public port_start_trickery(KSPit k_pit)
             {
+
+                // Same code as before, just that it's location has been shifted to here.
+                // Also, it has been changed to represent the fact that it is not running
+                // in what amounted to a static class, but instead in an instance.
                 for (int i = 254; i >= 0; i--)
                 {
                     Debug.Log("For loop cycle");
@@ -103,20 +127,15 @@ namespace KerbalSimpit
                 SerialPorts = createPortList(Config);
                 if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Found {0} serial ports", SerialPorts.Length));
 
-
+                // Open the ports, for this classes instance
                 k_pit.OpenPorts();
 
                 k_pit.onSerialReceivedArray[CommonPackets.Synchronisation].Add(k_pit.handshakeCallback);
-                Debug.Log("add handshake");
                 k_pit.onSerialReceivedArray[InboundPackets.RegisterHandler].Add(k_pit.registerCallback);
-                Debug.Log("add callback");
                 k_pit.onSerialReceivedArray[InboundPackets.DeregisterHandler].Add(k_pit.deregisterCallback);
-                Debug.Log("add deregister");
 
                 EventDispatchThread = new Thread(k_pit.EventWorker);
-                Debug.Log("New thread");
                 EventDispatchThread.Start();
-                Debug.Log("Thread started");
                 while (!EventDispatchThread.IsAlive) ;
 
                 Debug.Log("KerbalSimpit: Started.");
@@ -124,14 +143,13 @@ namespace KerbalSimpit
 
         }
 
-
+        // Method that inits the ports, by creating a new instance of the trickery class
         public static void init_ports(KSPit k_pit)
         {
-
             port_start_trick = new port_start_trickery(k_pit);
-           
         }
 
+        // Method used to kill the ports
         public static void kill_ports(KSPit k_pit)
         {
             k_pit.ClosePorts();
@@ -233,46 +251,57 @@ namespace KerbalSimpit
         }
 
         public void OpenPorts() {
-            Debug.Log("open ports");
+
+            // Local variable used to store the status of the ports connection.
+            // Means that the dictionary is only populated in one place
             bool connected_status = false;
+
             for (int i = SerialPorts.Length-1; i>=0; i--)
             {
-                Debug.Log("Cycle for loop connect ports");
                 if (SerialPorts[i].open())
                 {
-                    Debug.Log("Port open");
+                    // If the port connected, set connected status to true
                     connected_status = true;
                     if (Config.Verbose){
                         Debug.Log(String.Format("KerbalSimpit: Opened {0}", SerialPorts[i].PortName));
-                        Debug.Log("Port opened");
                     }
                 } else {
-                    Debug.Log("Port Closed");
                     if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Unable to open {0}", SerialPorts[i].PortName));
+                    // If the port was not connected to, set connected status to false
                     connected_status = false;
                 }
-                // set the state of the serial port to true/false depending on the state of whether or not it was opened
-                Debug.Log("Set status");
+                // set the state of the serial port's dictionary entry to true/false
+                // depending on the state of whether or not it was opened
+
+                // If the dictionary already contains an entry for this serial port
                 if (serial_ports.ContainsKey(SerialPorts[i].PortName)){
+                    // Overright the entry with a new one
                     serial_ports[SerialPorts[i].PortName] = new port_data(SerialPorts[i].PortName, connected_status);
                 } else
                 {
+                    // Otherwise, if there is not an entry for this port, create a new one for it
                     serial_ports.Add(SerialPorts[i].PortName, new port_data(SerialPorts[i].PortName, connected_status));
                 }
                 
-                Debug.Log("Status added");
             }
-            Debug.Log("Should have opened ports");
+            
+            // Run connect set to true, signalling that the list has been populated at least once
             run_connect = true;
         }
 
         private void ClosePorts() {
+
+            // Sets this to false, to signal to the workers to stop running.
+            // Without this, they will cause many problems, and prevent the arduino from being reconnected
+            // Also, without this if the arduino is disconnected the workers will throw so many errors, that
+            // they seem to be the cause of KSP crashing not long after 
+
             DoEventDispatching = false;
-            //EventDispatchThread.
+            
             for (int i = SerialPorts.Length-1; i>=0; i--)
             {
                 SerialPorts[i].close();
-                // sets the state of the serial port when it is closed, to closed
+                // sets the state of the serial port's dictionary entry when it is closed, to closed
                 serial_ports[SerialPorts[i].PortName] = new port_data(SerialPorts[i].PortName, false);
             }
 
