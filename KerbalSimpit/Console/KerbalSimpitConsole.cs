@@ -151,7 +151,10 @@ namespace KerbalSimpit.Console
                         simpit_commands[Simpit_Command_Codes.HELP].Simpit_Command_Call(new Command_Arguments(simpit_commands[Simpit_Command_Codes.HELP], command_arguments));
                         break;
                     }
-                    
+
+                case Simpit_Command_Codes.SERIAL:
+                    simpit_commands[Simpit_Command_Codes.SERIAL].Simpit_Command_Call(new Command_Arguments(simpit_commands[Simpit_Command_Codes.SERIAL], command_arguments));
+                    break;
             }
                 
 
