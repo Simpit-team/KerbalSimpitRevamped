@@ -13,20 +13,30 @@ namespace KerbalSimpit
 {
     public delegate void ToDeviceCallback();
 
-    [KSPAddon(KSPAddon.Startup.Instantly, true)]
+    //[KSPAddon(KSPAddon.Startup.Instantly, true)]
     public class KSPit : MonoBehaviour
     {
-        
+        public KSPit kpit;
+        public KSPit()
+        {
+            kpit = this;
+        }
+
+        public KSPit k_pit
+        {
+            get { return this.kpit; }
+        }
+
         // To receive events from serial devices on channel i,
         // register a callback for onSerialReceivedArray[i].
-        public static EventData<byte, object>[] onSerialReceivedArray =
+        public EventData<byte, object>[] onSerialReceivedArray =
             new EventData<byte, object>[255];
         // To send a packet on channel i, call
         // toSerialArray[i].Fire()
-        public static EventData<byte, object>[] toSerialArray =
+        public EventData<byte, object>[] toSerialArray =
             new EventData<byte, object>[255];
 
-        [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)] [Serializable]
         public struct HandshakePacket
         {
             public byte HandShakeType;
@@ -34,19 +44,35 @@ namespace KerbalSimpit
         }
 
         public static KerbalSimpitConfig Config;
-        
+
 
         private static KSPSerialPort[] SerialPorts;
 
         private static List<ToDeviceCallback> RegularEventList =
             new List<ToDeviceCallback>(255);
-        private bool DoEventDispatching = false;
-        private Thread EventDispatchThread;
+        private static bool DoEventDispatching = false;
+        private static Thread EventDispatchThread;
 
         // Variables added for terminal commands
 
-        public static Dictionary<string, bool> serial_ports = new Dictionary<string, bool>();
+        public static Dictionary<string, port_data> serial_ports = new Dictionary<string, port_data>();
 
+        public struct port_data
+        {
+            public string port_name;
+            public bool port_connected;
+
+            public port_data(string port, bool status)
+            {
+                this.port_name = port;
+                this.port_connected = status;
+            }
+
+        }
+
+        private static port_start_trickery port_start_trick;
+        
+        public static bool run_connect = false;
         // End Variables for commands
 
 
@@ -55,28 +81,60 @@ namespace KerbalSimpit
             Debug.Log("KerbalSimpit Has put a message into the console!");
             DontDestroyOnLoad(this);
 
-            for (int i=254; i>=0; i--)
+
+            init_ports(this.kpit);
+        }
+
+        class port_start_trickery{
+
+            public port_start_trickery(KSPit k_pit)
             {
-                onSerialReceivedArray[i] = new EventData<byte, object>(String.Format("onSerialReceived{0}", i));
-                toSerialArray[i] = new EventData<byte, object>(String.Format("toSerial{0}", i));
+                for (int i = 254; i >= 0; i--)
+                {
+                    Debug.Log("For loop cycle");
+                    k_pit.onSerialReceivedArray[i] = new EventData<byte, object>(String.Format("onSerialReceived{0}", i));
+                    k_pit.toSerialArray[i] = new EventData<byte, object>(String.Format("toSerial{0}", i));
+                }
+
+                Debug.Log("Before config");
+                Config = new KerbalSimpitConfig();
+
+                Debug.Log("Before serial list");
+                SerialPorts = createPortList(Config);
+                if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Found {0} serial ports", SerialPorts.Length));
+
+
+                k_pit.OpenPorts();
+
+                k_pit.onSerialReceivedArray[CommonPackets.Synchronisation].Add(k_pit.handshakeCallback);
+                Debug.Log("add handshake");
+                k_pit.onSerialReceivedArray[InboundPackets.RegisterHandler].Add(k_pit.registerCallback);
+                Debug.Log("add callback");
+                k_pit.onSerialReceivedArray[InboundPackets.DeregisterHandler].Add(k_pit.deregisterCallback);
+                Debug.Log("add deregister");
+
+                EventDispatchThread = new Thread(k_pit.EventWorker);
+                Debug.Log("New thread");
+                EventDispatchThread.Start();
+                Debug.Log("Thread started");
+                while (!EventDispatchThread.IsAlive) ;
+
+                Debug.Log("KerbalSimpit: Started.");
             }
 
-            Config = new KerbalSimpitConfig();
+        }
 
-            SerialPorts = createPortList(Config);
-            if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Found {0} serial ports", SerialPorts.Length));
 
-            OpenPorts();
+        public static void init_ports(KSPit k_pit)
+        {
 
-            onSerialReceivedArray[CommonPackets.Synchronisation].Add(handshakeCallback);
-            onSerialReceivedArray[InboundPackets.RegisterHandler].Add(registerCallback);
-            onSerialReceivedArray[InboundPackets.DeregisterHandler].Add(deregisterCallback);
+            port_start_trick = new port_start_trickery(k_pit);
+           
+        }
 
-            EventDispatchThread = new Thread(EventWorker);
-            EventDispatchThread.Start();
-            while (!EventDispatchThread.IsAlive);
-
-            Debug.Log("KerbalSimpit: Started.");
+        public static void kill_ports(KSPit k_pit)
+        {
+            k_pit.ClosePorts();
         }
 
         public void OnDestroy()
@@ -102,7 +160,7 @@ namespace KerbalSimpit
             SerialPorts[PortID].sendPacket(Type, Data);
         }
 
-        public static void SendSerialData(byte Channel, object Data)
+        public void SendSerialData(byte Channel, object Data)
         {
             // Nothing yet
         }
@@ -140,7 +198,7 @@ namespace KerbalSimpit
             Debug.Log("KerbalSimpit: Event dispatch loop exiting");
         }
             
-        private static void FlightReadyHandler()
+        private void FlightReadyHandler()
         {
             for (int i=SerialPorts.Length-1; i>=0; i--)
             {
@@ -160,7 +218,7 @@ namespace KerbalSimpit
             }
         }
 
-        private KSPSerialPort[] createPortList(KerbalSimpitConfig config)
+        private static KSPSerialPort[] createPortList(KerbalSimpitConfig config)
         {
             List<KSPSerialPort> PortList = new List<KSPSerialPort>();
             int count = config.SerialPorts.Count;
@@ -174,28 +232,50 @@ namespace KerbalSimpit
             return PortList.ToArray();
         }
 
-        private void OpenPorts() {
+        public void OpenPorts() {
+            Debug.Log("open ports");
             bool connected_status = false;
             for (int i = SerialPorts.Length-1; i>=0; i--)
             {
-                
+                Debug.Log("Cycle for loop connect ports");
                 if (SerialPorts[i].open())
                 {
+                    Debug.Log("Port open");
                     connected_status = true;
-                    if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Opened {0}", SerialPorts[i].PortName));
+                    if (Config.Verbose){
+                        Debug.Log(String.Format("KerbalSimpit: Opened {0}", SerialPorts[i].PortName));
+                        Debug.Log("Port opened");
+                    }
                 } else {
+                    Debug.Log("Port Closed");
                     if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Unable to open {0}", SerialPorts[i].PortName));
                     connected_status = false;
                 }
-                serial_ports.Add(SerialPorts[i].PortName, connected_status);
+                // set the state of the serial port to true/false depending on the state of whether or not it was opened
+                Debug.Log("Set status");
+                if (serial_ports.ContainsKey(SerialPorts[i].PortName)){
+                    serial_ports[SerialPorts[i].PortName] = new port_data(SerialPorts[i].PortName, connected_status);
+                } else
+                {
+                    serial_ports.Add(SerialPorts[i].PortName, new port_data(SerialPorts[i].PortName, connected_status));
+                }
+                
+                Debug.Log("Status added");
             }
+            Debug.Log("Should have opened ports");
+            run_connect = true;
         }
 
         private void ClosePorts() {
+            DoEventDispatching = false;
+            //EventDispatchThread.
             for (int i = SerialPorts.Length-1; i>=0; i--)
             {
                 SerialPorts[i].close();
+                // sets the state of the serial port when it is closed, to closed
+                serial_ports[SerialPorts[i].PortName] = new port_data(SerialPorts[i].PortName, false);
             }
+
         }
 
         private void handshakeCallback(byte portID, object data)
