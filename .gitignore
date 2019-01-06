@@ -12,9 +12,8 @@ KSPresources
 # Ignore WIP bits
 junk/
 
+# Stuff from having developed in VS
 /KerbalSimpit.csproj
-/.vs/KerbalSimpit/v15/Server/sqlite3
-/.vs/KerbalSimpit/v15
 /.vs/*
 /KerbalSimpit.sln
 /Kerbal_Simpit_Modified.csproj
