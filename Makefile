@@ -17,7 +17,7 @@ endif
 # the environment will overwrite this.
 ifndef KSPLIBDIR
 	# This default works for macOS
-	KSPLIBDIR=$(KSPDIR)/KSP.app/Contents/Resources/Data/Managed
+	#KSPLIBDIR=$(KSPDIR)/KSP.app/Contents/Resources/Data/Managed
 	# On Linux, comment out the above line and try this
 	 KSPLIBDIR=$(KSPDIR)/KSP_x64_Data/Managed
 endif
