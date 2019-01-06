@@ -1,7 +1,7 @@
 # Kerbal Simpit Changelog
 
 ## v1.4.0 (2019-01-06)
-
+ 
 Added in a number of features:
 
 Commands to control serial. This has been done by restructuring the KSPit class code,
