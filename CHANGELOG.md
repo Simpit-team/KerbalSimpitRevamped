@@ -1,11 +1,7 @@
 # Kerbal Simpit Changelog
 
-## v1.3.0 (2018-12-18)
-
-Adds new channel for SAS mode. Thanks Zack Thomas.
-
-## testing commands (Ver can be decided at release?)
-
+## v1.4.0 (2019-01-06)
+ 
 Added in a number of features:
 
 Commands to control serial. This has been done by restructuring the KSPit class code,
@@ -36,6 +32,10 @@ I added the files I created to the Main.csproj file, so they are compiled.
 
 Note to testers: The command to access the help/serial commands is "/sim [command]"
 The "/sim help" should hopefully provide the details needed. 
+
+## v1.3.0 (2018-12-18)
+
+Adds new channel for SAS mode. Thanks Zack Thomas.
 
 ## v1.2.9 (2018-10-21)
 
