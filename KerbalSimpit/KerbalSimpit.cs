@@ -13,7 +13,6 @@ namespace KerbalSimpit
 {
     public delegate void ToDeviceCallback();
 
-    //[KSPAddon(KSPAddon.Startup.Instantly, true)]
     public class KSPit : MonoBehaviour
     {
 
