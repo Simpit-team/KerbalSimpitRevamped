@@ -1,5 +1,9 @@
 # Kerbal Simpit Changelog
 
+## v1.3.0 (2018-12-18)
+
+Adds new channel for SAS mode. Thanks Zack Thomas.
+
 ## testing commands (Ver can be decided at release?)
 
 Added in a number of features:

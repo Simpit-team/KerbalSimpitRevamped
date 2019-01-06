@@ -15,6 +15,10 @@
       <HintPath>$(KSPLIBDIR)/Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(KSPLIBDIR)/UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>$(KSPLIBDIR)/UnityEngine.dll</HintPath>
       <Private>False</Private>
