@@ -92,6 +92,9 @@ namespace KerbalSimpit.Console
 
             // Sets the commands initalised flag
             commands_initialised = true;
+
+            String[] start_argument = new string[] { Localizer.GetStringByTag(Command_Lib.serial_command_tag(Command_Lib.SIM_SERIAL_COMMAND_START)) };
+            simpit_commands[Simpit_Command_Codes.SERIAL].Simpit_Command_Call(new Command_Arguments(simpit_commands[Simpit_Command_Codes.SERIAL],start_argument));
         }
 
         private void AddDebugConsoleCommand()
