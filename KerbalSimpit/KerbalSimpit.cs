@@ -61,34 +61,34 @@ namespace KerbalSimpit
         // Variables added for terminal commands
 
         // Dictionary to store the serial ports, and their individual statuses
-        public static Dictionary<string, port_data> serial_ports = new Dictionary<string, port_data>();
+        public static Dictionary<string, portData> serialPorts = new Dictionary<string, portData>();
 
         // Structure to store the name of the port, and its status. Just makes extracting the name of each port easier
         // As you do not need to try get it from the key of the entry that is being currently observed.
-        public struct port_data
+        public struct portData
         {
             // Name of the port
-            public string port_name;
+            public string portName;
             // Ports connection status
-            public bool port_connected;
+            public bool portConnected;
 
             // Set the above values
-            public port_data(string port, bool status)
+            public portData(string port, bool status)
             {
-                this.port_name = port;
-                this.port_connected = status;
+                this.portName = port;
+                this.portConnected = status;
             }
 
         }
 
         // Variable to store the instance of the class that is used to start the serial port (Solves static/non-static incompatabilities
         // nonsense. Can probally be made cleaner
-        private static port_start_trickery port_start_trick;
+        private static portStartTrickery portStartTrick;
         
         // If the connection to the ports has been run before. Just to prevent the start command from erroring out.
         // Start command errors out if the dictionary with the ports and their statuses has not been filled out, which requires starting
         // the connections to them to do.
-        public static bool run_connect = false;
+        public static bool runConnect = false;
         // End Variables for commands
 
 
@@ -99,14 +99,14 @@ namespace KerbalSimpit
             DontDestroyOnLoad(this);
 
             // Init the ports when an instance of this class is created
-            init_ports(this.kpit);
+            initPorts(this.kpit);
         }
 
         // Class whos sole purpose in life, is to solve some fiddly static to non-static irks
-        class port_start_trickery{
+        class portStartTrickery{
 
             // Constructor that runs the code to start a new connection
-            public port_start_trickery(KSPit k_pit)
+            public portStartTrickery(KSPit k_pit)
             {
 
                 // Same code as before, just that it's location has been shifted to here.
@@ -143,13 +143,13 @@ namespace KerbalSimpit
         }
 
         // Method that inits the ports, by creating a new instance of the trickery class
-        public static void init_ports(KSPit k_pit)
+        public static void initPorts(KSPit k_pit)
         {
-            port_start_trick = new port_start_trickery(k_pit);
+            portStartTrick = new portStartTrickery(k_pit);
         }
 
         // Method used to kill the ports
-        public static void kill_ports(KSPit k_pit)
+        public static void killPorts(KSPit k_pit)
         {
             k_pit.ClosePorts();
         }
@@ -253,39 +253,39 @@ namespace KerbalSimpit
 
             // Local variable used to store the status of the ports connection.
             // Means that the dictionary is only populated in one place
-            bool connected_status = false;
+            bool connectedStatus = false;
 
             for (int i = SerialPorts.Length-1; i>=0; i--)
             {
                 if (SerialPorts[i].open())
                 {
                     // If the port connected, set connected status to true
-                    connected_status = true;
+                    connectedStatus = true;
                     if (Config.Verbose){
                         Debug.Log(String.Format("KerbalSimpit: Opened {0}", SerialPorts[i].PortName));
                     }
                 } else {
                     if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Unable to open {0}", SerialPorts[i].PortName));
                     // If the port was not connected to, set connected status to false
-                    connected_status = false;
+                    connectedStatus = false;
                 }
                 // set the state of the serial port's dictionary entry to true/false
                 // depending on the state of whether or not it was opened
 
                 // If the dictionary already contains an entry for this serial port
-                if (serial_ports.ContainsKey(SerialPorts[i].PortName)){
+                if (serialPorts.ContainsKey(SerialPorts[i].PortName)){
                     // Overright the entry with a new one
-                    serial_ports[SerialPorts[i].PortName] = new port_data(SerialPorts[i].PortName, connected_status);
+                    serialPorts[SerialPorts[i].PortName] = new portData(SerialPorts[i].PortName, connectedStatus);
                 } else
                 {
                     // Otherwise, if there is not an entry for this port, create a new one for it
-                    serial_ports.Add(SerialPorts[i].PortName, new port_data(SerialPorts[i].PortName, connected_status));
+                    serialPorts.Add(SerialPorts[i].PortName, new portData(SerialPorts[i].PortName, connectedStatus));
                 }
                 
             }
             
             // Run connect set to true, signalling that the list has been populated at least once
-            run_connect = true;
+            runConnect = true;
         }
 
         private void ClosePorts() {
@@ -301,7 +301,7 @@ namespace KerbalSimpit
             {
                 SerialPorts[i].close();
                 // sets the state of the serial port's dictionary entry when it is closed, to closed
-                serial_ports[SerialPorts[i].PortName] = new port_data(SerialPorts[i].PortName, false);
+                serialPorts[SerialPorts[i].PortName] = new portData(SerialPorts[i].PortName, false);
             }
 
         }

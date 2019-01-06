@@ -13,7 +13,7 @@ namespace KerbalSimpit.Localisation_Libs
 
     // Inspired by: https://github.com/Alshain01/ActionGroupManager/blob/master/ActionGroupManager/KSPActionGroupExtensions.cs
 
-    public static class Command_Lib_Local
+    public static class commandLibValues
     {
         // Command values. EG sim, help, serial etc
         public const string SIM_SIM_COMMAND_ID = "sim_sim_command_id";
@@ -23,7 +23,7 @@ namespace KerbalSimpit.Localisation_Libs
 
         // Command Value Tags
 
-        private static readonly Dictionary<string, string> command_default_tags = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> commandDefaultTags = new Dictionary<string, string>()
         {
             {SIM_SIM_COMMAND_ID, "#autoLOC_SIM_DEF_001" },
             {SIM_HELP_COMMAND_ID, "#autoLOC_SIM_DEF_002" },
@@ -32,7 +32,7 @@ namespace KerbalSimpit.Localisation_Libs
 
         // Command Help Value Tags
 
-        private static readonly Dictionary<string, string> command_help_tags = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> commandHelpTags = new Dictionary<string, string>()
         {
             {SIM_SIM_COMMAND_ID, "#autoLOC_SIM_HELP_001"},
             {SIM_HELP_COMMAND_ID, "#autoLOC_SIM_HELP_002" },
@@ -41,7 +41,7 @@ namespace KerbalSimpit.Localisation_Libs
 
         // Help Extra Value Tags
 
-        private static readonly Dictionary<string, string> help_extra_values = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> helpExtraValues = new Dictionary<string, string>()
         {
             {"sim_help_list_head", "#autoLOC_SIM_HELP_EXTRA_001" },
             {"sim_help_arg_over", "#autoLOC_SIM_HELP_EXTRA_002" }
@@ -49,7 +49,7 @@ namespace KerbalSimpit.Localisation_Libs
 
         // Command Usage Tags
 
-        private static readonly Dictionary<string, string> command_usage_tags = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> commandUsageTags = new Dictionary<string, string>()
         {
             {SIM_SIM_COMMAND_ID, "#autoLOC_SIM_USAGE_001"},
             {SIM_HELP_COMMAND_ID, "#autoLOC_SIM_USAGE_002" },
@@ -58,30 +58,30 @@ namespace KerbalSimpit.Localisation_Libs
 
         // Returns command tags
 
-        public static string command_default_tag(string dict_key)
+        public static string commandDefaultTag(string dict_key)
         {
-             return command_default_tags[dict_key]; 
+             return commandDefaultTags[dict_key]; 
         }
 
         // Returns help tags
 
-        public static string command_help_tag(string dict_key)
+        public static string commandHelpTag(string dict_key)
         {
-            return command_help_tags[dict_key];
+            return commandHelpTags[dict_key];
         }
 
         // Returns extra value tags
 
-        public static string help_extra_value(string dict_key)
+        public static string helpExtraValue(string dict_key)
         {
-            return help_extra_values[dict_key];
+            return helpExtraValues[dict_key];
         }
 
         // Returns Usage Tags
 
-        public static string command_usage_tag(string dict_key)
+        public static string commandUsageTag(string dict_key)
         {
-            return command_usage_tags[dict_key];
+            return commandUsageTags[dict_key];
         }
 
         // Serial Commands
@@ -92,7 +92,7 @@ namespace KerbalSimpit.Localisation_Libs
 
         // Serial Command Tags
 
-        private static readonly Dictionary<string, string> serial_command_tags = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> serialCommandTags = new Dictionary<string, string>()
         {
             {SIM_SERIAL_COMMAND_STATUS, "#autoLOC_SIM_SER_STATUS"},
             {SIM_SERIAL_COMMAND_START, "#autoLOC_SIM_SER_START"},
@@ -101,9 +101,9 @@ namespace KerbalSimpit.Localisation_Libs
 
         // Return serial command tags
 
-        public static string serial_command_tag(string dict_key)
+        public static string serialCommandTag(string dict_key)
         {
-            return serial_command_tags[dict_key];
+            return serialCommandTags[dict_key];
         }
 
         // Serial Output Values
@@ -113,7 +113,7 @@ namespace KerbalSimpit.Localisation_Libs
 
         // Serial Status Tags
 
-        private static readonly Dictionary<string, string> serial_status_tags = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> serialOutputTags = new Dictionary<string, string>()
         {
             {SIM_SERIAL_OUTPUT_HEADER, "#autoLOC_SIM_SER_OUTPUT_HEADER"},
             {SIM_SERIAL_OUTPUT_STATUS, "#autoLOC_SIM_SER_OUTPUT_STATUS"}
@@ -121,9 +121,9 @@ namespace KerbalSimpit.Localisation_Libs
 
         // Return serial output tags
 
-        public static string serial_output_tag(string dict_key)
+        public static string serialOutputTag(string dict_key)
         {
-            return serial_status_tags[dict_key];
+            return serialOutputTags[dict_key];
         }
 
         // Serial Misc Values
@@ -143,7 +143,7 @@ namespace KerbalSimpit.Localisation_Libs
 
         // Serial Misc Value Tags
 
-        private static readonly Dictionary<string, string> serial_misc_tags = new Dictionary<string, string>()
+        private static readonly Dictionary<string, string> serialMiscTags = new Dictionary<string, string>()
         {
             {SIM_SERIAL_MISC_CONNECT, "#autoLOC_SIM_SER_MISC_CONNECT" },
             {SIM_SERIAL_MISC_CONNECTED, "#autoLOC_SIM_SER_MISC_CONNECTED" },
@@ -157,9 +157,9 @@ namespace KerbalSimpit.Localisation_Libs
 
         // Return serial misc value tags
 
-        public static string serial_misc_tag(string dict_key)
+        public static string serialMiscTag(string dict_key)
         {
-            return serial_misc_tags[dict_key];
+            return serialMiscTags[dict_key];
         }
     }
 }
