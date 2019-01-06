@@ -367,7 +367,7 @@ namespace KerbalSimpit.Serial
             Array.Copy(Payload, buf, Size);
 
             // Changed to refer to the instance of KSPit the plugin is using
-            KerbalSimpitConsole_SerialCommand.get_kspit.onSerialReceivedArray[Type].Fire(ID, buf);
+            KerbalSimpitConsole_SerialCommand.getKspit.onSerialReceivedArray[Type].Fire(ID, buf);
         }
     }
 }
