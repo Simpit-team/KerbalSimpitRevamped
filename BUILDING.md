@@ -19,7 +19,7 @@
 * Run the [KerbalSimpit deployment](https://home.hardy.dropbear.id.au/bamboo/deploy/viewDeploymentProjectEnvironments.action?id=950273)
   deployment project. This will take the release artefact generated above
   and upload it to the pool directory on the server.
-  
+
 ### Build and deploy metadata.
 
 * Run the [KSPIT-CKAN](https://home.hardy.dropbear.id.au/bamboo/browse/KSPIT-CKAN)
