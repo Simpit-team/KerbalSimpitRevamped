@@ -33,7 +33,7 @@ INSTALLDIR=$(KSPDIR)/GameData/KerbalSimpit
 CONFIGDIR=$(INSTALLDIR)/PluginData/KerbalSimpit
 
 # Shouldn't need to change variables below here
-XBUILD=xbuild
+MSBUILD=msbuild
 CONFIG=Release
 
 PACKAGEDIR=package/KerbalSimpit
@@ -52,10 +52,10 @@ export KSPLIBDIR
 all:KerbalSimpitSerial.dll KerbalSimpit.dll
 
 KerbalSimpit.dll:Properties/AssemblyInfo.cs
-	$(XBUILD) /p:Configuration=$(CONFIG) Main.csproj
+	$(MSBUILD) /p:Configuration=$(CONFIG) Main.csproj
 
 KerbalSimpitSerial.dll:Properties/SerialAssemblyInfo.cs
-	$(XBUILD) /p:Configuration=$(CONFIG) Serial.csproj
+	$(MSBUILD) /p:Configuration=$(CONFIG) Serial.csproj
 
 install:all
 	cp Bin/KerbalSimpit.dll $(INSTALLDIR)
@@ -63,8 +63,8 @@ install:all
 	cp Bin/Mono.Posix.dll $(INSTALLDIR)
 
 clean:
-	$(XBUILD) /p:Configuration=$(CONFIG) /t:Clean Main.csproj
-	$(XBUILD) /p:Configuration=$(CONFIG) /t:Clean Serial.csproj
+	$(MSBUILD) /p:Configuration=$(CONFIG) /t:Clean Main.csproj
+	$(MSBUILD) /p:Configuration=$(CONFIG) /t:Clean Serial.csproj
 	rm -f KerbalSimpit.version
 	rm -f Properties/AssemblyInfo.cs
 	rm -f Properties/SerialAssemblyInfo.cs

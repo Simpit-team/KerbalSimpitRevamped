@@ -3,7 +3,7 @@
          xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>KerbalSimpitSerial</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <OutputType>Library</OutputType>
     <OutputPath>SerialBin\</OutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
