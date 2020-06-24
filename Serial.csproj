@@ -4,16 +4,21 @@
   <PropertyGroup>
     <AssemblyName>KerbalSimpitSerial</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <NoStdLib>true</NoStdLib>
+    <NoSdkPath>true</NoSdkPath>
     <OutputType>Library</OutputType>
     <OutputPath>SerialBin\</OutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mono.Posix">
-      <Private>True</Private>
+    <Reference Include="mscorlib">
+      <HintPath>$(KSPLIBDIR)/mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core">
+      <HintPath>$(KSPLIBDIR)/System.Core.dll</HintPath>
     </Reference>
     <Reference Include="System">
-      <Private>False</Private>
+      <HintPath>$(KSPLIBDIR)/System.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>$(KSPLIBDIR)/Assembly-CSharp.dll</HintPath>

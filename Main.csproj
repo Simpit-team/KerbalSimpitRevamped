@@ -3,13 +3,21 @@
          xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>KerbalSimpit</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <NoStdLib>true</NoStdLib>
+    <NoSdkPath>true</NoSdkPath>
     <OutputType>Library</OutputType>
     <OutputPath>Bin\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="mscorlib">
+      <HintPath>$(KSPLIBDIR)/mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core">
+      <HintPath>$(KSPLIBDIR)/System.Core.dll</HintPath>
+    </Reference>
     <Reference Include="System">
-      <Private>False</Private>
+      <HintPath>$(KSPLIBDIR)/System.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>$(KSPLIBDIR)/Assembly-CSharp.dll</HintPath>
@@ -25,9 +33,6 @@
     </Reference>
     <Reference Include="KerbalSimpit.IO.Ports">
       <HintPath>SerialBin/KerbalSimpitSerial.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Mono.Posix">
       <Private>True</Private>
     </Reference>
   </ItemGroup>
