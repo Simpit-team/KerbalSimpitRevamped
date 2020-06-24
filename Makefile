@@ -49,7 +49,7 @@ endif
 export KSPDIR
 export KSPLIBDIR
 
-all:KerbalSimpitSerial.dll KerbalSimpit.dll
+all:KerbalSimpit.dll
 
 KerbalSimpit.dll:Properties/AssemblyInfo.cs
 	$(MSBUILD) /p:Configuration=$(CONFIG) Main.csproj
@@ -59,11 +59,9 @@ KerbalSimpitSerial.dll:Properties/SerialAssemblyInfo.cs
 
 install:all
 	cp Bin/KerbalSimpit.dll $(INSTALLDIR)
-	cp Bin/KerbalSimpitSerial.dll $(INSTALLDIR)
 
 clean:
 	$(MSBUILD) /p:Configuration=$(CONFIG) /t:Clean Main.csproj
-	$(MSBUILD) /p:Configuration=$(CONFIG) /t:Clean Serial.csproj
 	rm -f KerbalSimpit.version
 	rm -f Properties/AssemblyInfo.cs
 	rm -f Properties/SerialAssemblyInfo.cs
@@ -78,9 +76,6 @@ validate:KerbalSimpit.version
 Properties/AssemblyInfo.cs:Properties/AssemblyInfo.cs.m4 version-info.m4
 	m4 -DBUILDVER=$(BUILDVERSION) version-info.m4 Properties/AssemblyInfo.cs.m4 > Properties/AssemblyInfo.cs
 
-Properties/SerialAssemblyInfo.cs:Properties/SerialAssemblyInfo.cs.m4 version-info.m4
-	m4 -DBUILDVER=$(BUILDVERSION) version-info.m4 Properties/SerialAssemblyInfo.cs.m4 > Properties/SerialAssemblyInfo.cs
-
 package: all KerbalSimpit.version
 	mkdir -p $(PACKAGEDIR)
 	cp Bin/*.dll $(PACKAGEDIR)
@@ -88,4 +83,3 @@ package: all KerbalSimpit.version
 	cp -r distrib/* $(PACKAGEDIR)
 	cd package; zip -r -9 ../$(ZIPNAME) KerbalSimpit
 	rm -r package
-

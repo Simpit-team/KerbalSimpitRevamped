@@ -9,7 +9,7 @@ using System.Threading;
 using KSP.IO;
 using UnityEngine;
 
-using KerbalSimpit.IO.Ports;
+using System.IO.Ports;
 
 namespace KerbalSimpit.Serial
 {
