@@ -54,9 +54,6 @@ all:KerbalSimpit.dll
 KerbalSimpit.dll:Properties/AssemblyInfo.cs
 	$(MSBUILD) /p:Configuration=$(CONFIG) Main.csproj
 
-KerbalSimpitSerial.dll:Properties/SerialAssemblyInfo.cs
-	$(MSBUILD) /p:Configuration=$(CONFIG) Serial.csproj
-
 install:all
 	cp Bin/KerbalSimpit.dll $(INSTALLDIR)
 

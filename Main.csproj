@@ -31,10 +31,6 @@
       <HintPath>$(KSPLIBDIR)/UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="KerbalSimpit.IO.Ports">
-      <HintPath>SerialBin/KerbalSimpitSerial.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KerbalSimpit\KerbalSimpit.cs" />

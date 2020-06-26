@@ -43,7 +43,3 @@ using System.Runtime.InteropServices;
 // If you're not running m4 over these files (see the Makefile in the parent
 // directory), then you'll have to overwrite these values by hand.
 [assembly: KSPAssembly ("KerbalSimpit", MAJORVER, MINORVER)]
-
-// KSPAssemblyDependency ensures assemblies required by this
-// assembly are loaded first.
-[assembly: KSPAssemblyDependency ("KerbalSimpitSerial", SERIALMAJORVER, SERIALMINORVER)]
