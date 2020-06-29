@@ -1,5 +1,11 @@
 # Kerbal Simpit Changelog
 
+## v1.4.0 (2020-06-29)
+
+* Built against KSP 1.9.1.
+* Remove KerbalSimpitSerial. Use Unity's System.IO.Ports provided
+  by KSP instead.
+
 ## v1.3.0 (2018-12-18)
 
 Adds new channel for SAS mode. Thanks Zack Thomas.
