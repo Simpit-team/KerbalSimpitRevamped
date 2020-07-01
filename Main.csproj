@@ -12,12 +12,15 @@
   <ItemGroup>
     <Reference Include="mscorlib">
       <HintPath>$(KSPLIBDIR)/mscorlib.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System.Core">
       <HintPath>$(KSPLIBDIR)/System.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System">
       <HintPath>$(KSPLIBDIR)/System.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>$(KSPLIBDIR)/Assembly-CSharp.dll</HintPath>
