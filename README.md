@@ -1,4 +1,8 @@
-# Kerbal Simpit
+# Kerbal Simpit Revamped
+
+This is the repository for my revamped version of the excellent KSP mod Kerbal Simpit, to try and bring it up to date with some of the recent changes to the game. Also, I am planing to look at incorporating some suggested features into this mod, to make it better match what the community wants.
+
+## Original Readme Contents - yet to be updated
 
 This is a [Kerbal Space Program](https://kerbalspaceprogram.com/) plugin
 to enable communication with devices over a serial connection.
