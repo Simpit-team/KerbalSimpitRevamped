@@ -18,6 +18,8 @@ The [wiki] contains more information on using, and working on the plugin.
 * Flesh out Arduino library, and fix the warnings that break compile on
   some platforms (like teensy).
 * Runtime configuration of serial ports.
+* Naming of custom action groups? Could allow for digital scribble strips?
+* Add Stage/Total DeltaV Packets
 
 ## Planned features
 
