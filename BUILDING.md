@@ -5,13 +5,16 @@
 1. Have WSL enabled, running Debian 10
 2. Run: sudo apt install build-essential
 3. Install mono complete as instructed here: https://www.mono-project.com/download/stable/#download-lin-debian
-4. Symlink from your KSP install directory to the directory of this project
-    * ln -s /path/to/steamapps/common/Kerbal Space Program    /path/to/this/project/KerbalSpaceProgram
-5. Symlink from your KSP install gamedata directory to the directory of this project
-    * ln -s /path/to/steamapps/common/Kerbal Space Program/GameData    /path/to/this/project/install
-6. Run: make install, to build and install the DLL
+4. Create the required symlinks from your KSP install directory to the directory of this project
+    * For Windows/WSL (In an Admin CMD Prompt): 
+        - mklink /D "C:\Path\To\Local\Repo\KerbalSpaceProgram" "C:\Path\To\KSP\Root\Install"
+        - mklink /D "C:\Path\To\Local\Repo\install" "C:\Path\To\KSP\Root\Install\GameData"
+    * For Linux:
+        - ln -s /path/to/steamapps/common/Kerbal Space Program    /path/to/this/project/KerbalSpaceProgram
+        - ln -s /path/to/steamapps/common/Kerbal Space Program/GameData    /path/to/this/project/install
+5. Run: make install, to build and install the DLL
 
-7. Try the above steps, and if they do not work, also try installing dotnet, following the install instructions here: https://docs.microsoft.com/en-gb/dotnet/core/install/linux
+6. Try the above steps, and if they do not work, also try installing dotnet, following the install instructions here: https://docs.microsoft.com/en-gb/dotnet/core/install/linux
 
 
 ## Compiling:
