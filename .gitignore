@@ -12,3 +12,6 @@ KSPresources
 # Ignore WIP bits
 junk/
 
+# Ignore the symlink files, pointing to the game install directory
+install
+KerbalSpaceProgram
