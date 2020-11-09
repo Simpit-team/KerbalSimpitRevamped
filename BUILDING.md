@@ -1,5 +1,19 @@
 # Building Kerbal Simpit
 
+## Requirements - building on Windows/Linux
+
+1. Have WSL enabled, running Debian 10
+2. Run: sudo apt install build-essential
+3. Install mono complete as instructed here: https://www.mono-project.com/download/stable/#download-lin-debian
+4. Symlink from your KSP install directory to the directory of this project
+    * ln -s /path/to/steamapps/common/Kerbal Space Program    /path/to/this/project/KerbalSpaceProgram
+5. Symlink from your KSP install gamedata directory to the directory of this project
+    * ln -s /path/to/steamapps/common/Kerbal Space Program/GameData    /path/to/this/project/install
+6. Run: make install, to build and install the DLL
+
+7. Try the above steps, and if they do not work, also try installing dotnet, following the install instructions here: https://docs.microsoft.com/en-gb/dotnet/core/install/linux
+
+
 ## Compiling:
 
 
