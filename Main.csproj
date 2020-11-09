@@ -8,6 +8,7 @@
     <NoSdkPath>true</NoSdkPath>
     <OutputType>Library</OutputType>
     <OutputPath>Bin\</OutputPath>
+    <KSPLIBDIR>KerbalSpaceProgram\KSP_x64_Data\Managed\</KSPLIBDIR>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib">
