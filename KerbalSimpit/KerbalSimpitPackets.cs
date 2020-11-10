@@ -30,6 +30,8 @@ namespace KerbalSimpit
         public static byte TargetInfo = 25;
         public static byte SoIName = 26;
         public static byte Airspeed = 27;
+        public static byte Xenon = 28;
+        public static byte XenonStage = 29;
     }
 
     public static class InboundPackets

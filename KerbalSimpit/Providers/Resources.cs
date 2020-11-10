@@ -18,17 +18,17 @@ namespace KerbalSimpit.Providers
 
         private ResourceStruct TotalLF, StageLF, TotalOx, StageOx,
             TotalSF, StageSF, TotalMono, TotalElectric, TotalEva,
-            TotalOre, TotalAb, StageAb;
+            TotalOre, TotalAb, StageAb, TotalXenon, StageXenon;
 
         private EventData<byte, object> LFChannel, LFStageChannel,
             OxChannel, OxStageChannel, SFChannel, SFStageChannel,
             MonoChannel, ElectricChannel, EvaChannel, OreChannel,
-            AbChannel, AbStageChannel;
+            AbChannel, AbStageChannel, XenonChannel, XenonStageChannel;
 
         // IDs of resources we care about
         private int LiquidFuelID, OxidizerID, SolidFuelID,
             MonoPropellantID, ElectricChargeID, EvaPropellantID,
-            OreID, AblatorID;
+            OreID, AblatorID, XenonID;
 
         private bool ARPPresent;
 
@@ -74,6 +74,12 @@ namespace KerbalSimpit.Providers
                 KSPit.AddToDeviceHandler(AbStageProvider);
                 AbStageChannel =
                     GameEvents.FindEvent<EventData<byte, object>>("toSerial21");
+                KSPit.AddToDeviceHandler(XenonProvider);
+                XenonChannel =
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial28");
+                KSPit.AddToDeviceHandler(XenonStageProvider);
+                XenonStageChannel =
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial29");
 
                 ScanForResources();
             } else {
@@ -98,6 +104,8 @@ namespace KerbalSimpit.Providers
                 GetTotalResources(OreID, ref TotalOre);
                 GetTotalResources(AblatorID, ref TotalAb);
                 GetStageResources(AblatorID, ref StageAb);
+                GetTotalResources(XenonID, ref TotalXenon);
+                GetStageResources(XenonID, ref StageXenon);
             }
         }
 
@@ -115,6 +123,8 @@ namespace KerbalSimpit.Providers
             KSPit.RemoveToDeviceHandler(OreProvider);
             KSPit.RemoveToDeviceHandler(AbProvider);
             KSPit.RemoveToDeviceHandler(AbStageProvider);
+            KSPit.RemoveToDeviceHandler(XenonProvider);
+            KSPit.RemoveToDeviceHandler(XenonStageProvider);
         }
 
         public void ScanForResources()
@@ -128,6 +138,7 @@ namespace KerbalSimpit.Providers
             EvaPropellantID = GetResourceID("EVA Propellant");
             OreID = GetResourceID("Ore");
             AblatorID = GetResourceID("Ablator");
+            XenonID = GetResourceID("XenonGas");
         }
 
         public void LFProvider()
@@ -188,6 +199,16 @@ namespace KerbalSimpit.Providers
         public void AbStageProvider()
         {
             if (AbStageChannel != null) AbStageChannel.Fire(OutboundPackets.AblatorStage, StageAb);
+        }
+
+        public void XenonProvider()
+        {
+            if (XenonChannel != null) XenonChannel.Fire(OutboundPackets.Xenon, TotalXenon);
+        }
+
+        public void XenonStageProvider()
+        {
+            if (XenonStageChannel != null) XenonStageChannel.Fire(OutboundPackets.XenonStage, StageXenon);
         }
 
         private int GetResourceID(string resourceName)
