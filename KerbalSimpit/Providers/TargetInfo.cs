@@ -57,7 +57,7 @@ namespace KerbalSimpit.Providers
         {
             if (FlightGlobals.fetch.VesselTarget != null)
             {
-                myTargetInfo.distance = (float)Vector3.Distance(FlightGlobals.fetch.VesselTarget.GetVessel().transform.position, FlightGlobals.ActiveVessel.transform.position);
+                myTargetInfo.distance = (float)Vector3.Distance(FlightGlobals.fetch.VesselTarget.GetTransform().position, FlightGlobals.ActiveVessel.transform.position);
                 myTargetInfo.velocity = (float)FlightGlobals.ship_tgtVelocity.magnitude;
                 if (targetChannel != null) targetChannel.Fire(OutboundPackets.TargetInfo, myTargetInfo);
             }
