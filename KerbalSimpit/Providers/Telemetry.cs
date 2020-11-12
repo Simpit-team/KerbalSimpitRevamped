@@ -58,19 +58,19 @@ namespace KerbalSimpit.Providers
         public void Start()
         {
             KSPit.AddToDeviceHandler(AltitudeProvider);
-            altitudeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial8");
+            altitudeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial30");
             KSPit.AddToDeviceHandler(ApsidesProvider);
-            apsidesChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial9");
+            apsidesChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial33");
             KSPit.AddToDeviceHandler(ApsidesTimeProvider);
-            apsidesTimeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial24");
+            apsidesTimeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial34");
             KSPit.AddToDeviceHandler(VelocityProvider);
-            velocityChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial22");
+            velocityChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial31");
             // We fire one SoI packet when SoI changes. So no need to use the
             // periodic DeviceHandler infrastructure.
             CurrentSoI = "";
-            soiChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial26");
+            soiChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial51");
             KSPit.AddToDeviceHandler(AirspeedProvider);
-            airspeedChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial27");
+            airspeedChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial32");
         }
 
         public void OnDestroy()
