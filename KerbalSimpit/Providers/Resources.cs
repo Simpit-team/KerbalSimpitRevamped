@@ -18,17 +18,17 @@ namespace KerbalSimpit.Providers
 
         private ResourceStruct TotalLF, StageLF, TotalOx, StageOx,
             TotalSF, StageSF, TotalMono, TotalElectric, TotalEva,
-            TotalOre, TotalAb, StageAb;
+            TotalOre, TotalAb, StageAb, TotalXenon, StageXenon;
 
         private EventData<byte, object> LFChannel, LFStageChannel,
             OxChannel, OxStageChannel, SFChannel, SFStageChannel,
             MonoChannel, ElectricChannel, EvaChannel, OreChannel,
-            AbChannel, AbStageChannel;
+            AbChannel, AbStageChannel, XenonChannel, XenonStageChannel;
 
         // IDs of resources we care about
         private int LiquidFuelID, OxidizerID, SolidFuelID,
             MonoPropellantID, ElectricChargeID, EvaPropellantID,
-            OreID, AblatorID;
+            OreID, AblatorID, XenonID;
 
         private bool ARPPresent;
 
@@ -56,6 +56,12 @@ namespace KerbalSimpit.Providers
                 KSPit.AddToDeviceHandler(SFStageProvider);
                 SFStageChannel =
                     GameEvents.FindEvent<EventData<byte, object>>("toSerial6");
+                KSPit.AddToDeviceHandler(XenonProvider);
+                XenonChannel =
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial7");
+                KSPit.AddToDeviceHandler(XenonStageProvider);
+                XenonStageChannel =
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial8");
                 KSPit.AddToDeviceHandler(MonoProvider);
                 MonoChannel =
                     GameEvents.FindEvent<EventData<byte, object>>("toSerial9");
@@ -92,6 +98,8 @@ namespace KerbalSimpit.Providers
                 GetStageResources(OxidizerID, ref StageOx);
                 GetTotalResources(SolidFuelID, ref TotalSF);
                 GetStageResources(SolidFuelID, ref StageSF);
+                GetTotalResources(XenonID, ref TotalXenon);
+                GetStageResources(XenonID, ref StageXenon);
                 GetTotalResources(MonoPropellantID, ref TotalMono);
                 GetTotalResources(ElectricChargeID, ref TotalElectric);
                 GetTotalResources(EvaPropellantID, ref TotalEva);
@@ -109,6 +117,8 @@ namespace KerbalSimpit.Providers
             KSPit.RemoveToDeviceHandler(OxStageProvider);
             KSPit.RemoveToDeviceHandler(SFProvider);
             KSPit.RemoveToDeviceHandler(SFStageProvider);
+            KSPit.RemoveToDeviceHandler(XenonProvider);
+            KSPit.RemoveToDeviceHandler(XenonStageProvider);
             KSPit.RemoveToDeviceHandler(MonoProvider);
             KSPit.RemoveToDeviceHandler(ElectricProvider);
             KSPit.RemoveToDeviceHandler(EvaProvider);
@@ -123,6 +133,7 @@ namespace KerbalSimpit.Providers
             LiquidFuelID = GetResourceID("LiquidFuel");
             OxidizerID = GetResourceID("Oxidizer");
             SolidFuelID = GetResourceID("SolidFuel");
+            XenonID = GetResourceID("XenonGas");
             MonoPropellantID = GetResourceID("MonoPropellant");
             ElectricChargeID = GetResourceID("ElectricCharge");
             EvaPropellantID = GetResourceID("EVA Propellant");
@@ -158,6 +169,16 @@ namespace KerbalSimpit.Providers
         public void SFStageProvider()
         {
             if (SFStageChannel != null) SFStageChannel.Fire(OutboundPackets.SolidFuelStage, StageSF);
+        }
+
+        public void XenonProvider()
+        {
+            if (XenonChannel != null) XenonChannel.Fire(OutboundPackets.XenonGas, TotalXenon);
+        }
+
+        public void XenonStageProvider()
+        {
+            if (XenonStageChannel != null) XenonStageChannel.Fire(OutboundPackets.XenonGasStage, StageXenon);
         }
 
         public void MonoProvider()
