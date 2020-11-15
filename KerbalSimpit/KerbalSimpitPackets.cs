@@ -36,8 +36,9 @@ namespace KerbalSimpit
 
         // Vessel Details
         public static byte ActionGroups = 40;
-        // public static byte DeltaVTotal = ;
-        // public static byte DeltaVStage = ;
+        public static byte DeltaV = 41;
+        public static byte DeltaVEnv = 42;
+        public static byte BurnTime = 43;
 
         // External Environment
         public static byte TargetInfo = 50;
