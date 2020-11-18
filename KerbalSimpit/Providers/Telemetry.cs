@@ -44,14 +44,41 @@ namespace KerbalSimpit.Providers
             public float MachNumber;
         }
 
+        [StructLayout(LayoutKind.Sequential, Pack = 1)][Serializable]
+        public struct DeltaVStruct
+        {
+            public float stageDeltaV;
+            public float totalDeltaV;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)][Serializable]
+        public struct DeltaVEnvStruct
+        {
+            public float stageDeltaVASL;
+            public float totalDeltaVASL;
+            public float stageDeltaVVac;
+            public float totalDeltaVVac;
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1)][Serializable]
+        public struct BurnTimeStruct
+        {
+            public float stageBurnTime;
+            public float totalBurnTime;
+        }
+
         private AltitudeStruct myAlt;
         private ApsidesStruct myApsides;
         private ApsidesTimeStruct myApsidesTime;
         private VelocityStruct myVelocity;
         private AirspeedStruct myAirspeed;
+        private DeltaVStruct myDeltaVStruct;
+        private DeltaVEnvStruct myDeltaVEnvStruct;
+        private BurnTimeStruct myBurnTimeStruct;
 
         private EventData<byte, object> altitudeChannel, apsidesChannel,
-            apsidesTimeChannel, velocityChannel, soiChannel, airspeedChannel;
+            apsidesTimeChannel, velocityChannel, soiChannel, airspeedChannel,
+            deltaVChannel, deltaVEnvChannel, burnTimeChannel;
 
         private string CurrentSoI;
 
@@ -65,6 +92,12 @@ namespace KerbalSimpit.Providers
             apsidesTimeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial34");
             KSPit.AddToDeviceHandler(VelocityProvider);
             velocityChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial31");
+            KSPit.AddToDeviceHandler(DeltaVProvider);
+            deltaVChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial41");
+            KSPit.AddToDeviceHandler(DeltaVEnvProvider);
+            deltaVEnvChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial42");
+            KSPit.AddToDeviceHandler(BurnTimeProvider);
+            burnTimeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial43");
             // We fire one SoI packet when SoI changes. So no need to use the
             // periodic DeviceHandler infrastructure.
             CurrentSoI = "";
@@ -80,6 +113,9 @@ namespace KerbalSimpit.Providers
             KSPit.RemoveToDeviceHandler(ApsidesTimeProvider);
             KSPit.RemoveToDeviceHandler(VelocityProvider);
             KSPit.RemoveToDeviceHandler(AirspeedProvider);
+            KSPit.RemoveToDeviceHandler(DeltaVProvider);
+            KSPit.RemoveToDeviceHandler(DeltaVEnvProvider);
+            KSPit.RemoveToDeviceHandler(BurnTimeProvider);
         }
 
         public void Update()
@@ -128,6 +164,110 @@ namespace KerbalSimpit.Providers
             myAirspeed.IAS = (float)FlightGlobals.ActiveVessel.indicatedAirSpeed;
             myAirspeed.MachNumber = (float)FlightGlobals.ActiveVessel.mach;
             if (airspeedChannel != null) airspeedChannel.Fire(OutboundPackets.Airspeed, myAirspeed);
+        }
+
+        public void DeltaVProvider()
+        {
+            DeltaVStageInfo currentStageInfo = null;
+            if (FlightGlobals.ActiveVessel.currentStage == FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count)
+            {
+                // Rocket has not taken off, use first stage with deltaV (to avoid stage of only stabilizer)
+                for (int i = FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count - 1; i >= 0; i--)
+                {
+                    currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(i);
+                    if(currentStageInfo.deltaVActual > 0)
+                    {
+                        break;
+                    }
+                }
+            } else
+            {
+                currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(FlightGlobals.ActiveVessel.currentStage);
+            }
+
+            if (currentStageInfo != null)
+            {
+                myDeltaVStruct.stageDeltaV = (float)currentStageInfo.deltaVActual;
+            }
+            else
+            {
+                //Debug.Log("KerbalSimpit: DeltaVProvider could not find current stage info.");
+                myDeltaVStruct.stageDeltaV = 0;
+            }
+            myDeltaVStruct.totalDeltaV = (float)FlightGlobals.ActiveVessel.VesselDeltaV.TotalDeltaVActual;
+            if (deltaVChannel != null) deltaVChannel.Fire(OutboundPackets.DeltaV, myDeltaVStruct);
+        }
+
+        public void DeltaVEnvProvider()
+        {
+            DeltaVStageInfo currentStageInfo = null;
+            if (FlightGlobals.ActiveVessel.currentStage == FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count)
+            {
+                // Rocket has not taken off, use first stage with deltaV (to avoid stage of only stabilizer)
+                for (int i = FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count - 1; i >= 0; i--)
+                {
+                    currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(i);
+                    if (currentStageInfo.deltaVActual > 0)
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(FlightGlobals.ActiveVessel.currentStage);
+            }
+
+            if (currentStageInfo != null)
+            {
+
+                myDeltaVEnvStruct.stageDeltaVASL = (float)currentStageInfo.deltaVatASL;
+                myDeltaVEnvStruct.stageDeltaVVac = (float)currentStageInfo.deltaVinVac;
+            }
+            else
+            {
+                //Debug.Log("KerbalSimpit: DeltaVEnvProvider could not find current stage info.");
+                myDeltaVEnvStruct.stageDeltaVASL = 0;
+                myDeltaVEnvStruct.stageDeltaVVac = 0;
+            }
+
+            myDeltaVEnvStruct.totalDeltaVASL = (float)FlightGlobals.ActiveVessel.VesselDeltaV.TotalDeltaVASL;
+            myDeltaVEnvStruct.totalDeltaVVac = (float)FlightGlobals.ActiveVessel.VesselDeltaV.TotalDeltaVVac;
+            if (deltaVEnvChannel != null) deltaVEnvChannel.Fire(OutboundPackets.DeltaVEnv, myDeltaVEnvStruct);
+        }
+
+        public void BurnTimeProvider()
+        {
+            DeltaVStageInfo currentStageInfo = null;
+            if (FlightGlobals.ActiveVessel.currentStage == FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count)
+            {
+                // Rocket has not taken off, use first stage with deltaV (to avoid stage of only stabilizer)
+                for (int i = FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count - 1; i >= 0; i--)
+                {
+                    currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(i);
+                    if (currentStageInfo.deltaVActual > 0)
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(FlightGlobals.ActiveVessel.currentStage);
+            }
+
+            if (currentStageInfo != null)
+            {
+                myBurnTimeStruct.stageBurnTime = (float)currentStageInfo.stageBurnTime;
+            }
+            else
+            {
+                //Debug.Log("KerbalSimpit: BurnTimeProvider could not find current stage info.");
+                myBurnTimeStruct.stageBurnTime = 0;
+            }
+
+            myBurnTimeStruct.totalBurnTime = (float)FlightGlobals.ActiveVessel.VesselDeltaV.TotalBurnTime;
+            if (burnTimeChannel != null) burnTimeChannel.Fire(OutboundPackets.BurnTime, myBurnTimeStruct);
         }
     }
 }
