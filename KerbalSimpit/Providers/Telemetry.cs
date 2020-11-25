@@ -166,39 +166,8 @@ namespace KerbalSimpit.Providers
             if (airspeedChannel != null) airspeedChannel.Fire(OutboundPackets.Airspeed, myAirspeed);
         }
 
-        public void DeltaVProvider()
-        {
-            DeltaVStageInfo currentStageInfo = null;
-            if (FlightGlobals.ActiveVessel.currentStage == FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count)
-            {
-                // Rocket has not taken off, use first stage with deltaV (to avoid stage of only stabilizer)
-                for (int i = FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count - 1; i >= 0; i--)
-                {
-                    currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(i);
-                    if(currentStageInfo.deltaVActual > 0)
-                    {
-                        break;
-                    }
-                }
-            } else
-            {
-                currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(FlightGlobals.ActiveVessel.currentStage);
-            }
-
-            if (currentStageInfo != null)
-            {
-                myDeltaVStruct.stageDeltaV = (float)currentStageInfo.deltaVActual;
-            }
-            else
-            {
-                //Debug.Log("KerbalSimpit: DeltaVProvider could not find current stage info.");
-                myDeltaVStruct.stageDeltaV = 0;
-            }
-            myDeltaVStruct.totalDeltaV = (float)FlightGlobals.ActiveVessel.VesselDeltaV.TotalDeltaVActual;
-            if (deltaVChannel != null) deltaVChannel.Fire(OutboundPackets.DeltaV, myDeltaVStruct);
-        }
-
-        public void DeltaVEnvProvider()
+        //Return the DeltaVStageInfo of the first stage to consider for deltaV and burn time computation
+        private DeltaVStageInfo getCurrentStageDeltaV()
         {
             DeltaVStageInfo currentStageInfo = null;
             if (FlightGlobals.ActiveVessel.currentStage == FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count)
@@ -217,6 +186,30 @@ namespace KerbalSimpit.Providers
             {
                 currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(FlightGlobals.ActiveVessel.currentStage);
             }
+
+            return currentStageInfo;
+        }
+
+        public void DeltaVProvider()
+        {
+            DeltaVStageInfo currentStageInfo = getCurrentStageDeltaV();
+
+            if (currentStageInfo != null)
+            {
+                myDeltaVStruct.stageDeltaV = (float)currentStageInfo.deltaVActual;
+            }
+            else
+            {
+                //Debug.Log("KerbalSimpit: DeltaVProvider could not find current stage info.");
+                myDeltaVStruct.stageDeltaV = 0;
+            }
+            myDeltaVStruct.totalDeltaV = (float)FlightGlobals.ActiveVessel.VesselDeltaV.TotalDeltaVActual;
+            if (deltaVChannel != null) deltaVChannel.Fire(OutboundPackets.DeltaV, myDeltaVStruct);
+        }
+
+        public void DeltaVEnvProvider()
+        {
+            DeltaVStageInfo currentStageInfo = getCurrentStageDeltaV();
 
             if (currentStageInfo != null)
             {
@@ -238,23 +231,7 @@ namespace KerbalSimpit.Providers
 
         public void BurnTimeProvider()
         {
-            DeltaVStageInfo currentStageInfo = null;
-            if (FlightGlobals.ActiveVessel.currentStage == FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count)
-            {
-                // Rocket has not taken off, use first stage with deltaV (to avoid stage of only stabilizer)
-                for (int i = FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count - 1; i >= 0; i--)
-                {
-                    currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(i);
-                    if (currentStageInfo.deltaVActual > 0)
-                    {
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(FlightGlobals.ActiveVessel.currentStage);
-            }
+            DeltaVStageInfo currentStageInfo = getCurrentStageDeltaV();
 
             if (currentStageInfo != null)
             {
