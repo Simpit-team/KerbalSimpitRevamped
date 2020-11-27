@@ -33,6 +33,7 @@ namespace KerbalSimpit
         public static byte Airspeed = 32;
         public static byte Apsides = 33;
         public static byte ApsidesTime = 34;
+        public static byte ManeuverData = 35;
 
         // Vessel Details
         public static byte ActionGroups = 40;

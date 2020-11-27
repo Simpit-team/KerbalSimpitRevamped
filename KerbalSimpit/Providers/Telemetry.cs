@@ -44,6 +44,14 @@ namespace KerbalSimpit.Providers
             public float MachNumber;
         }
 
+        public struct ManeuverStruct
+        {
+            public float timeToNextManeuver;
+            public float deltaVNextManeuver;
+            public float durationNextManeuver;
+            public float deltaVTotal;
+        }
+
         [StructLayout(LayoutKind.Sequential, Pack = 1)][Serializable]
         public struct DeltaVStruct
         {
@@ -72,13 +80,14 @@ namespace KerbalSimpit.Providers
         private ApsidesTimeStruct myApsidesTime;
         private VelocityStruct myVelocity;
         private AirspeedStruct myAirspeed;
+        private ManeuverStruct myManeuver;
         private DeltaVStruct myDeltaVStruct;
         private DeltaVEnvStruct myDeltaVEnvStruct;
         private BurnTimeStruct myBurnTimeStruct;
 
         private EventData<byte, object> altitudeChannel, apsidesChannel,
             apsidesTimeChannel, velocityChannel, soiChannel, airspeedChannel,
-            deltaVChannel, deltaVEnvChannel, burnTimeChannel;
+            maneuverChannel, deltaVChannel, deltaVEnvChannel, burnTimeChannel;
 
         private string CurrentSoI;
 
@@ -91,6 +100,8 @@ namespace KerbalSimpit.Providers
             KSPit.AddToDeviceHandler(ApsidesTimeProvider);
             apsidesTimeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial34");
             KSPit.AddToDeviceHandler(VelocityProvider);
+            maneuverChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial35");
+            KSPit.AddToDeviceHandler(ManeuverProvider);
             velocityChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial31");
             KSPit.AddToDeviceHandler(DeltaVProvider);
             deltaVChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial41");
@@ -113,6 +124,7 @@ namespace KerbalSimpit.Providers
             KSPit.RemoveToDeviceHandler(ApsidesTimeProvider);
             KSPit.RemoveToDeviceHandler(VelocityProvider);
             KSPit.RemoveToDeviceHandler(AirspeedProvider);
+            KSPit.RemoveToDeviceHandler(ManeuverProvider);
             KSPit.RemoveToDeviceHandler(DeltaVProvider);
             KSPit.RemoveToDeviceHandler(DeltaVEnvProvider);
             KSPit.RemoveToDeviceHandler(BurnTimeProvider);
@@ -188,6 +200,41 @@ namespace KerbalSimpit.Providers
             }
 
             return currentStageInfo;
+        }
+
+        public void ManeuverProvider()
+        {
+            myManeuver.timeToNextManeuver = 0.0f;
+            myManeuver.deltaVNextManeuver = 0.0f;
+            myManeuver.durationNextManeuver = 0.0f;
+            myManeuver.deltaVTotal = 0.0f;
+
+            if (FlightGlobals.ActiveVessel.patchedConicSolver != null)
+            {
+                if (FlightGlobals.ActiveVessel.patchedConicSolver.maneuverNodes != null)
+                {
+                    System.Collections.Generic.List<ManeuverNode> maneuvers = FlightGlobals.ActiveVessel.patchedConicSolver.maneuverNodes;
+
+                    if(maneuvers.Count > 0)
+                    {
+                        myManeuver.timeToNextManeuver = (float)(maneuvers[0].UT - Planetarium.GetUniversalTime());
+                        myManeuver.deltaVNextManeuver = (float)maneuvers[0].DeltaV.magnitude;
+
+                        DeltaVStageInfo currentStageInfo = getCurrentStageDeltaV();
+                        if (currentStageInfo != null)
+                        {
+                            //For now, use a simple crossmultiplication to compute the estimated burn time based on the current stage only
+                            myManeuver.durationNextManeuver = (float)(maneuvers[0].DeltaV.magnitude * currentStageInfo.stageBurnTime) / currentStageInfo.deltaVActual;
+                        }
+
+                        foreach (ManeuverNode maneuver in maneuvers)
+                        {
+                            myManeuver.deltaVTotal += (float)maneuver.DeltaV.magnitude;
+                        }
+                    }
+                }
+            }
+            if (maneuverChannel != null) maneuverChannel.Fire(OutboundPackets.ManeuverData, myManeuver);
         }
 
         public void DeltaVProvider()
