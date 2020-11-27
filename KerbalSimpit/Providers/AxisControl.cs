@@ -60,7 +60,7 @@ namespace KerbalSimPit.Providers
             if (WheelChannel != null) WheelChannel.Add(wheelCallback);
             ThrottleChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived19");
             if (ThrottleChannel != null) ThrottleChannel.Add(throttleCallback);
-            AutopilotChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived28");
+            AutopilotChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived20");
             if (AutopilotChannel != null) AutopilotChannel.Add(autopilotModeCallback);
 
             FlightGlobals.ActiveVessel.OnPostAutopilotUpdate += AutopilotUpdater;
