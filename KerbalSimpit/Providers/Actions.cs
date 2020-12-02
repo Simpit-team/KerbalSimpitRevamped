@@ -37,7 +37,7 @@ namespace KerbalSimpit.Providers
             AGToggleChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived15");
             if (AGToggleChannel != null) AGToggleChannel.Add(actionToggleCallback);
 
-            AGStateChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial23");
+            AGStateChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial40");
         }
 
         public void OnDestroy()
