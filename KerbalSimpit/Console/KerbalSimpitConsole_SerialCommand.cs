@@ -19,9 +19,6 @@ namespace KerbalSimpit.Console
         private static readonly string SERIAL_HELP = Localizer.GetStringByTag(Command_Lib.commandHelpTag(Command_Lib.SIM_SERIAL_COMMAND_ID));
         private static readonly string SERIAL_USAGE = Localizer.Format(Command_Lib.commandUsageTag(Command_Lib.SIM_SERIAL_COMMAND_ID), KerbalSimpitConsole.SIMPIT_IDENTIFIER, SERIAL_COMMAND);
     
-        // Command constructor
-        public KerbalSimpitConsole_SerialCommand() : base(SERIAL_COMMAND, SERIAL_HELP, SERIAL_USAGE) { }
-
         // Command strings, specific to serial
         private static readonly string SERIAL_STATUS_COMMAND = Localizer.GetStringByTag(Command_Lib.serialCommandTag(Command_Lib.SIM_SERIAL_COMMAND_STATUS));
         private static readonly string SERIAL_START_COMMAND = Localizer.GetStringByTag(Command_Lib.serialCommandTag(Command_Lib.SIM_SERIAL_COMMAND_START));
@@ -37,15 +34,12 @@ namespace KerbalSimpit.Console
         private static readonly string SERIAL_STATUS_MESSAGE = Localizer.GetStringByTag(Command_Lib.serialOutputTag(Command_Lib.SIM_SERIAL_OUTPUT_STATUS));
 
         // KerbalSimpit Instance
+        public KSPit k_simpit;
 
-        public static KSPit k_simpit = new KSPit();
-
-        // Returns the instance of the KSPit class, to other parts of the program that need it.
-        public static KSPit getKspit
-        {
-            get { return k_simpit; }
-        }
-
+        // Command constructor
+        public KerbalSimpitConsole_SerialCommand(KSPit k_simpit) : base(SERIAL_COMMAND, SERIAL_HELP, SERIAL_USAGE) {
+            this.k_simpit = k_simpit;
+         }
 
         // When the command is called, what to do
         public override void simpitCommandCall(KerbalSimpitConsole.commandArguments commandArgs)
@@ -66,13 +60,13 @@ namespace KerbalSimpit.Console
                 {
                     if (KSPit.serialPorts.First().Value.portConnected == false)
                     {
-                        KSPit.initPorts(k_simpit);
+                        this.k_simpit.initPorts();
                     }
                 }
                 // Else if they have not been connected to before, run this
                 else
                 {
-                    KSPit.initPorts(k_simpit);
+                    this.k_simpit.initPorts();
                 }
                 
             }
@@ -82,7 +76,7 @@ namespace KerbalSimpit.Console
             {
                 if(KSPit.serialPorts.First().Value.portConnected == true)
                 {
-                    KSPit.killPorts(k_simpit);
+                    this.k_simpit.ClosePorts();
                 }
             }
         }
@@ -114,7 +108,7 @@ namespace KerbalSimpit.Console
                 }
             }
 
-            // Print out trailing seperation bar
+            // Print out trailing separation bar
             Debug.Log(String.Concat(Enumerable.Repeat("-", 50).ToArray()));
 
         }

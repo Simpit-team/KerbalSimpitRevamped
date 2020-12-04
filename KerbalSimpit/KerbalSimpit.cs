@@ -13,24 +13,10 @@ namespace KerbalSimpit
 {
     public delegate void ToDeviceCallback();
 
+    // When this thing is to be started
+    [KSPAddon(KSPAddon.Startup.Instantly, false)]
     public class KSPit : MonoBehaviour
     {
-
-
-        // Variable to store the instance of this class that is being used
-        public KSPit kpit;
-
-        // Constructor to set the variable
-        public KSPit()
-        {
-            kpit = this;
-        }
-
-        // Returns this instances instance of this class
-        public KSPit k_pit
-        {
-            get { return this.kpit; }
-        }
 
         // To receive events from serial devices on channel i,
         // register a callback for onSerialReceivedArray[i].
@@ -55,8 +41,8 @@ namespace KerbalSimpit
 
         private static List<ToDeviceCallback> RegularEventList =
             new List<ToDeviceCallback>(255);
-        private static bool DoEventDispatching = false;
-        private static Thread EventDispatchThread;
+        private bool DoEventDispatching = false;
+        private Thread EventDispatchThread;
 
         // Variables added for terminal commands
 
@@ -80,10 +66,6 @@ namespace KerbalSimpit
             }
 
         }
-
-        // Variable to store the instance of the class that is used to start the serial port (Solves static/non-static incompatabilities
-        // nonsense. Can probally be made cleaner
-        private static portStartTrickery portStartTrick;
         
         // If the connection to the ports has been run before. Just to prevent the start command from erroring out.
         // Start command errors out if the dictionary with the ports and their statuses has not been filled out, which requires starting
@@ -91,6 +73,7 @@ namespace KerbalSimpit
         public static bool runConnect = false;
         // End Variables for commands
 
+        private Console.KerbalSimpitConsole KSPitConsole;
 
         public void Start()
         {
@@ -99,67 +82,50 @@ namespace KerbalSimpit
             DontDestroyOnLoad(this);
 
             // Init the ports when an instance of this class is created
-            initPorts(this.kpit);
+            this.initPorts();
+            this.KSPitConsole = new Console.KerbalSimpitConsole(this);
+            Debug.Log("Trying to start the terminal");
+            this.KSPitConsole.Start();
         }
 
-        // Class whos sole purpose in life, is to solve some fiddly static to non-static irks
-        class portStartTrickery{
+         // Method that inits the ports
+        public void initPorts()
+        {
 
-            // Constructor that runs the code to start a new connection
-            public portStartTrickery(KSPit k_pit)
+            // Same code as before, just that it's location has been shifted to here.
+            // Also, it has been changed to represent the fact that it is not running
+            // in what amounted to a static class, but instead in an instance.
+            for (int i = 254; i >= 0; i--)
             {
-
-                // Same code as before, just that it's location has been shifted to here.
-                // Also, it has been changed to represent the fact that it is not running
-                // in what amounted to a static class, but instead in an instance.
-                for (int i = 254; i >= 0; i--)
-                {
-                    Debug.Log("For loop cycle");
-                    k_pit.onSerialReceivedArray[i] = new EventData<byte, object>(String.Format("onSerialReceived{0}", i));
-                    k_pit.toSerialArray[i] = new EventData<byte, object>(String.Format("toSerial{0}", i));
-                }
-
-                Debug.Log("Before config");
-                Config = new KerbalSimpitConfig();
-
-                Debug.Log("Before serial list");
-                SerialPorts = createPortList(Config);
-                if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Found {0} serial ports", SerialPorts.Length));
-
-                // Open the ports, for this classes instance
-                k_pit.OpenPorts();
-
-                k_pit.onSerialReceivedArray[CommonPackets.Synchronisation].Add(k_pit.handshakeCallback);
-                k_pit.onSerialReceivedArray[InboundPackets.RegisterHandler].Add(k_pit.registerCallback);
-                k_pit.onSerialReceivedArray[InboundPackets.DeregisterHandler].Add(k_pit.deregisterCallback);
-
-                EventDispatchThread = new Thread(k_pit.EventWorker);
-                EventDispatchThread.Start();
-                while (!EventDispatchThread.IsAlive) ;
-
-                Debug.Log("KerbalSimpit: Started.");
+                this.onSerialReceivedArray[i] = new EventData<byte, object>(String.Format("onSerialReceived{0}", i));
+                this.toSerialArray[i] = new EventData<byte, object>(String.Format("toSerial{0}", i));
             }
 
-        }
+            Config = new KerbalSimpitConfig();
 
-        // Method that inits the ports, by creating a new instance of the trickery class
-        public static void initPorts(KSPit k_pit)
-        {
-            portStartTrick = new portStartTrickery(k_pit);
-        }
+            SerialPorts = createPortList(Config);
+            if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Found {0} serial ports", SerialPorts.Length));
 
-        // Method used to kill the ports
-        public static void killPorts(KSPit k_pit)
-        {
-            k_pit.ClosePorts();
+            // Open the ports, for this classes instance
+            this.OpenPorts();
+
+            this.onSerialReceivedArray[CommonPackets.Synchronisation].Add(this.handshakeCallback);
+            this.onSerialReceivedArray[InboundPackets.RegisterHandler].Add(this.registerCallback);
+            this.onSerialReceivedArray[InboundPackets.DeregisterHandler].Add(this.deregisterCallback);
+
+            this.EventDispatchThread = new Thread(this.EventWorker);
+            this.EventDispatchThread.Start();
+            while (!this.EventDispatchThread.IsAlive) ;
+
+            Debug.Log("KerbalSimpit: Started");
         }
 
         public void OnDestroy()
         {
-            ClosePorts();
+            this.ClosePorts();
             Config.Save();
             DoEventDispatching = false;
-            Debug.Log("KerbalSimpit: Shutting down.");
+            Debug.Log("KerbalSimpit: Shutting down");
         }
 
         public static void AddToDeviceHandler(ToDeviceCallback cb)
@@ -235,13 +201,13 @@ namespace KerbalSimpit
             }
         }
 
-        private static KSPSerialPort[] createPortList(KerbalSimpitConfig config)
+        private KSPSerialPort[] createPortList(KerbalSimpitConfig config)
         {
             List<KSPSerialPort> PortList = new List<KSPSerialPort>();
             int count = config.SerialPorts.Count;
             for (byte i = 0; i<count; i++)
             {
-                KSPSerialPort newPort = new KSPSerialPort(config.SerialPorts[i].PortName,
+                KSPSerialPort newPort = new KSPSerialPort(this, config.SerialPorts[i].PortName,
                                                           config.SerialPorts[i].BaudRate,
                                                           i);
                 PortList.Add(newPort);
@@ -288,11 +254,11 @@ namespace KerbalSimpit
             runConnect = true;
         }
 
-        private void ClosePorts() {
+        public void ClosePorts() {
 
             // Sets this to false, to signal to the workers to stop running.
-            // Without this, they will cause many problems, and prevent the arduino from being reconnected
-            // Also, without this if the arduino is disconnected the workers will throw so many errors, that
+            // Without this, they will cause many problems, and prevent the Arduino from being reconnected
+            // Also, without this if the Arduino is disconnected the workers will throw so many errors, that
             // they seem to be the cause of KSP crashing not long after 
 
             DoEventDispatching = false;

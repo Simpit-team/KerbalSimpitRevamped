@@ -25,7 +25,6 @@ namespace KerbalSimpit.Console
         // Calls the constructor of the class this one was derived from
         public KerbalSimpitConsole_HelpCommand() : base(HELP_COMMAND, HELP_HELP, HELP_USAGE) { }
 
-
         /// <summary>
         /// The method that is called when a help command is read in
         /// </summary>
@@ -48,17 +47,15 @@ namespace KerbalSimpit.Console
             // if there is an argument present after the help command, do the following
             if (commandValues.arguments.Length == 1)
             {
-
                 // Prints out help message if an argument is present
                 // Gets key of passed commands dictionary entry. Here because the second command after the first is in string form
-                var arguementCommand = KerbalSimpitConsole.simpitCommands.FirstOrDefault(x => x.Value.getSimpitCommand == commandValues.arguments[0]).Key;
+                var argumentCommand = KerbalSimpitConsole.simpitCommands.FirstOrDefault(x => x.Value.getSimpitCommand == commandValues.arguments[0]).Key;
 
                 // Request help string and store
-                helpToPrint[0] = helpStringGeneration(KerbalSimpitConsole.simpitCommands[arguementCommand]);
+                helpToPrint[0] = helpStringGeneration(KerbalSimpitConsole.simpitCommands[argumentCommand]);
                 // Print help message
                 printHelpMessages(helpToPrint);
                 return;
-                  
             }
 
             // Else if there is no argument following the command
@@ -104,11 +101,11 @@ namespace KerbalSimpit.Console
         /// <param name="helpToPrint"> String array containing all of the help messages to print</param>
         private static void printHelpMessages(string[] helpToPrint)
         {
-            // Print a seperation line of dashes
+            // Print a separation line of dashes
             Debug.Log(String.Concat(Enumerable.Repeat("-", 50).ToArray()));
             // Print the header
             Debug.Log(Localizer.GetStringByTag(Command_Lib.helpExtraValue("sim_help_list_head")));
-            // For each of the enteries on the list, print it out to the terminal
+            // For each of the entries on the list, print it out to the terminal
             for(int i = 0; i < helpToPrint.Length; i++)
             {
                 Debug.Log(helpToPrint[i]);

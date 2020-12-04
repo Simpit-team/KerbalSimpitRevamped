@@ -21,6 +21,7 @@ namespace KerbalSimpit.Serial
 
     public class KSPSerialPort
     {
+        private KSPit k_simpit;
         public string PortName;
         private int BaudRate;
         public  byte ID;
@@ -63,14 +64,15 @@ namespace KerbalSimpit.Serial
         // pn: port number
         // br: baud rate
         // idx: a unique identifier for this port
-        public KSPSerialPort(string pn, int br): this(pn, br, 37, false)
+        public KSPSerialPort(KSPit k_simpit, string pn, int br): this(k_simpit, pn, br, 37, false)
         {
         }
-        public KSPSerialPort(string pn, int br, byte idx): this(pn, br, idx, false)
+        public KSPSerialPort(KSPit k_simpit, string pn, int br, byte idx): this(k_simpit, pn, br, idx, false)
         {
         }
-        public KSPSerialPort(string pn, int br, byte idx, bool vb)
+        public KSPSerialPort(KSPit k_simpit, string pn, int br, byte idx, bool vb)
         {
+            this.k_simpit = k_simpit;
             PortName = pn;
             BaudRate = br;
             ID = idx;
@@ -367,7 +369,7 @@ namespace KerbalSimpit.Serial
             Array.Copy(Payload, buf, Size);
 
             // Changed to refer to the instance of KSPit the plugin is using
-            KerbalSimpitConsole_SerialCommand.getKspit.onSerialReceivedArray[Type].Fire(ID, buf);
+            this.k_simpit.onSerialReceivedArray[Type].Fire(ID, buf);
         }
     }
 }

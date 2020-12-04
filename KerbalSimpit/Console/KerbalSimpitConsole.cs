@@ -29,11 +29,10 @@ using commandLib = KerbalSimpit.Localisation_Libs.commandLibValues;
 // Namespace for all console code
 namespace KerbalSimpit.Console
 {
-    // When this thing is to be started
-    [KSPAddon(KSPAddon.Startup.Instantly, false)]
+
     public class KerbalSimpitConsole : MonoBehaviour
     {
-        // Values used for help messages and comamnds
+        // Values used for help messages and commands
         internal static readonly string SIMPIT_IDENTIFIER = Localizer.GetStringByTag(commandLib.commandDefaultTag(commandLib.SIM_SIM_COMMAND_ID));
         internal const string SIMPIT_COMMAND = null;
         private readonly string SIMPIT_HELP = Localizer.Format(commandLib.commandHelpTag(commandLib.SIM_SIM_COMMAND_ID), SIMPIT_IDENTIFIER, commandLib.commandDefaultTag(commandLib.SIM_HELP_COMMAND_ID));
@@ -45,7 +44,7 @@ namespace KerbalSimpit.Console
         // Enum to refer to dictionary keys. This is here so that the values of the commands can be changed without breaking the code
         // In theory, allows for possible localisation of the commands to the language of the game? Maybe?
         // Sorta using the tactic I used in Java when modding minecraft, so that language files could be used for localising the mod, without messing up the code
-        // due to the code using the values assigned ingame to refer to various things. Or was I using a static class containing the values?
+        // due to the code using the values assigned in game to refer to various things. Or was I using a static class containing the values?
 
         // Also keeps the key/name of each command in one place
 
@@ -54,6 +53,11 @@ namespace KerbalSimpit.Console
             HELP = 1,
             SERIAL = 2
         };
+
+        private KSPit k_simpit;
+        public KerbalSimpitConsole(KSPit k_simpit){
+            this.k_simpit = k_simpit;
+        }
 
 
         // Dictionary to store command instances, using enum as the key
@@ -77,24 +81,24 @@ namespace KerbalSimpit.Console
         }
         
         // Start method, standard unity thingy
-        private void Start()
+        public void Start()
         {
-
+            Debug.Log("Starting to try to add terminal commands");
             // Add commands to the command dictionary      
             simpitCommands.Add(simpitCommandCodes.HELP, new KerbalSimpitConsole_HelpCommand());
-            simpitCommands.Add(simpitCommandCodes.SERIAL, new KerbalSimpitConsole_SerialCommand());
+            simpitCommands.Add(simpitCommandCodes.SERIAL, new KerbalSimpitConsole_SerialCommand(this.k_simpit));
 
 
             // If the commands have already been initialised
             if (commandsInitialised) return;
             // Adds the command to the game
             DebugScreenConsole.AddConsoleCommand(SIMPIT_IDENTIFIER, OnCommand, SIMPIT_HELP);
-
-            // Sets the commands initalised flag
+            Debug.Log("Added Terminal Commands");
+            // Sets the commands initialised flag
             commandsInitialised = true;
 
             String[] startArgument = new string[] { Localizer.GetStringByTag(commandLib.serialCommandTag(commandLib.SIM_SERIAL_COMMAND_START)) };
-            simpitCommands[simpitCommandCodes.SERIAL].simpitCommandCall(new commandArguments(simpitCommands[simpitCommandCodes.SERIAL],startArgument));
+            //simpitCommands[simpitCommandCodes.SERIAL].simpitCommandCall(new commandArguments(simpitCommands[simpitCommandCodes.SERIAL],startArgument));
         }
 
         private void AddDebugConsoleCommand()
@@ -109,7 +113,7 @@ namespace KerbalSimpit.Console
             // Gets the commands passed in one string, into an array
             string[] readInCommands = simpitParseCommands(simpitArgString);
             
-            // Initialises a blank list to recieve command arguments if required
+            // Initialises a blank list to receive command arguments if required
             string[] commandArguments = new string[0];
 
             // If the command array has a length of 0, print the help message, and return
@@ -256,7 +260,7 @@ namespace KerbalSimpit.Console
         internal class simpitConsoleException : Exception
         {
 
-            // The command that an error has occured on
+            // The command that an error has occurred on
             private readonly string erroredCommand;
 
             // Constructor that takes the errored command, and an error message
@@ -278,7 +282,6 @@ namespace KerbalSimpit.Console
             }
 
         }
-            
 
     }
 }
