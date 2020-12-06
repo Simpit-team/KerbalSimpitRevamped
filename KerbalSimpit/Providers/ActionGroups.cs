@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using KSP.IO;
 using UnityEngine;
 
@@ -8,11 +9,50 @@ namespace KerbalSimpit.Providers
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class KerbalSimpitCAGProvider : MonoBehaviour
     {
+        [StructLayout(LayoutKind.Sequential, Pack = 1)][Serializable]
+        public class CAGStatusStruct
+        {
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+            public byte[] status;
+
+            public CAGStatusStruct()
+            {
+                status = new byte[32];
+                //Initialize all values to all at the begining
+                for(int i = 0; i < 32; i++)
+                {
+                    status[i] = 0;
+                }
+            }
+
+            public bool Equals(CAGStatusStruct obj)
+            {
+            if (status.Length != obj.status.Length)
+            {
+                return false;
+            }
+            for(int i = 0; i < status.Length; i++)
+            {
+                if (status[i] != obj.status[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+            }
+        }
+
         private EventData<byte, object> enableChannel, disableChannel,
             toggleChannel;
+
+        // Outbound messages
+        private EventData<byte, object> CAGStateChannel;
+
         private static bool AGXPresent;
         private static Type AGXExternal;
-    
+
+        private CAGStatusStruct lastCAGStatus;
+
         private static KSPActionGroup[] ActionGroupIDs = new KSPActionGroup[] {
             KSPActionGroup.None,
             KSPActionGroup.Custom01,
@@ -38,6 +78,10 @@ namespace KerbalSimpit.Providers
             if (disableChannel != null) disableChannel.Add(disableCAGCallback);
             toggleChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived12");
             if (toggleChannel != null) toggleChannel.Add(toggleCAGCallback);
+
+            CAGStateChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial44");
+
+            lastCAGStatus = new CAGStatusStruct();
         }
 
         public void OnDestroy()
@@ -45,6 +89,30 @@ namespace KerbalSimpit.Providers
             if (enableChannel != null) enableChannel.Remove(enableCAGCallback);
             if (disableChannel != null) disableChannel.Remove(disableCAGCallback);
             if (toggleChannel != null) toggleChannel.Remove(toggleCAGCallback);
+        }
+
+        private bool UpdateCurrentState()
+        {
+            CAGStatusStruct newState = getCAGState();
+            if (!newState.Equals(lastCAGStatus))
+            {
+                if (CAGStateChannel != null)
+                {
+                    //Debug.Log(String.Format("Sending CAG status : (" + newState.status[0] + ") (" + newState.status[1] + ") "));
+                    CAGStateChannel.Fire(OutboundPackets.CustomActionGroups, newState);
+                    lastCAGStatus = newState;
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void Update()
+        {
+            UpdateCurrentState();
         }
 
         public static bool AGXInstalled()
@@ -133,6 +201,34 @@ namespace KerbalSimpit.Providers
                         (ActionGroupIDs[idx]);
                 }
             }
+        }
+
+        private CAGStatusStruct getCAGState()
+        {
+            CAGStatusStruct result = new CAGStatusStruct();
+
+            if (AGXPresent)
+            {
+                for (int group = 1; group <= 250; group++) //Ignoring 0 since there is no Action Group 0
+                {
+                    bool activated = (bool) AGXExternal.InvokeMember("AGXGroupState",
+                        BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Static, null, null, new System.Object[] { group });
+
+                    if (activated)
+                    {
+                        result.status[group / 8] |= (byte) (1 << group % 8); //Set the selected bit to 1
+                    }
+                }
+            } else
+            {
+                for(int i = 1; i < ActionGroupIDs.Length; i++) //Ignoring 0 since there is no Action Group 0
+                {
+                    if (FlightGlobals.ActiveVessel.ActionGroups[ActionGroupIDs[i]]){
+                        result.status[i / 8] |= (byte)(1 << (i%8)); //Set the selected bit to 1
+                    }
+                }
+            }
+            return result;
         }
     }
 }

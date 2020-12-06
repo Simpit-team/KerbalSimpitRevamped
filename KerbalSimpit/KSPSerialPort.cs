@@ -35,7 +35,8 @@ namespace KerbalSimpit.Serial
 
         // Packet buffer related fields
         // This is *total* packet size, including all headers.
-        private const int MaxPacketSize = 32;
+        // At least 32 is needed for the CAGSTATUS message.
+        private const int MaxPacketSize = 32 + 4;
         // Buffer for sending outbound packets
         private byte[] OutboundPacketBuffer;
         private enum ReceiveStates: byte {
