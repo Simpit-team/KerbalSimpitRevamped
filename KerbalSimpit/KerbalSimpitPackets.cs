@@ -40,6 +40,7 @@ namespace KerbalSimpit
         public static byte DeltaV = 41;
         public static byte DeltaVEnv = 42;
         public static byte BurnTime = 43;
+        public static byte CustomActionGroups = 44;
 
         // External Environment
         public static byte TargetInfo = 50;
