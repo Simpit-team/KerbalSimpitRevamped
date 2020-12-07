@@ -10,6 +10,13 @@ namespace KerbalSimPit.Providers
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class KerbalSimpitCameraControl : MonoBehaviour
     {
+
+        [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
+        public struct CameraModeStruct
+        {
+            public short cameraMode;
+        }
+
         [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
         public struct CameraRotationalStruct
         {
@@ -28,9 +35,11 @@ namespace KerbalSimPit.Providers
         }
 
         // Inbound messages
+        private EventData<byte, object> CameraModeChannel;
+
         private EventData<byte, object> CameraRotationChannel, CameraTranslationChannel;
 
-        private EventData<byte, object> CameraMode;
+        private volatile short receivedCameraControlMode, oldCameraModeControl;
 
         private CameraRotationalStruct myCameraRotation, newCameraRotation;
 
@@ -40,19 +49,50 @@ namespace KerbalSimPit.Providers
 
         public void Start()
         {
-            CameraRotationChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived16");
+
+            receivedCameraControlMode = 0;
+            oldCameraModeControl = 0;
+            CameraModeChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived21");
+            if (CameraModeChannel != null) CameraModeChannel.Add(cameraModeCallback);
+
+            CameraRotationChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived22");
             if (CameraRotationChannel != null) CameraRotationChannel.Add(cameraRotationCallback);
-            CameraTranslationChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived17");
+            CameraTranslationChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived23");
             if (CameraTranslationChannel != null) CameraTranslationChannel.Add(cameraTranslationCallback);
 
         }
 
         public void OnDestroy()
         {
+            if (CameraModeChannel != null) CameraModeChannel.Remove(cameraModeCallback);
             if (CameraRotationChannel != null) CameraRotationChannel.Remove(cameraRotationCallback);
             if (CameraTranslationChannel != null) CameraTranslationChannel.Remove(cameraTranslationCallback);
 
         }
+
+        public void Update(){
+            if(receivedCameraControlMode != oldCameraModeControl){
+                updateCameraMode(receivedCameraControlMode);
+            }
+        }
+
+
+        public void cameraModeCallback(byte ID, object Data){
+            short[] payload = (short[])Data;
+            receivedCameraControlMode = payload[0];
+        }
+
+        private void updateCameraMode(short controlModeShort){
+            oldCameraModeControl = receivedCameraControlMode;
+
+            if((controlModeShort & CameraControlBits.FlightBit) != 0){
+                cameraManager.SetCameraFlight();
+            }
+            if((controlModeShort & CameraControlBits.MapBit) != 0){
+                cameraManager.SetCameraMap();
+            }
+        }
+
 
         public void cameraRotationCallback(byte ID, object Data)
         {
