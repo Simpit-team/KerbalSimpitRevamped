@@ -62,6 +62,26 @@ namespace KerbalSimpit
         public static byte WheelControl = 18;
         public static byte VesselThrottle = 19;
         public static byte AutopilotMode = 20;
+        public static byte CameraMode = 21;
+        public static byte CameraRotation = 22;
+        public static byte CameraTranslation = 23;
+    }
+
+    public static class CameraControlBits
+    {
+        // Direct Camera Modes
+        public static short FlightBit = 1;
+        public static short MapBit = 2;
+        public static short ExternalBit = 3;
+        public static short IVABit = 4;
+        public static short InternalBit = 5;
+        
+        // Cycle Camera Modes
+        public static short NextBit = 6;
+        public static short PreviousBit = 7;
+
+        //public static short 
+
     }
 
     public static class ActionGroupBits
