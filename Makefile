@@ -12,7 +12,6 @@
 ifndef KSPDIR
 	KSPDIR=KerbalSpaceProgram
 endif
-
 # KSPLIBDIR
 # Path to the KSP managed libraries. Again, setting KSPLIBDIR in
 # the environment will overwrite this.
@@ -56,6 +55,7 @@ KerbalSimpit.dll:Properties/AssemblyInfo.cs
 
 install:all
 	cp Bin/KerbalSimpit.dll $(INSTALLDIR)
+	cp Localisation/*.cfg $(INSTALLDIR)
 
 clean:
 	$(MSBUILD) /p:Configuration=$(CONFIG) /t:Clean Main.csproj

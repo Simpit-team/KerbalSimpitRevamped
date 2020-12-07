@@ -1,5 +1,40 @@
 # Kerbal Simpit Changelog
 
+## v(to be decided)
+
+### (2019-01-06)
+ 
+Added in a number of features:
+
+Commands to control serial. This has been done by restructuring the KSPit class code,
+to enable code outside of that class to control the serial port stopping/starting.
+
+The commands have localization in English and German, so that they are more easily
+usable by those who may not speak English as their first language. 
+This localization has been done in a manner that means it cannot affect the program
+parsing in the commands, unless the localization of a command into another language
+would require the addition of a space. If that happens, then the current command parser I
+implemented would have a right royal paddy, and spit the dummy.
+
+The serial port has been tested to go from being used in KSP, to being used by the Arduino IDE to program,
+back to KSP. I am happy to report that this works, so long as you disconnect from KSP before programming, then
+hit the reset button on the arduino before trying to get KSP to reconnect.
+
+Help commands have been implemented for the serial commands. The help command is fairly basic, and some
+more changes will need to be made for it to work with potential future changes and additions to the commands.
+However, the basic framework is there, and the help messages are also localised.
+
+NB: The serial port no longer starts up automatically, at this point in time. The previous
+method of having the KSPit class be automatically loaded/run when the game starts breaks the serial
+start/stop commands.
+
+I think that is all of the things that I have done, baring that I made a minor change to the makefile, so
+that the install command also copies the localisation files into the gamedata folder as well. Not to mention,
+I added the files I created to the Main.csproj file, so they are compiled.
+
+Note to testers: The command to access the help/serial commands is "/sim [command]"
+The "/sim help" should hopefully provide the details needed. 
+
 ## v1.4.1 (2020-07-02)
 
 * Built against KSP 1.10.0.
