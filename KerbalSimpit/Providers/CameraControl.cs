@@ -109,26 +109,26 @@ namespace KerbalSimPit.Providers
                 {
                     case CameraControlBits.Auto:
                         FlightCamera.SetMode(FlightCamera.Modes.AUTO);
-                        Debug.Log("Camera Mode: Auto");
+                        printCameraMode("Auto");
                         break;
                     case CameraControlBits.Free:
                         FlightCamera.SetMode(FlightCamera.Modes.FREE);
-                        Debug.Log("Camera Mode: Free");
+                        printCameraMode("Free");
                         break;
                     case CameraControlBits.Orbital:
                         FlightCamera.SetMode(FlightCamera.Modes.ORBITAL);
-                        Debug.Log("Camera Mode: Orbital");
+                        printCameraMode("Orbital");
                         break;
                     case CameraControlBits.Chase:
                         FlightCamera.SetMode(FlightCamera.Modes.CHASE);
-                        Debug.Log("Camera Mode: Chase");
+                        printCameraMode("Chase");
                         break;
                     case CameraControlBits.Locked:
                         FlightCamera.SetMode(FlightCamera.Modes.LOCKED);
-                        Debug.Log("Camera Mode: Locked");
+                        printCameraMode("Locked");
                         break;
                     case CameraControlBits.NextMode:
-                        Debug.Log("Camera Mode: Next");
+                        printCameraMode("Next");
                         if (currentFlightMode == maxEnum)
                         {
                             FlightCamera.SetMode((FlightCamera.Modes)0);
@@ -139,7 +139,7 @@ namespace KerbalSimPit.Providers
                         }
                         break;
                     case CameraControlBits.PreviousMode:
-                        Debug.Log("Camera Mode: Previous");
+                        printCameraMode("Previous");
                         if (currentFlightMode == 0)
                         {
                             FlightCamera.SetMode((FlightCamera.Modes)maxEnum);
@@ -150,18 +150,22 @@ namespace KerbalSimPit.Providers
                             if (((FlightCamera.Modes)(FlightCamera.CamMode - 1)) == FlightCamera.Modes.ORBITAL && autoMode != FlightCamera.Modes.ORBITAL)
                             {
                                 FlightCamera.SetMode((FlightCamera.Modes)(currentFlightMode - 2));
-                                FlightCamera.Modes temp = (FlightCamera.Modes)(currentFlightMode - 2);
-                                Debug.Log("Camera should be: " + temp.ToString());
-                            } else {
+                            }
+                            else
+                            {
                                 FlightCamera.SetMode((FlightCamera.Modes)currentFlightMode - 1);
                             }
                         }
                         break;
                     default:
-                        Debug.Log("Camera Mode: No Camera Mode :(");
+                        printCameraMode("No Camera Mode :(");
                         break;
                 }
             }
+        }
+
+        private void printCameraMode(String cameraModeString){
+             if (KSPit.Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Set Camera Mode to: ", cameraModeString));
         }
 
 
