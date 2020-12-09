@@ -69,16 +69,21 @@ namespace KerbalSimpit
 
     public static class CameraControlBits
     {
-        // Direct Camera Modes
-        public static short FlightBit = 1;
-        public static short MapBit = 2;
-        public static short ExternalBit = 3;
-        public static short IVABit = 4;
-        public static short InternalBit = 5;
-        
+        // Flight Camera Modes
+        public static byte FlightBit = 1;
+
+        // Order from: https://kerbalspaceprogram.com/api/class_flight_camera.html#ae90b21deb28ca1978c229f0511116c1a
+        public static byte Auto = 2;
+        public static byte Free = 3;
+        public static byte Orbital = 4;
+        public static byte Chase = 5;
+        public static byte Locked = 6;
+
+        public static byte NextMode = 7;
+        public static byte PreviousMode = 8;
         // Cycle Camera Modes
-        public static short NextBit = 6;
-        public static short PreviousBit = 7;
+       // public static byte NextBit = 6;
+        //public static byte PreviousBit = 7;
 
         //public static short 
 

@@ -14,7 +14,7 @@ namespace KerbalSimPit.Providers
         [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
         public struct CameraModeStruct
         {
-            public short cameraMode;
+            public byte cameraMode;
         }
 
         [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
@@ -39,13 +39,14 @@ namespace KerbalSimPit.Providers
 
         private EventData<byte, object> CameraRotationChannel, CameraTranslationChannel;
 
-        private volatile short receivedCameraControlMode, oldCameraModeControl;
+        private volatile byte receivedCameraControlMode, oldCameraModeControl;
+        private volatile Boolean needToUpdateCamera = false;
 
         private CameraRotationalStruct myCameraRotation, newCameraRotation;
 
         private CameraTranslationalStruct myCameraTranslation, newCameraTranslation;
 
-        private CameraManager cameraManager;
+        private CameraManager cameraManager = CameraManager.Instance;
 
         public void Start()
         {
@@ -71,26 +72,47 @@ namespace KerbalSimPit.Providers
         }
 
         public void Update(){
-            if(receivedCameraControlMode != oldCameraModeControl){
+            if(needToUpdateCamera){
                 updateCameraMode(receivedCameraControlMode);
             }
         }
 
 
         public void cameraModeCallback(byte ID, object Data){
-            short[] payload = (short[])Data;
+            byte[] payload = (byte[])Data;
             receivedCameraControlMode = payload[0];
+            needToUpdateCamera = true;
         }
 
-        private void updateCameraMode(short controlModeShort){
+        private void updateCameraMode(byte controlMode){
+            Debug.Log("Camera update called");
             oldCameraModeControl = receivedCameraControlMode;
+            needToUpdateCamera = false;
 
-            if((controlModeShort & CameraControlBits.FlightBit) != 0){
+            if(controlMode == CameraControlBits.FlightBit){
                 cameraManager.SetCameraFlight();
             }
-            if((controlModeShort & CameraControlBits.MapBit) != 0){
+            if((controlMode & CameraControlBits.MapBit) != 0){
                 cameraManager.SetCameraMap();
             }
+            if((controlMode & CameraControlBits.ExternalBit) != 0){
+                cameraManager.SetCameraMode(CameraManager.CameraMode.External);
+            }
+            if((controlMode & CameraControlBits.IVABit) != 0){
+                cameraManager.SetCameraIVA();
+            }
+            if((controlMode & CameraControlBits.InternalBit) != 0){
+                cameraManager.SetCameraMode(CameraManager.CameraMode.Internal);
+            }
+            if(controlMode == CameraControlBits.NextBit){
+                Debug.Log("Camera Mode Next");
+                cameraManager.NextCamera();
+            }
+            if(controlMode == CameraControlBits.PreviousBit){
+                Debug.Log("Camera Mode Previous");
+                cameraManager.PreviousCameraMode();
+            }
+            
         }
 
 
