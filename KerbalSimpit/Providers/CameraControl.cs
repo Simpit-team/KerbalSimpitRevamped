@@ -11,13 +11,15 @@ namespace KerbalSimPit.Providers
     public class KerbalSimpitCameraControl : MonoBehaviour
     {
 
-        [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        [Serializable]
         public struct CameraModeStruct
         {
             public byte cameraMode;
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        [Serializable]
         public struct CameraRotationalStruct
         {
             public short pitch;
@@ -25,7 +27,8 @@ namespace KerbalSimPit.Providers
             public short yaw;
             public byte mask;
         }
-        [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        [Serializable]
         public struct CameraTranslationalStruct
         {
             public short X;
@@ -71,48 +74,94 @@ namespace KerbalSimPit.Providers
 
         }
 
-        public void Update(){
-            if(needToUpdateCamera){
+        public void Update()
+        {
+            if (needToUpdateCamera)
+            {
                 updateCameraMode(receivedCameraControlMode);
             }
         }
 
 
-        public void cameraModeCallback(byte ID, object Data){
+        public void cameraModeCallback(byte ID, object Data)
+        {
             byte[] payload = (byte[])Data;
             receivedCameraControlMode = payload[0];
             needToUpdateCamera = true;
         }
 
-        private void updateCameraMode(byte controlMode){
+        private void updateCameraMode(byte controlMode)
+        {
             Debug.Log("Camera update called");
             oldCameraModeControl = receivedCameraControlMode;
             needToUpdateCamera = false;
 
-            if(controlMode == CameraControlBits.FlightBit){
-                cameraManager.SetCameraFlight();
+            if (controlMode < 10 && cameraManager.currentCameraMode == CameraManager.CameraMode.Flight)
+            {
+                Debug.Log("Camera can have it's mode changed");
+                Debug.Log("Control mode: " + controlMode.ToString());
+                int currentFlightMode = FlightCamera.CamMode;
+                int maxEnum = Enum.GetNames(typeof(FlightCamera.Modes)).Length - 1;
+                Debug.Log("Max Enum Value: " + maxEnum.ToString());
+                int caseSwitch = controlMode;
+
+                switch (caseSwitch)
+                {
+                    case CameraControlBits.Auto:
+                        FlightCamera.SetMode(FlightCamera.Modes.AUTO);
+                        Debug.Log("Camera Mode: Auto");
+                        break;
+                    case CameraControlBits.Free:
+                        FlightCamera.SetMode(FlightCamera.Modes.FREE);
+                        Debug.Log("Camera Mode: Free");
+                        break;
+                    case CameraControlBits.Orbital:
+                        FlightCamera.SetMode(FlightCamera.Modes.ORBITAL);
+                        Debug.Log("Camera Mode: Orbital");
+                        break;
+                    case CameraControlBits.Chase:
+                        FlightCamera.SetMode(FlightCamera.Modes.CHASE);
+                        Debug.Log("Camera Mode: Chase");
+                        break;
+                    case CameraControlBits.Locked:
+                        FlightCamera.SetMode(FlightCamera.Modes.LOCKED);
+                        Debug.Log("Camera Mode: Locked");
+                        break;
+                    case CameraControlBits.NextMode:
+                        Debug.Log("Camera Mode: Next");
+                        if (currentFlightMode == maxEnum)
+                        {
+                            FlightCamera.SetMode((FlightCamera.Modes)0);
+                        }
+                        else
+                        {
+                            FlightCamera.SetMode((FlightCamera.Modes)currentFlightMode + 1);
+                        }
+                        break;
+                    case CameraControlBits.PreviousMode:
+                        Debug.Log("Camera Mode: Previous");
+                        if (currentFlightMode == 0)
+                        {
+                            FlightCamera.SetMode((FlightCamera.Modes)maxEnum);
+                        }
+                        else
+                        {
+                            FlightCamera.Modes autoMode = FlightCamera.GetAutoModeForVessel(FlightGlobals.ActiveVessel);
+                            if (((FlightCamera.Modes)(FlightCamera.CamMode - 1)) == FlightCamera.Modes.ORBITAL && autoMode != FlightCamera.Modes.ORBITAL)
+                            {
+                                FlightCamera.SetMode((FlightCamera.Modes)(currentFlightMode - 2));
+                                FlightCamera.Modes temp = (FlightCamera.Modes)(currentFlightMode - 2);
+                                Debug.Log("Camera should be: " + temp.ToString());
+                            } else {
+                                FlightCamera.SetMode((FlightCamera.Modes)currentFlightMode - 1);
+                            }
+                        }
+                        break;
+                    default:
+                        Debug.Log("Camera Mode: No Camera Mode :(");
+                        break;
+                }
             }
-            if((controlMode & CameraControlBits.MapBit) != 0){
-                cameraManager.SetCameraMap();
-            }
-            if((controlMode & CameraControlBits.ExternalBit) != 0){
-                cameraManager.SetCameraMode(CameraManager.CameraMode.External);
-            }
-            if((controlMode & CameraControlBits.IVABit) != 0){
-                cameraManager.SetCameraIVA();
-            }
-            if((controlMode & CameraControlBits.InternalBit) != 0){
-                cameraManager.SetCameraMode(CameraManager.CameraMode.Internal);
-            }
-            if(controlMode == CameraControlBits.NextBit){
-                Debug.Log("Camera Mode Next");
-                cameraManager.NextCamera();
-            }
-            if(controlMode == CameraControlBits.PreviousBit){
-                Debug.Log("Camera Mode Previous");
-                cameraManager.PreviousCameraMode();
-            }
-            
         }
 
 
