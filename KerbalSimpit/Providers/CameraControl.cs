@@ -164,22 +164,39 @@ namespace KerbalSimPit.Providers
             }
         }
 
-        private void printCameraMode(String cameraModeString){
-             if (KSPit.Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Set Camera Mode to: ", cameraModeString));
+        private void printCameraMode(String cameraModeString)
+        {
+            if (KSPit.Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Set Camera Mode to: ", cameraModeString));
         }
 
 
         public void cameraRotationCallback(byte ID, object Data)
         {
-
+            Debug.Log("Camera Rotation Callback");
             newCameraRotation = KerbalSimpitUtils.ByteArrayToStructure<CameraRotationalStruct>((byte[])Data);
             // Bit fields:
             // pitch = 1
             // roll = 2
             // yaw = 4
+            FlightCamera flightCamera = FlightCamera.fetch;
             if ((newCameraRotation.mask & (byte)1) > 0)
             {
                 myCameraRotation.pitch = newCameraRotation.pitch;
+                Debug.Log("Rotation Message Seen");
+                float newPitch = flightCamera.camPitch + (myCameraRotation.pitch * 0.00002f);
+                if (newPitch > flightCamera.maxPitch)
+                {
+                    flightCamera.camPitch = flightCamera.maxPitch;
+                }
+                else if (newPitch < flightCamera.minPitch)
+                {
+                    flightCamera.camPitch = flightCamera.minPitch;
+                }
+                else
+                {
+                    flightCamera.camPitch = newPitch;
+                }
+
             }
             if ((newCameraRotation.mask & (byte)2) > 0)
             {
@@ -188,7 +205,11 @@ namespace KerbalSimPit.Providers
             if ((newCameraRotation.mask & (byte)4) > 0)
             {
                 myCameraRotation.yaw = newCameraRotation.yaw;
+                Debug.Log("Yaw Message Seen");
+                float newHdg = flightCamera.camHdg + (myCameraRotation.yaw * 0.00006f);
+                flightCamera.camHdg = newHdg;
             }
+
         }
 
         public void cameraTranslationCallback(byte ID, object Data)
