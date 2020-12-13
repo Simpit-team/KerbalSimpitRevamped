@@ -166,46 +166,42 @@ namespace KerbalSimPit.Providers
         {
             if (myRotation.pitch != 0)
             {
-                fcs.pitch = (float)myRotation.pitch/32767;
+                fcs.pitch = (float)myRotation.pitch/ Int16.MaxValue;
             }
             if (myRotation.roll != 0)
             {
-                fcs.roll = (float)myRotation.roll/32767;
+                fcs.roll = (float)myRotation.roll/ Int16.MaxValue;
             }
             if (myRotation.yaw != 0)
             {
-                fcs.yaw = (float)myRotation.yaw/32767;
+                fcs.yaw = (float)myRotation.yaw/ Int16.MaxValue;
             }
 
             if (myTranslation.X != 0)
             {
-                fcs.X = (float)myTranslation.X/32767;
+                fcs.X = (float)myTranslation.X/ Int16.MaxValue;
             }
             if (myTranslation.Y != 0)
             {
-                fcs.Y = (float)myTranslation.Y/32767;
+                fcs.Y = (float)myTranslation.Y/ Int16.MaxValue;
             }
             if (myTranslation.Z != 0)
             {
-                fcs.Z = (float)myTranslation.Z/32767;
+                fcs.Z = (float)myTranslation.Z/ Int16.MaxValue;
             }
 
             if (myWheel.steer != 0)
             {
-                fcs.wheelSteer = (float)myWheel.steer/32767;
+                fcs.wheelSteer = (float)myWheel.steer/ Int16.MaxValue;
             }
             if (myWheel.throttle != 0)
             {
-                fcs.wheelThrottle = (float)myWheel.throttle/32767;
+                fcs.wheelThrottle = (float)myWheel.throttle/ Int16.MaxValue;
             }
 
             if (myThrottleFlag)
             {
-            		if(KSPit.Config.Verbose)
-                {
-            		    Debug.Log(String.Format("KerbalSimpit: Setting throttle to {0}/32767", myThrottle));
-            		}
-                fcs.mainThrottle = (float)myThrottle/32767;
+                fcs.mainThrottle = (float)myThrottle/ Int16.MaxValue;
             }
         }
     }
