@@ -51,6 +51,9 @@ namespace KerbalSimPit.Providers
 
         private CameraManager cameraManager = CameraManager.Instance;
 
+        private float flightCameraPitchMultiplier = 0.00002f;
+        private float flightCameraYawMultiplier = 0.00006f;
+
         public void Start()
         {
 
@@ -162,6 +165,7 @@ namespace KerbalSimPit.Providers
                         break;
                 }
             }
+            //if (controlMode > 10 && controlMode < 20 && cameraManager.currentCameraMode == CameraManager.CameraMode.)
         }
 
         private void printCameraMode(String cameraModeString)
@@ -178,36 +182,103 @@ namespace KerbalSimPit.Providers
             // pitch = 1
             // roll = 2
             // yaw = 4
-            FlightCamera flightCamera = FlightCamera.fetch;
-            if ((newCameraRotation.mask & (byte)1) > 0)
+            if (cameraManager.currentCameraMode == CameraManager.CameraMode.Flight)
             {
-                myCameraRotation.pitch = newCameraRotation.pitch;
-                Debug.Log("Rotation Message Seen");
-                float newPitch = flightCamera.camPitch + (myCameraRotation.pitch * 0.00002f);
-                if (newPitch > flightCamera.maxPitch)
+                FlightCamera flightCamera = FlightCamera.fetch;
+                if ((newCameraRotation.mask & (byte)1) > 0)
                 {
-                    flightCamera.camPitch = flightCamera.maxPitch;
+                    myCameraRotation.pitch = newCameraRotation.pitch;
+                    Debug.Log("Rotation Message Seen");
+                    float newPitch = flightCamera.camPitch + (myCameraRotation.pitch * flightCameraPitchMultiplier);
+                    if (newPitch > flightCamera.maxPitch)
+                    {
+                        flightCamera.camPitch = flightCamera.maxPitch;
+                    }
+                    else if (newPitch < flightCamera.minPitch)
+                    {
+                        flightCamera.camPitch = flightCamera.minPitch;
+                    }
+                    else
+                    {
+                        flightCamera.camPitch = newPitch;
+                    }
+
                 }
-                else if (newPitch < flightCamera.minPitch)
+                if ((newCameraRotation.mask & (byte)2) > 0)
                 {
-                    flightCamera.camPitch = flightCamera.minPitch;
+                    myCameraRotation.roll = newCameraRotation.roll;
+                }
+                if ((newCameraRotation.mask & (byte)4) > 0)
+                {
+                    myCameraRotation.yaw = newCameraRotation.yaw;
+                    Debug.Log("Yaw Message Seen");
+                    float newHdg = flightCamera.camHdg + (myCameraRotation.yaw * flightCameraYawMultiplier);
+                    flightCamera.camHdg = newHdg;
+                }
+            }
+            else if (cameraManager.currentCameraMode == CameraManager.CameraMode.IVA)
+            {
+                Kerbal ivaKerbal = cameraManager.IVACameraActiveKerbal;
+
+                if (ivaKerbal == null)
+                {
+                    Debug.Log("Kerbal is null");
+                }
+
+                InternalCamera ivaCamera = InternalCamera.Instance;
+
+                //IVACamera ivaCamera = ivaKerbal.gameObject.GetComponent<IVACamera>();
+
+
+                if (ivaCamera == null)
+                {
+                    Debug.Log("IVA Camera is null");
                 }
                 else
                 {
-                    flightCamera.camPitch = newPitch;
-                }
 
-            }
-            if ((newCameraRotation.mask & (byte)2) > 0)
-            {
-                myCameraRotation.roll = newCameraRotation.roll;
-            }
-            if ((newCameraRotation.mask & (byte)4) > 0)
-            {
-                myCameraRotation.yaw = newCameraRotation.yaw;
-                Debug.Log("Yaw Message Seen");
-                float newHdg = flightCamera.camHdg + (myCameraRotation.yaw * 0.00006f);
-                flightCamera.camHdg = newHdg;
+                    float newPitch = ivaCamera.transform.eulerAngles.x;
+                    float newYaw = ivaKerbal.camPivot.eulerAngles.y;
+                    float oldRoll = ivaKerbal.camPivot.eulerAngles.z;
+
+
+                    if ((newCameraRotation.mask & (byte)1) > 0)
+                    {
+                        myCameraRotation.pitch = newCameraRotation.pitch;
+                        Debug.Log("IVA Rotation Message Seen");
+                        newPitch += (myCameraRotation.pitch * flightCameraPitchMultiplier);
+
+                        if (newPitch > ivaCamera.maxPitch)
+                        {
+                            newPitch = ivaCamera.maxPitch;
+                        }
+                        else if (newPitch < ivaCamera.minPitch)
+                        {
+                            newPitch = ivaCamera.minPitch;
+                        }
+                    }
+                    if ((newCameraRotation.mask & (byte)2) > 0)
+                    {
+                        myCameraRotation.roll = newCameraRotation.roll;
+                    }
+                    if ((newCameraRotation.mask & (byte)4) > 0)
+                    {
+                        myCameraRotation.yaw = newCameraRotation.yaw;
+                        Debug.Log("IVA Yaw Message Seen");
+                        newYaw += (myCameraRotation.yaw * flightCameraYawMultiplier);
+                        if (newYaw > ivaCamera.maxRot)
+                        {
+                            newYaw = ivaCamera.maxRot;
+                        }
+                        else if (newYaw < -60f)
+                        {
+                            newYaw = -60f;
+                        }
+                    }
+                    Debug.Log("Before set angle");
+                    //ivaKerbal.camPivot.eulerAngles.Set(newPitch, newYaw, oldRoll);
+                    ivaCamera.transform.
+                }
             }
 
         }
