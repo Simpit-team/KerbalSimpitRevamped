@@ -179,8 +179,14 @@ namespace KerbalSimpit.Providers
         }
 
         //Return the DeltaVStageInfo of the first stage to consider for deltaV and burn time computation
+        //Can return null when no deltaV is available (for instance in EVA).
         private DeltaVStageInfo getCurrentStageDeltaV()
         {
+            if(FlightGlobals.ActiveVessel.VesselDeltaV == null)
+            {
+                return null; //This happen in EVA for instance.
+            }
+
             DeltaVStageInfo currentStageInfo = null;
             if (FlightGlobals.ActiveVessel.currentStage == FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count)
             {
@@ -244,13 +250,14 @@ namespace KerbalSimpit.Providers
             if (currentStageInfo != null)
             {
                 myDeltaVStruct.stageDeltaV = (float)currentStageInfo.deltaVActual;
+                myDeltaVStruct.totalDeltaV = (float)FlightGlobals.ActiveVessel.VesselDeltaV.TotalDeltaVActual;
             }
             else
             {
-                //Debug.Log("KerbalSimpit: DeltaVProvider could not find current stage info.");
                 myDeltaVStruct.stageDeltaV = 0;
+                myDeltaVStruct.totalDeltaV = 0;
             }
-            myDeltaVStruct.totalDeltaV = (float)FlightGlobals.ActiveVessel.VesselDeltaV.TotalDeltaVActual;
+
             if (deltaVChannel != null) deltaVChannel.Fire(OutboundPackets.DeltaV, myDeltaVStruct);
         }
 
@@ -263,16 +270,17 @@ namespace KerbalSimpit.Providers
 
                 myDeltaVEnvStruct.stageDeltaVASL = (float)currentStageInfo.deltaVatASL;
                 myDeltaVEnvStruct.stageDeltaVVac = (float)currentStageInfo.deltaVinVac;
+                myDeltaVEnvStruct.totalDeltaVASL = (float)FlightGlobals.ActiveVessel.VesselDeltaV.TotalDeltaVASL;
+                myDeltaVEnvStruct.totalDeltaVVac = (float)FlightGlobals.ActiveVessel.VesselDeltaV.TotalDeltaVVac;
             }
             else
             {
-                //Debug.Log("KerbalSimpit: DeltaVEnvProvider could not find current stage info.");
                 myDeltaVEnvStruct.stageDeltaVASL = 0;
                 myDeltaVEnvStruct.stageDeltaVVac = 0;
+                myDeltaVEnvStruct.totalDeltaVASL = 0;
+                myDeltaVEnvStruct.totalDeltaVVac = 0;
             }
 
-            myDeltaVEnvStruct.totalDeltaVASL = (float)FlightGlobals.ActiveVessel.VesselDeltaV.TotalDeltaVASL;
-            myDeltaVEnvStruct.totalDeltaVVac = (float)FlightGlobals.ActiveVessel.VesselDeltaV.TotalDeltaVVac;
             if (deltaVEnvChannel != null) deltaVEnvChannel.Fire(OutboundPackets.DeltaVEnv, myDeltaVEnvStruct);
         }
 
@@ -283,14 +291,14 @@ namespace KerbalSimpit.Providers
             if (currentStageInfo != null)
             {
                 myBurnTimeStruct.stageBurnTime = (float)currentStageInfo.stageBurnTime;
+                myBurnTimeStruct.totalBurnTime = (float)FlightGlobals.ActiveVessel.VesselDeltaV.TotalBurnTime;
             }
             else
             {
-                //Debug.Log("KerbalSimpit: BurnTimeProvider could not find current stage info.");
                 myBurnTimeStruct.stageBurnTime = 0;
+                myBurnTimeStruct.totalBurnTime = 0;
             }
 
-            myBurnTimeStruct.totalBurnTime = (float)FlightGlobals.ActiveVessel.VesselDeltaV.TotalBurnTime;
             if (burnTimeChannel != null) burnTimeChannel.Fire(OutboundPackets.BurnTime, myBurnTimeStruct);
         }
     }
