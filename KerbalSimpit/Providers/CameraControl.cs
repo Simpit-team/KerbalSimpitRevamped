@@ -1,5 +1,8 @@
 using System;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 using UnityEngine;
 
 using KerbalSimpit;
@@ -54,9 +57,14 @@ namespace KerbalSimPit.Providers
         private float flightCameraPitchMultiplier = 0.00002f;
         private float flightCameraYawMultiplier = 0.00006f;
 
+        private bool ivaCamFieldsLoaded = true;
+        private FieldInfo ivaPitchField;
+        private FieldInfo ivaYawField;
+
         public void Start()
         {
 
+            LoadReflectionFields();
             receivedCameraControlMode = 0;
             oldCameraModeControl = 0;
             CameraModeChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived21");
@@ -176,7 +184,7 @@ namespace KerbalSimPit.Providers
 
         public void cameraRotationCallback(byte ID, object Data)
         {
-            Debug.Log("Camera Rotation Callback");
+            //Debug.Log("Camera Rotation Callback");
             newCameraRotation = KerbalSimpitUtils.ByteArrayToStructure<CameraRotationalStruct>((byte[])Data);
             // Bit fields:
             // pitch = 1
@@ -188,7 +196,7 @@ namespace KerbalSimPit.Providers
                 if ((newCameraRotation.mask & (byte)1) > 0)
                 {
                     myCameraRotation.pitch = newCameraRotation.pitch;
-                    Debug.Log("Rotation Message Seen");
+                    // Debug.Log("Rotation Message Seen");
                     float newPitch = flightCamera.camPitch + (myCameraRotation.pitch * flightCameraPitchMultiplier);
                     if (newPitch > flightCamera.maxPitch)
                     {
@@ -211,12 +219,13 @@ namespace KerbalSimPit.Providers
                 if ((newCameraRotation.mask & (byte)4) > 0)
                 {
                     myCameraRotation.yaw = newCameraRotation.yaw;
-                    Debug.Log("Yaw Message Seen");
+                    // Debug.Log("Yaw Message Seen");
                     float newHdg = flightCamera.camHdg + (myCameraRotation.yaw * flightCameraYawMultiplier);
                     flightCamera.camHdg = newHdg;
                 }
             }
-            else if (cameraManager.currentCameraMode == CameraManager.CameraMode.IVA)
+            // Internal camera work based on this code: https://github.com/AlexanderDzhoganov/ksp-advanced-flybywire/blob/master/CameraController.cs
+            else if (cameraManager.currentCameraMode == CameraManager.CameraMode.IVA || cameraManager.currentCameraMode == CameraManager.CameraMode.Internal)
             {
                 Kerbal ivaKerbal = cameraManager.IVACameraActiveKerbal;
 
@@ -226,6 +235,7 @@ namespace KerbalSimPit.Providers
                 }
 
                 InternalCamera ivaCamera = InternalCamera.Instance;
+                ivaCamera.mouseLocked = false;
 
                 //IVACamera ivaCamera = ivaKerbal.gameObject.GetComponent<IVACamera>();
 
@@ -237,16 +247,14 @@ namespace KerbalSimPit.Providers
                 else
                 {
 
-                    float newPitch = ivaCamera.transform.eulerAngles.x;
-                    float newYaw = ivaKerbal.camPivot.eulerAngles.y;
-                    float oldRoll = ivaKerbal.camPivot.eulerAngles.z;
-
+                    float newPitch = (float)ivaPitchField.GetValue(ivaCamera);
+                    float newYaw = (float)ivaYawField.GetValue(ivaCamera);
 
                     if ((newCameraRotation.mask & (byte)1) > 0)
                     {
                         myCameraRotation.pitch = newCameraRotation.pitch;
-                        Debug.Log("IVA Rotation Message Seen");
-                        newPitch += (myCameraRotation.pitch * flightCameraPitchMultiplier);
+                        //Debug.Log("IVA Rotation Message Seen");
+                        newPitch += (myCameraRotation.pitch * 0.0001f);
 
                         if (newPitch > ivaCamera.maxPitch)
                         {
@@ -264,24 +272,44 @@ namespace KerbalSimPit.Providers
                     if ((newCameraRotation.mask & (byte)4) > 0)
                     {
                         myCameraRotation.yaw = newCameraRotation.yaw;
-                        Debug.Log("IVA Yaw Message Seen");
-                        newYaw += (myCameraRotation.yaw * flightCameraYawMultiplier);
-                        if (newYaw > ivaCamera.maxRot)
+                        //Debug.Log("IVA Yaw Message Seen");
+                        newYaw += (myCameraRotation.yaw * 0.0001f);
+                        if (newYaw > 100f)
                         {
-                            newYaw = ivaCamera.maxRot;
+                            newYaw = 100f;
                         }
-                        else if (newYaw < -60f)
+                        else if (newYaw < -100f)
                         {
-                            newYaw = -60f;
+                            newYaw = -100f;
                         }
                     }
-                    Debug.Log("Before set angle");
-                    //ivaKerbal.camPivot.eulerAngles.Set(newPitch, newYaw, oldRoll);
-                    ivaCamera.transform.
+                    //Debug.Log("Before set angle");
+                    if (this.ivaCamFieldsLoaded)
+                    {
+                        ivaPitchField.SetValue(ivaCamera, newPitch);
+                        ivaYawField.SetValue(ivaCamera, newYaw);
+                        Debug.Log("Camera vector: " + ivaCamera.transform.localEulerAngles.ToString());
+                        FlightCamera.fetch.transform.rotation = InternalSpace.InternalToWorld(InternalCamera.Instance.transform.rotation);
+                    }
                 }
             }
 
         }
+
+        private void LoadReflectionFields()
+        {
+            List<FieldInfo> fields = new List<FieldInfo>(typeof(InternalCamera).GetFields(
+                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance));
+            fields = new List<FieldInfo>(fields.Where(f => f.FieldType.Equals(typeof(float))));
+            this.ivaPitchField = fields[3];
+            this.ivaYawField = fields[4];
+            if (ivaPitchField == null || ivaYawField == null)
+            {
+                this.ivaCamFieldsLoaded = false;
+                Debug.LogWarning("AFBW - Failed to acquire pitch/yaw fields in InternalCamera");
+            }
+        }
+
 
         public void cameraTranslationCallback(byte ID, object Data)
         {
