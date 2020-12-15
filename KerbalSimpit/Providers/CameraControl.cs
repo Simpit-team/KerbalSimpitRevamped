@@ -60,6 +60,8 @@ namespace KerbalSimPit.Providers
         private bool ivaCamFieldsLoaded = true;
         private FieldInfo ivaPitchField;
         private FieldInfo ivaYawField;
+        private float ivaCameraMultiplier = 0.003f;
+
 
         public void Start()
         {
@@ -254,7 +256,7 @@ namespace KerbalSimPit.Providers
                     {
                         myCameraRotation.pitch = newCameraRotation.pitch;
                         //Debug.Log("IVA Rotation Message Seen");
-                        newPitch += (myCameraRotation.pitch * 0.0001f);
+                        newPitch += (myCameraRotation.pitch * ivaCameraMultiplier);
 
                         if (newPitch > ivaCamera.maxPitch)
                         {
@@ -273,14 +275,14 @@ namespace KerbalSimPit.Providers
                     {
                         myCameraRotation.yaw = newCameraRotation.yaw;
                         //Debug.Log("IVA Yaw Message Seen");
-                        newYaw += (myCameraRotation.yaw * 0.0001f);
-                        if (newYaw > 100f)
+                        newYaw += (myCameraRotation.yaw * ivaCameraMultiplier);
+                        if (newYaw > 120f)
                         {
-                            newYaw = 100f;
+                            newYaw = 120f;
                         }
-                        else if (newYaw < -100f)
+                        else if (newYaw < -120f)
                         {
-                            newYaw = -100f;
+                            newYaw = -120f;
                         }
                     }
                     //Debug.Log("Before set angle");
@@ -288,7 +290,7 @@ namespace KerbalSimPit.Providers
                     {
                         ivaPitchField.SetValue(ivaCamera, newPitch);
                         ivaYawField.SetValue(ivaCamera, newYaw);
-                        Debug.Log("Camera vector: " + ivaCamera.transform.localEulerAngles.ToString());
+                       // Debug.Log("Camera vector: " + ivaCamera.transform.localEulerAngles.ToString());
                         FlightCamera.fetch.transform.rotation = InternalSpace.InternalToWorld(InternalCamera.Instance.transform.rotation);
                     }
                 }
