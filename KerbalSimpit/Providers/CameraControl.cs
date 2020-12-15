@@ -109,73 +109,106 @@ namespace KerbalSimPit.Providers
             oldCameraModeControl = receivedCameraControlMode;
             needToUpdateCamera = false;
 
-            if (controlMode < 10 && cameraManager.currentCameraMode == CameraManager.CameraMode.Flight)
-            {
-                Debug.Log("Camera can have it's mode changed");
-                Debug.Log("Control mode: " + controlMode.ToString());
-                int currentFlightMode = FlightCamera.CamMode;
-                int maxEnum = Enum.GetNames(typeof(FlightCamera.Modes)).Length - 1;
-                Debug.Log("Max Enum Value: " + maxEnum.ToString());
-                int caseSwitch = controlMode;
 
-                switch (caseSwitch)
-                {
-                    case CameraControlBits.Auto:
-                        FlightCamera.SetMode(FlightCamera.Modes.AUTO);
-                        printCameraMode("Auto");
-                        break;
-                    case CameraControlBits.Free:
-                        FlightCamera.SetMode(FlightCamera.Modes.FREE);
-                        printCameraMode("Free");
-                        break;
-                    case CameraControlBits.Orbital:
-                        FlightCamera.SetMode(FlightCamera.Modes.ORBITAL);
-                        printCameraMode("Orbital");
-                        break;
-                    case CameraControlBits.Chase:
-                        FlightCamera.SetMode(FlightCamera.Modes.CHASE);
-                        printCameraMode("Chase");
-                        break;
-                    case CameraControlBits.Locked:
-                        FlightCamera.SetMode(FlightCamera.Modes.LOCKED);
-                        printCameraMode("Locked");
-                        break;
-                    case CameraControlBits.NextMode:
-                        printCameraMode("Next");
-                        if (currentFlightMode == maxEnum)
-                        {
-                            FlightCamera.SetMode((FlightCamera.Modes)0);
-                        }
-                        else
-                        {
-                            FlightCamera.SetMode((FlightCamera.Modes)currentFlightMode + 1);
-                        }
-                        break;
-                    case CameraControlBits.PreviousMode:
-                        printCameraMode("Previous");
-                        if (currentFlightMode == 0)
-                        {
-                            FlightCamera.SetMode((FlightCamera.Modes)maxEnum);
-                        }
-                        else
-                        {
-                            FlightCamera.Modes autoMode = FlightCamera.GetAutoModeForVessel(FlightGlobals.ActiveVessel);
-                            if (((FlightCamera.Modes)(FlightCamera.CamMode - 1)) == FlightCamera.Modes.ORBITAL && autoMode != FlightCamera.Modes.ORBITAL)
+            // Switch based on the CameraControlBits values
+            switch (controlMode)
+            {
+                // See if the control bit is a camera mode setting bit - need to add validity checking, to make sure the modes can be entered
+                case CameraControlBits.FlightMode:
+                    cameraManager.SetCameraFlight();
+                    break;
+                case CameraControlBits.IVAMode:
+                    cameraManager.SetCameraIVA();
+                    break;
+                case CameraControlBits.PlanetaryMode:
+                    PlanetariumCamera.fetch.Activate();
+                    break;
+                // If it is not a camera mode, it must be a mode for the (hopefully) current camera
+                default:
+
+                    // Based on the current camera mode, change where the CameraControl value gets sent
+                    switch (cameraManager.currentCameraMode)
+                    {
+                        // Flight Camera
+                        case CameraManager.CameraMode.Flight:
+                            Debug.Log("Camera can have it's mode changed");
+                            Debug.Log("Control mode: " + controlMode.ToString());
+                            int currentFlightMode = FlightCamera.CamMode;
+                            int maxEnum = Enum.GetNames(typeof(FlightCamera.Modes)).Length - 1;
+                            Debug.Log("Max Enum Value: " + maxEnum.ToString());
+
+                            // Switch based on the operation to perform on the flight camera
+                            switch (controlMode)
                             {
-                                FlightCamera.SetMode((FlightCamera.Modes)(currentFlightMode - 2));
+                                case CameraControlBits.Auto:
+                                    FlightCamera.SetMode(FlightCamera.Modes.AUTO);
+                                    printCameraMode("Auto");
+                                    break;
+                                case CameraControlBits.Free:
+                                    FlightCamera.SetMode(FlightCamera.Modes.FREE);
+                                    printCameraMode("Free");
+                                    break;
+                                case CameraControlBits.Orbital:
+                                    FlightCamera.SetMode(FlightCamera.Modes.ORBITAL);
+                                    printCameraMode("Orbital");
+                                    break;
+                                case CameraControlBits.Chase:
+                                    FlightCamera.SetMode(FlightCamera.Modes.CHASE);
+                                    printCameraMode("Chase");
+                                    break;
+                                case CameraControlBits.Locked:
+                                    FlightCamera.SetMode(FlightCamera.Modes.LOCKED);
+                                    printCameraMode("Locked");
+                                    break;
+                                case CameraControlBits.NextCameraModeState:
+                                    printCameraMode("Next");
+                                    // If the current flight camera mode is at the end of the list, wrap around to the start
+                                    if (currentFlightMode == maxEnum)
+                                    {
+                                        FlightCamera.SetMode((FlightCamera.Modes)0);
+                                    }
+                                    else
+                                    {
+                                        FlightCamera.SetMode((FlightCamera.Modes)currentFlightMode + 1);
+                                    }
+                                    break;
+                                case CameraControlBits.PreviousCameraModeState:
+                                    printCameraMode("Previous");
+                                    // If the current flight camera mode is at the start of the list, wrap around to the end
+                                    if (currentFlightMode == 0)
+                                    {
+                                        FlightCamera.SetMode((FlightCamera.Modes)maxEnum);
+                                    }
+                                    else
+                                    {
+                                        // Hack to get around the issue of orbital mode not being available below a certain altitude around SOIs.
+                                        FlightCamera.Modes autoMode = FlightCamera.GetAutoModeForVessel(FlightGlobals.ActiveVessel);
+                                        // If the Flight Camera mode tries to go backwards to orbital mode, and orbital mode is not available, set the camera mode back two places.
+                                        if (((FlightCamera.Modes)(FlightCamera.CamMode - 1)) == FlightCamera.Modes.ORBITAL && autoMode != FlightCamera.Modes.ORBITAL)
+                                        {
+                                            FlightCamera.SetMode((FlightCamera.Modes)(currentFlightMode - 2));
+                                        }
+                                        // Otherwise just change the mode back by one
+                                        else
+                                        {
+                                            FlightCamera.SetMode((FlightCamera.Modes)currentFlightMode - 1);
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    printCameraMode("No flight camera state to match the control bits:(");
+                                    break;
                             }
-                            else
-                            {
-                                FlightCamera.SetMode((FlightCamera.Modes)currentFlightMode - 1);
-                            }
-                        }
-                        break;
-                    default:
-                        printCameraMode("No Camera Mode :(");
-                        break;
-                }
-            }
-            //if (controlMode > 10 && controlMode < 20 && cameraManager.currentCameraMode == CameraManager.CameraMode.)
+                            break; /* End Flight Camera Mode */
+                        case CameraManager.CameraMode.IVA:
+                            break;
+
+                        default:
+                            Debug.Log(String.Format("Simpit control for the camera mode: {0} is unsupported", cameraManager.currentCameraMode.ToString()));
+                            break;
+                    } /* End of current camera mode switch */
+                    break;
+            } /* End of control mode switch */
         }
 
         private void printCameraMode(String cameraModeString)
@@ -192,80 +225,29 @@ namespace KerbalSimPit.Providers
             // pitch = 1
             // roll = 2
             // yaw = 4
-            if (cameraManager.currentCameraMode == CameraManager.CameraMode.Flight)
+            switch (cameraManager.currentCameraMode)
             {
-                FlightCamera flightCamera = FlightCamera.fetch;
-                if ((newCameraRotation.mask & (byte)1) > 0)
-                {
-                    myCameraRotation.pitch = newCameraRotation.pitch;
-                    // Debug.Log("Rotation Message Seen");
-                    float newPitch = flightCamera.camPitch + (myCameraRotation.pitch * flightCameraPitchMultiplier);
-                    if (newPitch > flightCamera.maxPitch)
-                    {
-                        flightCamera.camPitch = flightCamera.maxPitch;
-                    }
-                    else if (newPitch < flightCamera.minPitch)
-                    {
-                        flightCamera.camPitch = flightCamera.minPitch;
-                    }
-                    else
-                    {
-                        flightCamera.camPitch = newPitch;
-                    }
 
-                }
-                if ((newCameraRotation.mask & (byte)2) > 0)
-                {
-                    myCameraRotation.roll = newCameraRotation.roll;
-                }
-                if ((newCameraRotation.mask & (byte)4) > 0)
-                {
-                    myCameraRotation.yaw = newCameraRotation.yaw;
-                    // Debug.Log("Yaw Message Seen");
-                    float newHdg = flightCamera.camHdg + (myCameraRotation.yaw * flightCameraYawMultiplier);
-                    flightCamera.camHdg = newHdg;
-                }
-            }
-            // Internal camera work based on this code: https://github.com/AlexanderDzhoganov/ksp-advanced-flybywire/blob/master/CameraController.cs
-            else if (cameraManager.currentCameraMode == CameraManager.CameraMode.IVA || cameraManager.currentCameraMode == CameraManager.CameraMode.Internal)
-            {
-                Kerbal ivaKerbal = cameraManager.IVACameraActiveKerbal;
-
-                if (ivaKerbal == null)
-                {
-                    Debug.Log("Kerbal is null");
-                }
-
-                InternalCamera ivaCamera = InternalCamera.Instance;
-                ivaCamera.mouseLocked = false;
-
-                //IVACamera ivaCamera = ivaKerbal.gameObject.GetComponent<IVACamera>();
-
-
-                if (ivaCamera == null)
-                {
-                    Debug.Log("IVA Camera is null");
-                }
-                else
-                {
-
-                    float newPitch = (float)ivaPitchField.GetValue(ivaCamera);
-                    float newYaw = (float)ivaYawField.GetValue(ivaCamera);
-
+                case CameraManager.CameraMode.Flight:
+                    FlightCamera flightCamera = FlightCamera.fetch;
                     if ((newCameraRotation.mask & (byte)1) > 0)
                     {
                         myCameraRotation.pitch = newCameraRotation.pitch;
-                        //Debug.Log("IVA Rotation Message Seen");
-                        newPitch += (myCameraRotation.pitch * ivaCameraMultiplier);
+                        // Debug.Log("Rotation Message Seen");
+                        float newPitch = flightCamera.camPitch + (myCameraRotation.pitch * flightCameraPitchMultiplier);
+                        if (newPitch > flightCamera.maxPitch)
+                        {
+                            flightCamera.camPitch = flightCamera.maxPitch;
+                        }
+                        else if (newPitch < flightCamera.minPitch)
+                        {
+                            flightCamera.camPitch = flightCamera.minPitch;
+                        }
+                        else
+                        {
+                            flightCamera.camPitch = newPitch;
+                        }
 
-                        if (newPitch > ivaCamera.maxPitch)
-                        {
-                            newPitch = ivaCamera.maxPitch;
-                        }
-                        else if (newPitch < ivaCamera.minPitch)
-                        {
-                            newPitch = ivaCamera.minPitch;
-                        }
                     }
                     if ((newCameraRotation.mask & (byte)2) > 0)
                     {
@@ -274,28 +256,80 @@ namespace KerbalSimPit.Providers
                     if ((newCameraRotation.mask & (byte)4) > 0)
                     {
                         myCameraRotation.yaw = newCameraRotation.yaw;
-                        //Debug.Log("IVA Yaw Message Seen");
-                        newYaw += (myCameraRotation.yaw * ivaCameraMultiplier);
-                        if (newYaw > 120f)
-                        {
-                            newYaw = 120f;
-                        }
-                        else if (newYaw < -120f)
-                        {
-                            newYaw = -120f;
-                        }
+                        // Debug.Log("Yaw Message Seen");
+                        float newHdg = flightCamera.camHdg + (myCameraRotation.yaw * flightCameraYawMultiplier);
+                        flightCamera.camHdg = newHdg;
                     }
-                    //Debug.Log("Before set angle");
-                    if (this.ivaCamFieldsLoaded)
-                    {
-                        ivaPitchField.SetValue(ivaCamera, newPitch);
-                        ivaYawField.SetValue(ivaCamera, newYaw);
-                       // Debug.Log("Camera vector: " + ivaCamera.transform.localEulerAngles.ToString());
-                        FlightCamera.fetch.transform.rotation = InternalSpace.InternalToWorld(InternalCamera.Instance.transform.rotation);
-                    }
-                }
-            }
+                    break;
 
+                case CameraManager.CameraMode.IVA:
+                case CameraManager.CameraMode.Internal:
+                    Kerbal ivaKerbal = cameraManager.IVACameraActiveKerbal;
+
+                    if (ivaKerbal == null)
+                    {
+                        Debug.Log("Kerbal is null");
+                    }
+
+                    InternalCamera ivaCamera = InternalCamera.Instance;
+                    ivaCamera.mouseLocked = false;
+
+                    if (ivaCamera == null)
+                    {
+                        Debug.Log("IVA Camera is null");
+                    }
+                    else
+                    {
+                        float newPitch = (float)ivaPitchField.GetValue(ivaCamera);
+                        float newYaw = (float)ivaYawField.GetValue(ivaCamera);
+
+                        if ((newCameraRotation.mask & (byte)1) > 0)
+                        {
+                            myCameraRotation.pitch = newCameraRotation.pitch;
+                            //Debug.Log("IVA Rotation Message Seen");
+                            newPitch += (myCameraRotation.pitch * ivaCameraMultiplier);
+
+                            if (newPitch > ivaCamera.maxPitch)
+                            {
+                                newPitch = ivaCamera.maxPitch;
+                            }
+                            else if (newPitch < ivaCamera.minPitch)
+                            {
+                                newPitch = ivaCamera.minPitch;
+                            }
+                        }
+                        if ((newCameraRotation.mask & (byte)2) > 0)
+                        {
+                            myCameraRotation.roll = newCameraRotation.roll;
+                        }
+                        if ((newCameraRotation.mask & (byte)4) > 0)
+                        {
+                            myCameraRotation.yaw = newCameraRotation.yaw;
+                            //Debug.Log("IVA Yaw Message Seen");
+                            newYaw += (myCameraRotation.yaw * ivaCameraMultiplier);
+                            if (newYaw > 120f)
+                            {
+                                newYaw = 120f;
+                            }
+                            else if (newYaw < -120f)
+                            {
+                                newYaw = -120f;
+                            }
+                        }
+                        //Debug.Log("Before set angle");
+                        if (this.ivaCamFieldsLoaded)
+                        {
+                            ivaPitchField.SetValue(ivaCamera, newPitch);
+                            ivaYawField.SetValue(ivaCamera, newYaw);
+                            // Debug.Log("Camera vector: " + ivaCamera.transform.localEulerAngles.ToString());
+                            FlightCamera.fetch.transform.rotation = InternalSpace.InternalToWorld(InternalCamera.Instance.transform.rotation);
+                        }
+                    }
+                    break;
+                default:
+                    Debug.Log("Kerbal Simpit does not support this camera mode: " + cameraManager.currentCameraMode.ToString());
+                    break;
+            }
         }
 
         private void LoadReflectionFields()
