@@ -70,8 +70,7 @@ namespace KerbalSimpit
     public static class CameraControlBits
     {
         // Flight Camera Modes
-        public const byte FlightBit = 1;
-
+        public const byte FlightMode = 1;
         // Order from: https://kerbalspaceprogram.com/api/class_flight_camera.html#ae90b21deb28ca1978c229f0511116c1a
         public const byte Auto = 2;
         public const byte Free = 3;
@@ -79,8 +78,13 @@ namespace KerbalSimpit
         public const byte Chase = 5;
         public const byte Locked = 6;
 
-        public const byte NextMode = 7;
-        public const byte PreviousMode = 8;
+        public const byte IVAMode = 10;
+        public const byte PlanetaryMode = 20;
+
+        public const byte NextCamera = 50;
+        public const byte PreviousCamera = 51;
+        public const byte NextCameraModeState = 52;
+        public const byte PreviousCameraModeState = 53;
         // Cycle Camera Modes
        // public static byte NextBit = 6;
         //public static byte PreviousBit = 7;
