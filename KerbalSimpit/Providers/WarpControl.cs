@@ -80,40 +80,40 @@ namespace KerbalSimpit.KerbalSimpit.Providers
             int currentRate = TimeWarp.CurrentRateIndex;
             switch (command)
             {
-                case WarpContolEnum.timewarp1:
+                case WarpControlValues.timewarp1:
                     TimeWarp.SetRate(0, USE_INSTANT_WARP, DISPLAY_MESSAGE);
                     break;
-                case WarpContolEnum.timewarp5:
+                case WarpControlValues.timewarp5:
                     SetWarpRate(5, false);
                     break;
-                case WarpContolEnum.timewarp10:
+                case WarpControlValues.timewarp10:
                     SetWarpRate(10, false);
                     break;
-                case WarpContolEnum.timewarp50:
+                case WarpControlValues.timewarp50:
                     SetWarpRate(50, false);
                     break;
-                case WarpContolEnum.timewarp100:
+                case WarpControlValues.timewarp100:
                     SetWarpRate(100, false);
                     break;
-                case WarpContolEnum.timewarp1000:
+                case WarpControlValues.timewarp1000:
                     SetWarpRate(1000, false);
                     break;
-                case WarpContolEnum.timewarp10000:
+                case WarpControlValues.timewarp10000:
                     SetWarpRate(10000, false);
                     break;
-                case WarpContolEnum.timewarp100000:
+                case WarpControlValues.timewarp100000:
                     SetWarpRate(100000, false);
                     break;
-                case WarpContolEnum.timewarpPhysical2:
+                case WarpControlValues.timewarpPhysical2:
                     SetWarpRate(2, true);
                     break;
-                case WarpContolEnum.timewarpPhysical3:
+                case WarpControlValues.timewarpPhysical3:
                     SetWarpRate(3, true);
                     break;
-                case WarpContolEnum.timewarpPhysical4:
+                case WarpControlValues.timewarpPhysical4:
                     SetWarpRate(4, true);
                     break;
-                case WarpContolEnum.timewarpUp:
+                case WarpControlValues.timewarpUp:
                     int MaxRateIndex = -1;
                     if (TimeWarp.fetch.Mode == TimeWarp.Modes.HIGH)
                     {
@@ -131,7 +131,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                         Debug.Log("Simpit : Already at max warp rate.");
                     }
                     break;
-                case WarpContolEnum.timewarpDown:
+                case WarpControlValues.timewarpDown:
                     if (currentRate > 0)
                     {
                         TimeWarp.SetRate(currentRate - 1, USE_INSTANT_WARP, DISPLAY_MESSAGE);
@@ -141,7 +141,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                         Debug.Log("Simpit : Already at min warp rate.");
                     }
                     break;
-                case WarpContolEnum.timewarpNextManeuver:
+                case WarpControlValues.timewarpNextManeuver:
                     double timeOfNextManeuver = -1;
                     if (FlightGlobals.ActiveVessel.patchedConicSolver != null)
                     {
@@ -164,16 +164,42 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                         Debug.Log("Simpit : Cannot warp to next maneuver since I could not locate the next maneuver");
                     }
                     break;
-                case WarpContolEnum.timewarpSOIChange:
-                    Debug.Log("This rate is not implemented yet : " + command);
+                case WarpControlValues.timewarpSOIChange:
+                    Orbit.PatchTransitionType orbitType = FlightGlobals.ActiveVessel.GetOrbit().patchEndTransition;
+
+                    if(orbitType == Orbit.PatchTransitionType.ENCOUNTER ||
+                        orbitType == Orbit.PatchTransitionType.ESCAPE)
+                    {
+                        TimeWarp.fetch.WarpTo(FlightGlobals.ActiveVessel.GetOrbit().EndUT);
+                    } else
+                    {
+                        Debug.Log("Simpit : There is no SOI change to warp to. Orbit type : " + orbitType);
+                    }
                     break;
-                case WarpContolEnum.timewarpApoapsis:
-                    TimeWarp.fetch.WarpTo(Planetarium.GetUniversalTime() + FlightGlobals.ActiveVessel.GetOrbit().timeToAp);
+                case WarpControlValues.timewarpApoapsis:
+                    double timeToApoapsis = FlightGlobals.ActiveVessel.GetOrbit().timeToAp;
+                    if(Double.IsNaN(timeToApoapsis) || Double.IsInfinity(timeToApoapsis))
+                    {
+                        //This can happen in an escape trajectory for instance
+                        Debug.Log("Simpit : Cannot warp to apoasis since there is no apoapsis");
+                    } else
+                    {
+                        TimeWarp.fetch.WarpTo(Planetarium.GetUniversalTime() + timeToApoapsis);
+                    }
                     break;
-                case WarpContolEnum.timewarpPeriapsis:
-                    TimeWarp.fetch.WarpTo(Planetarium.GetUniversalTime() + FlightGlobals.ActiveVessel.GetOrbit().timeToPe);
+                case WarpControlValues.timewarpPeriapsis:
+                    double timeToPeriapsis = FlightGlobals.ActiveVessel.GetOrbit().timeToPe;
+                    if (Double.IsNaN(timeToPeriapsis) || Double.IsInfinity(timeToPeriapsis))
+                    {
+                        //This can happen in an escape trajectory for instance
+                        Debug.Log("Simpit : Cannot warp to periapsis since there is no apoapsis");
+                    }
+                    else
+                    {
+                        TimeWarp.fetch.WarpTo(Planetarium.GetUniversalTime() + timeToPeriapsis);
+                    }
                     break;
-                case WarpContolEnum.timewarpCancelAutoWarp:
+                case WarpControlValues.timewarpCancelAutoWarp:
                     TimeWarp.fetch.CancelAutoWarp();
                     TimeWarp.SetRate(0, USE_INSTANT_WARP, DISPLAY_MESSAGE);
                     break;

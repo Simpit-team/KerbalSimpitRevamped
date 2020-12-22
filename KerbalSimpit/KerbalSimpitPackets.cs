@@ -79,7 +79,7 @@ namespace KerbalSimpit
         public static byte AbortBit = 64;
     }
 
-    public static class WarpContolEnum
+    public static class WarpControlValues
     {
         public const byte timewarp1 = 0;
         public const byte timewarp5 = 1;
