@@ -28,6 +28,7 @@ namespace KerbalSimPit.Providers
             public short pitch;
             public short roll;
             public short yaw;
+            public short zoom;
             public byte mask;
         }
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -56,6 +57,7 @@ namespace KerbalSimPit.Providers
 
         private float flightCameraPitchMultiplier = 0.00002f;
         private float flightCameraYawMultiplier = 0.00006f;
+        private float flightCameraZoomMultiplier = 0.001f;
 
         private bool ivaCamFieldsLoaded = true;
         private FieldInfo ivaPitchField;
@@ -259,6 +261,17 @@ namespace KerbalSimPit.Providers
                         // Debug.Log("Yaw Message Seen");
                         float newHdg = flightCamera.camHdg + (myCameraRotation.yaw * flightCameraYawMultiplier);
                         flightCamera.camHdg = newHdg;
+                    }
+                    if ((newCameraRotation.mask & (byte)8) > 0)
+                    {
+                        myCameraRotation.zoom = newCameraRotation.zoom;
+                        float newZoom = flightCamera.Distance + (myCameraRotation.zoom * flightCameraZoomMultiplier);
+                        if(newZoom > flightCamera.maxDistance){
+                            newZoom = flightCamera.maxDistance;
+                        } else if (newZoom < flightCamera.minDistance){
+                            newZoom = flightCamera.minDistance;
+                        }
+                        flightCamera.SetDistance(newZoom);
                     }
                     break;
 
