@@ -60,7 +60,7 @@ namespace KerbalSimpit.Console
                 {
                     if (KSPit.serialPorts.First().Value.portConnected == false)
                     {
-                        this.k_simpit.initPorts();
+                        this.k_simpit.OpenPorts();
                     }
                 }
                 // Else if they have not been connected to before, run this

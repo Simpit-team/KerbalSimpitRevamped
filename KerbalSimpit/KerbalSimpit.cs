@@ -101,6 +101,10 @@ namespace KerbalSimpit
                 this.toSerialArray[i] = new EventData<byte, object>(String.Format("toSerial{0}", i));
             }
 
+            this.onSerialReceivedArray[CommonPackets.Synchronisation].Add(this.handshakeCallback);
+            this.onSerialReceivedArray[InboundPackets.RegisterHandler].Add(this.registerCallback);
+            this.onSerialReceivedArray[InboundPackets.DeregisterHandler].Add(this.deregisterCallback);
+
             Config = new KerbalSimpitConfig();
 
             SerialPorts = createPortList(Config);
@@ -109,15 +113,13 @@ namespace KerbalSimpit
             // Open the ports, for this classes instance
             this.OpenPorts();
 
-            this.onSerialReceivedArray[CommonPackets.Synchronisation].Add(this.handshakeCallback);
-            this.onSerialReceivedArray[InboundPackets.RegisterHandler].Add(this.registerCallback);
-            this.onSerialReceivedArray[InboundPackets.DeregisterHandler].Add(this.deregisterCallback);
+            Debug.Log("KerbalSimpit: Started");
+        }
 
+        private void StartEventDispatch(){
             this.EventDispatchThread = new Thread(this.EventWorker);
             this.EventDispatchThread.Start();
-            while (!this.EventDispatchThread.IsAlive) ;
-
-            Debug.Log("KerbalSimpit: Started");
+            while (!this.EventDispatchThread.IsAlive);
         }
 
         public void OnDestroy()
@@ -252,6 +254,9 @@ namespace KerbalSimpit
             
             // Run connect set to true, signalling that the list has been populated at least once
             runConnect = true;
+
+            StartEventDispatch();
+
         }
 
         public void ClosePorts() {
