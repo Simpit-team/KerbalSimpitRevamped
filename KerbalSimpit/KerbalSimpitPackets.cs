@@ -66,6 +66,7 @@ namespace KerbalSimpit
         public static byte CameraMode = 21;
         public static byte CameraRotation = 22;
         public static byte CameraTranslation = 23;
+        public static byte WarpChange = 24;
     }
 
     public static class CameraControlBits
@@ -105,5 +106,27 @@ namespace KerbalSimpit
         public static byte SASBit = 16;
         public static byte BrakesBit = 32;
         public static byte AbortBit = 64;
+    }
+
+    public static class WarpControlValues
+    {
+        public const byte timewarp1 = 0;
+        public const byte timewarp5 = 1;
+        public const byte timewarp10 = 2;
+        public const byte timewarp50 = 3;
+        public const byte timewarp100 = 4;
+        public const byte timewarp1000 = 5;
+        public const byte timewarp10000 = 6;
+        public const byte timewarp100000 = 7;
+        public const byte timewarpPhysical2 = 8;
+        public const byte timewarpPhysical3 = 9;
+        public const byte timewarpPhysical4 = 10;
+        public const byte timewarpUp = 11;
+        public const byte timewarpDown = 12;
+        public const byte timewarpNextManeuver = 13;
+        public const byte timewarpSOIChange = 14;
+        public const byte timewarpApoapsis = 15;
+        public const byte timewarpPeriapsis = 16;
+        public const byte timewarpCancelAutoWarp = 17;
     }
 }
