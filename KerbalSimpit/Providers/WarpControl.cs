@@ -33,7 +33,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
             ProcessWarpCommand(command);
         }
 
-        public void SetWarpRate(float rate, bool physical)
+        public void SetWarpRate(int rateIndex, bool physical)
         {
             if (physical)
             {
@@ -43,14 +43,13 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                 }
                 else
                 {
-                    int index = TimeWarp.fetch.physicsWarpRates.IndexOf(rate);
-                    if (index != -1)
+                    if (rateIndex < TimeWarp.fetch.physicsWarpRates.Length)
                     {
-                        TimeWarp.SetRate(index, USE_INSTANT_WARP, DISPLAY_MESSAGE);
+                        TimeWarp.SetRate(rateIndex, USE_INSTANT_WARP, DISPLAY_MESSAGE);
                     }
                     else
                     {
-                        Debug.Log("Simpit : Cannot find the x" + rate + " physical warp speed.");
+                        Debug.Log("Simpit : Cannot find a physical warp speed at index: " + rateIndex);
                     }
                 }
             }
@@ -62,14 +61,13 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                 }
                 else
                 {
-                    int index = TimeWarp.fetch.warpRates.IndexOf(rate);
-                    if (index != -1)
+                    if (rateIndex < TimeWarp.fetch.warpRates.Length)
                     {
-                        TimeWarp.SetRate(index, USE_INSTANT_WARP, DISPLAY_MESSAGE);
+                        TimeWarp.SetRate(rateIndex, USE_INSTANT_WARP, DISPLAY_MESSAGE);
                     }
                     else
                     {
-                        Debug.Log("Simpit : Cannot find the x" + rate + " warp speed.");
+                        Debug.Log("Simpit : Cannot find a warp speed at index: " + rateIndex);
                     }
                 }
             }
@@ -80,58 +78,47 @@ namespace KerbalSimpit.KerbalSimpit.Providers
             int currentRate = TimeWarp.CurrentRateIndex;
             switch (command)
             {
-                case WarpControlValues.timewarp1:
+                case WarpControlValues.warpRate1:
                     TimeWarp.SetRate(0, USE_INSTANT_WARP, DISPLAY_MESSAGE);
                     break;
-                case WarpControlValues.timewarp5:
-                    SetWarpRate(5, false);
+                case WarpControlValues.warpRate2:
+                case WarpControlValues.warpRate3:
+                case WarpControlValues.warpRate4:
+                case WarpControlValues.warpRate5:
+                case WarpControlValues.warpRate6:
+                case WarpControlValues.warpRate7:
+                case WarpControlValues.warpRate8:
+                    SetWarpRate(command, false);
                     break;
-                case WarpControlValues.timewarp10:
-                    SetWarpRate(10, false);
+                case WarpControlValues.warpRatePhys1:
+                    TimeWarp.SetRate(0, USE_INSTANT_WARP, DISPLAY_MESSAGE);
                     break;
-                case WarpControlValues.timewarp50:
-                    SetWarpRate(50, false);
+                case WarpControlValues.warpRatePhys2:
+                case WarpControlValues.warpRatePhys3:
+                case WarpControlValues.warpRatePhys4:
+                    SetWarpRate(command - WarpControlValues.warpRatePhys1, true);
                     break;
-                case WarpControlValues.timewarp100:
-                    SetWarpRate(100, false);
-                    break;
-                case WarpControlValues.timewarp1000:
-                    SetWarpRate(1000, false);
-                    break;
-                case WarpControlValues.timewarp10000:
-                    SetWarpRate(10000, false);
-                    break;
-                case WarpControlValues.timewarp100000:
-                    SetWarpRate(100000, false);
-                    break;
-                case WarpControlValues.timewarpPhysical2:
-                    SetWarpRate(2, true);
-                    break;
-                case WarpControlValues.timewarpPhysical3:
-                    SetWarpRate(3, true);
-                    break;
-                case WarpControlValues.timewarpPhysical4:
-                    SetWarpRate(4, true);
-                    break;
-                case WarpControlValues.timewarpUp:
-                    int MaxRateIndex = -1;
+                case WarpControlValues.warpRateUp:
+                    int MaxRateIndex = 0;
                     if (TimeWarp.fetch.Mode == TimeWarp.Modes.HIGH)
                     {
                         MaxRateIndex = TimeWarp.fetch.warpRates.Length;
-                    } else
+                    }
+                    else
                     {
                         MaxRateIndex = TimeWarp.fetch.physicsWarpRates.Length;
                     }
 
-                    if (currentRate < MaxRateIndex - 1)
+                    if (currentRate < MaxRateIndex)
                     {
                         TimeWarp.SetRate(currentRate + 1, USE_INSTANT_WARP, DISPLAY_MESSAGE);
-                    } else
+                    }
+                    else
                     {
                         Debug.Log("Simpit : Already at max warp rate.");
                     }
                     break;
-                case WarpControlValues.timewarpDown:
+                case WarpControlValues.warpRateDown:
                     if (currentRate > 0)
                     {
                         TimeWarp.SetRate(currentRate - 1, USE_INSTANT_WARP, DISPLAY_MESSAGE);
@@ -141,7 +128,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                         Debug.Log("Simpit : Already at min warp rate.");
                     }
                     break;
-                case WarpControlValues.timewarpNextManeuver:
+                case WarpControlValues.warpNextManeuver:
                     double timeOfNextManeuver = -1;
                     if (FlightGlobals.ActiveVessel.patchedConicSolver != null)
                     {
@@ -149,45 +136,48 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                         {
                             List<ManeuverNode> maneuvers = FlightGlobals.ActiveVessel.patchedConicSolver.maneuverNodes;
 
-                            if (maneuvers.Count > 0)
+                            if (maneuvers[0] != null)
                             {
                                 timeOfNextManeuver = maneuvers[0].UT;
                             }
                         }
                     }
 
-                    if(timeOfNextManeuver > 0)
+                    if (timeOfNextManeuver > 0)
                     {
                         TimeWarp.fetch.WarpTo(timeOfNextManeuver);
-                    } else
+                    }
+                    else
                     {
-                        Debug.Log("Simpit : Cannot warp to next maneuver since I could not locate the next maneuver");
+                        Debug.Log("Simpit : Cannot warp to next maneuver since the next maneuver could not be located");
                     }
                     break;
-                case WarpControlValues.timewarpSOIChange:
+                case WarpControlValues.warpSOIChange:
                     Orbit.PatchTransitionType orbitType = FlightGlobals.ActiveVessel.GetOrbit().patchEndTransition;
 
-                    if(orbitType == Orbit.PatchTransitionType.ENCOUNTER ||
+                    if (orbitType == Orbit.PatchTransitionType.ENCOUNTER ||
                         orbitType == Orbit.PatchTransitionType.ESCAPE)
                     {
                         TimeWarp.fetch.WarpTo(FlightGlobals.ActiveVessel.GetOrbit().EndUT);
-                    } else
+                    }
+                    else
                     {
                         Debug.Log("Simpit : There is no SOI change to warp to. Orbit type : " + orbitType);
                     }
                     break;
-                case WarpControlValues.timewarpApoapsis:
+                case WarpControlValues.warpApoapsis:
                     double timeToApoapsis = FlightGlobals.ActiveVessel.GetOrbit().timeToAp;
-                    if(Double.IsNaN(timeToApoapsis) || Double.IsInfinity(timeToApoapsis))
+                    if (Double.IsNaN(timeToApoapsis) || Double.IsInfinity(timeToApoapsis))
                     {
                         //This can happen in an escape trajectory for instance
                         Debug.Log("Simpit : Cannot warp to apoasis since there is no apoapsis");
-                    } else
+                    }
+                    else
                     {
                         TimeWarp.fetch.WarpTo(Planetarium.GetUniversalTime() + timeToApoapsis);
                     }
                     break;
-                case WarpControlValues.timewarpPeriapsis:
+                case WarpControlValues.warpPeriapsis:
                     double timeToPeriapsis = FlightGlobals.ActiveVessel.GetOrbit().timeToPe;
                     if (Double.IsNaN(timeToPeriapsis) || Double.IsInfinity(timeToPeriapsis))
                     {
@@ -199,7 +189,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                         TimeWarp.fetch.WarpTo(Planetarium.GetUniversalTime() + timeToPeriapsis);
                     }
                     break;
-                case WarpControlValues.timewarpCancelAutoWarp:
+                case WarpControlValues.warpCancelAutoWarp:
                     TimeWarp.fetch.CancelAutoWarp();
                     TimeWarp.SetRate(0, USE_INSTANT_WARP, DISPLAY_MESSAGE);
                     break;
