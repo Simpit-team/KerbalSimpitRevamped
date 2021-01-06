@@ -110,23 +110,24 @@ namespace KerbalSimpit
 
     public static class WarpControlValues
     {
-        public const byte timewarp1 = 0;
-        public const byte timewarp5 = 1;
-        public const byte timewarp10 = 2;
-        public const byte timewarp50 = 3;
-        public const byte timewarp100 = 4;
-        public const byte timewarp1000 = 5;
-        public const byte timewarp10000 = 6;
-        public const byte timewarp100000 = 7;
-        public const byte timewarpPhysical2 = 8;
-        public const byte timewarpPhysical3 = 9;
-        public const byte timewarpPhysical4 = 10;
-        public const byte timewarpUp = 11;
-        public const byte timewarpDown = 12;
-        public const byte timewarpNextManeuver = 13;
-        public const byte timewarpSOIChange = 14;
-        public const byte timewarpApoapsis = 15;
-        public const byte timewarpPeriapsis = 16;
-        public const byte timewarpCancelAutoWarp = 17;
+        public const byte warpRate1 = 0;
+        public const byte warpRate2 = 1;
+        public const byte warpRate3 = 2;
+        public const byte warpRate4 = 3;
+        public const byte warpRate5 = 4;
+        public const byte warpRate6 = 5;
+        public const byte warpRate7 = 6;
+        public const byte warpRate8 = 7;
+        public const byte warpRatePhys1 = 8;
+        public const byte warpRatePhys2 = 9;
+        public const byte warpRatePhys3 = 10;
+        public const byte warpRatePhys4 = 11;
+        public const byte warpRateUp = 12;
+        public const byte warpRateDown = 13;
+        public const byte warpNextManeuver = 14;
+        public const byte warpSOIChange = 15;
+        public const byte warpApoapsis = 16;
+        public const byte warpPeriapsis = 17;
+        public const byte warpCancelAutoWarp = 255;
     }
 }
