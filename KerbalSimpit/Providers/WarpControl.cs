@@ -14,6 +14,8 @@ namespace KerbalSimpit.KerbalSimpit.Providers
 
         private const bool USE_INSTANT_WARP = false;
         private const bool DISPLAY_MESSAGE = false; //When true, each call to Timewarp.SetRate crashes KSP on my computer
+        private const int MAX_WARP_RATE = 1000;
+        private const int MIN_WARP_RATE = 1;
 
         public void Start()
         {
@@ -145,7 +147,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
 
                     if (timeOfNextManeuver > 0)
                     {
-                        TimeWarp.fetch.WarpTo(timeOfNextManeuver);
+                        TimeWarp.fetch.WarpTo(timeOfNextManeuver, MAX_WARP_RATE, MIN_WARP_RATE);
                     }
                     else
                     {
@@ -158,7 +160,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                     if (orbitType == Orbit.PatchTransitionType.ENCOUNTER ||
                         orbitType == Orbit.PatchTransitionType.ESCAPE)
                     {
-                        TimeWarp.fetch.WarpTo(FlightGlobals.ActiveVessel.GetOrbit().EndUT);
+                        TimeWarp.fetch.WarpTo(FlightGlobals.ActiveVessel.GetOrbit().EndUT, MAX_WARP_RATE, MIN_WARP_RATE);
                     }
                     else
                     {
@@ -174,7 +176,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                     }
                     else
                     {
-                        TimeWarp.fetch.WarpTo(Planetarium.GetUniversalTime() + timeToApoapsis);
+                        TimeWarp.fetch.WarpTo(Planetarium.GetUniversalTime() + timeToApoapsis, MAX_WARP_RATE, MIN_WARP_RATE);
                     }
                     break;
                 case WarpControlValues.warpPeriapsis:
@@ -186,7 +188,20 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                     }
                     else
                     {
-                        TimeWarp.fetch.WarpTo(Planetarium.GetUniversalTime() + timeToPeriapsis);
+                        TimeWarp.fetch.WarpTo(Planetarium.GetUniversalTime() + timeToPeriapsis, MAX_WARP_RATE, MIN_WARP_RATE);
+                    }
+                    break;
+                case WarpControlValues.warpNextMorning:
+                    Vessel vessel = FlightGlobals.ActiveVessel;
+                    if (vessel.situation == Vessel.Situations.LANDED || 
+                        vessel.situation == Vessel.Situations.SPLASHED || 
+                        vessel.situation == Vessel.Situations.PRELAUNCH)
+                    {
+                        double timeToMorning = OrbitalComputations.TimeToDaylight(vessel.latitude, vessel.longitude, vessel.mainBody);
+                        TimeWarp.fetch.WarpTo(Planetarium.GetUniversalTime() + timeToMorning, MAX_WARP_RATE, MIN_WARP_RATE);
+                    } else
+                    {
+                        Debug.Log("[SimPit] Cannot warp to next morning if not landed or splashed");
                     }
                     break;
                 case WarpControlValues.warpCancelAutoWarp:
