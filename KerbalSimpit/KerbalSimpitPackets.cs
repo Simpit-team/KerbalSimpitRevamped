@@ -128,6 +128,7 @@ namespace KerbalSimpit
         public const byte warpSOIChange = 15;
         public const byte warpApoapsis = 16;
         public const byte warpPeriapsis = 17;
+        public const byte warpNextMorning = 18;
         public const byte warpCancelAutoWarp = 255;
     }
 }
