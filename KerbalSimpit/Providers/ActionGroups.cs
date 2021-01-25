@@ -164,8 +164,8 @@ namespace KerbalSimpit.Providers
                 {
                     AGXActivateGroupDelayCheck(idx, true);
                 } else {
-                    FlightGlobals.ActiveVessel.ActionGroups.SetGroup
-                        (ActionGroupIDs[idx], true);
+                    UnityMainThreadDispatcher.Instance().Enqueue(() => FlightGlobals.ActiveVessel.ActionGroups.SetGroup(ActionGroupIDs[idx], true));
+
                 }
             }
         }
@@ -181,8 +181,7 @@ namespace KerbalSimpit.Providers
                 {
                     AGXActivateGroupDelayCheck(idx, false);
                 } else {
-                    FlightGlobals.ActiveVessel.ActionGroups.SetGroup
-                        (ActionGroupIDs[idx], false);
+                    UnityMainThreadDispatcher.Instance().Enqueue(() => FlightGlobals.ActiveVessel.ActionGroups.SetGroup(ActionGroupIDs[idx], false));
                 }
             }
         }
@@ -198,8 +197,7 @@ namespace KerbalSimpit.Providers
                 {
                     AGXToggleGroupDelayCheck(idx);
                 } else {
-                    FlightGlobals.ActiveVessel.ActionGroups.ToggleGroup
-                        (ActionGroupIDs[idx]);
+                    UnityMainThreadDispatcher.Instance().Enqueue(() => FlightGlobals.ActiveVessel.ActionGroups.ToggleGroup(ActionGroupIDs[idx]));
                 }
             }
         }
