@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace KerbalSimpit.KerbalSimpit
+namespace KerbalSimpit.Utilities
 {
 	/** This class is mainly used to compute the time of the next morning given a 
 	 * celestial body and a location. Inspired by the EarlyBird mod by taniwha*/
