@@ -45,7 +45,8 @@ namespace KerbalSimpit
         // External Environment
         public static byte TargetInfo = 50;
         public static byte SoIName = 51;
-        public static byte SceneChange = 52;   
+        public static byte SceneChange = 52;
+        public static byte TimeKeeperInfo = 53;
     }
 
     public static class InboundPackets
