@@ -194,15 +194,23 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                     break;
                 case WarpControlValues.warpNextMorning:
                     Vessel vessel = FlightGlobals.ActiveVessel;
-                    if (vessel.situation == Vessel.Situations.LANDED || 
-                        vessel.situation == Vessel.Situations.SPLASHED || 
-                        vessel.situation == Vessel.Situations.PRELAUNCH)
+                    if (TimeWarp.CurrentRate > 1)
                     {
-                        double timeToMorning = OrbitalComputations.TimeToDaylight(vessel.latitude, vessel.longitude, vessel.mainBody);
-                        TimeWarp.fetch.WarpTo(Planetarium.GetUniversalTime() + timeToMorning, MAX_WARP_RATE, MIN_WARP_RATE);
-                    } else
+                        Debug.Log("Cannot Timewarp to next morning while already timewarping");
+                    }
+                    else
                     {
-                        Debug.Log("[SimPit] Cannot warp to next morning if not landed or splashed");
+                        if (vessel.situation == Vessel.Situations.LANDED ||
+                            vessel.situation == Vessel.Situations.SPLASHED ||
+                            vessel.situation == Vessel.Situations.PRELAUNCH)
+                        {
+                            double timeToMorning = OrbitalComputations.TimeToDaylight(vessel.latitude, vessel.longitude, vessel.mainBody);
+                            TimeWarp.fetch.WarpTo(Planetarium.GetUniversalTime() + timeToMorning, MAX_WARP_RATE, MIN_WARP_RATE);
+                        }
+                        else
+                        {
+                            Debug.Log("[SimPit] Cannot warp to next morning if not landed or splashed");
+                        }
                     }
                     break;
                 case WarpControlValues.warpCancelAutoWarp:
