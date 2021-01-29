@@ -39,6 +39,8 @@ Also - I'm looking for additional maintainers who are still actively using this 
 
 ### Modifiation for integration into Kerbal Simpit
 
+The original code can be found here : https://github.com/PimDeWitte/UnityMainThreadDispatcher
+
 A modification to run it as a KSP Addon (Adding the line ```[KSPAddon(KSPAddon.Startup.AllGameScenes, false)]```)
 
 A modification to allow using it without prefab (in ```public static UnityMainThreadDispatcher Instance()```)
