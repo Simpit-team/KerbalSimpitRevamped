@@ -218,15 +218,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
 
         private void safeWarpTo(double UT)
         {
-            if (TimeWarp.CurrentRate > 1)
-            {
-                Debug.Log("Cannot use \"Timewarp to\" while already timewarping");
-            }
-            else
-            {
-                TimeWarp.fetch.WarpTo(UT, MAX_WARP_RATE, MIN_WARP_RATE);
-            }
-
+            UnityMainThreadDispatcher.Instance().Enqueue(() => TimeWarp.fetch.WarpTo(UT, MAX_WARP_RATE, MIN_WARP_RATE));
         }
     }
 }
