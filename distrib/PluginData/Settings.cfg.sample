@@ -8,4 +8,18 @@ KerbalSimpit
 		PortName = COM1
 		BaudRate = 115200
 	}
+	CustomResourceMessages
+	{
+		resourceName1 = None
+		resourceName2 = None
+		resourceName3 = None
+		resourceName4 = None
+	}
+	CustomResourceMessages
+	{
+		resourceName1 = None
+		resourceName2 = None
+		resourceName3 = None
+		resourceName4 = None
+	}
 }
