@@ -62,4 +62,9 @@
   <Target Name="FakeBuild">
     <Message Text="Using $(KSPLIBDIR)/UnityEngine.dll"/>
   </Target>
+  <Target Name="Install Mod">
+    <!-- Executes the Batch file to copy the required mod files over to the game installation-->
+    <Exec Command = "WindowsDevInstall.bat"/>
+  </Target>
+  <Target Name="Build and Install" DependsOnTargets="FakeBuild; Install Mod"> </Target>
 </Project>

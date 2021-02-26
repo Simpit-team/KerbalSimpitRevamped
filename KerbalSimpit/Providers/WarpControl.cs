@@ -148,7 +148,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
 
                     if (timeOfNextManeuver > 0)
                     {
-                        TimeWarp.fetch.WarpTo(timeOfNextManeuver, MAX_WARP_RATE, MIN_WARP_RATE);
+                        safeWarpTo(timeOfNextManeuver);
                     }
                     else
                     {
@@ -161,7 +161,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                     if (orbitType == Orbit.PatchTransitionType.ENCOUNTER ||
                         orbitType == Orbit.PatchTransitionType.ESCAPE)
                     {
-                        TimeWarp.fetch.WarpTo(FlightGlobals.ActiveVessel.GetOrbit().EndUT, MAX_WARP_RATE, MIN_WARP_RATE);
+                        safeWarpTo(FlightGlobals.ActiveVessel.GetOrbit().EndUT);
                     }
                     else
                     {
@@ -177,7 +177,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                     }
                     else
                     {
-                        TimeWarp.fetch.WarpTo(Planetarium.GetUniversalTime() + timeToApoapsis, MAX_WARP_RATE, MIN_WARP_RATE);
+                        safeWarpTo(Planetarium.GetUniversalTime() + timeToApoapsis);
                     }
                     break;
                 case WarpControlValues.warpPeriapsis:
@@ -189,18 +189,20 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                     }
                     else
                     {
-                        TimeWarp.fetch.WarpTo(Planetarium.GetUniversalTime() + timeToPeriapsis, MAX_WARP_RATE, MIN_WARP_RATE);
+                        safeWarpTo(Planetarium.GetUniversalTime() + timeToPeriapsis);
                     }
                     break;
                 case WarpControlValues.warpNextMorning:
                     Vessel vessel = FlightGlobals.ActiveVessel;
-                    if (vessel.situation == Vessel.Situations.LANDED || 
-                        vessel.situation == Vessel.Situations.SPLASHED || 
+
+                    if (vessel.situation == Vessel.Situations.LANDED ||
+                        vessel.situation == Vessel.Situations.SPLASHED ||
                         vessel.situation == Vessel.Situations.PRELAUNCH)
                     {
                         double timeToMorning = OrbitalComputations.TimeToDaylight(vessel.latitude, vessel.longitude, vessel.mainBody);
-                        TimeWarp.fetch.WarpTo(Planetarium.GetUniversalTime() + timeToMorning, MAX_WARP_RATE, MIN_WARP_RATE);
-                    } else
+                        safeWarpTo(Planetarium.GetUniversalTime() + timeToMorning);
+                    }
+                    else
                     {
                         Debug.Log("[SimPit] Cannot warp to next morning if not landed or splashed");
                     }
@@ -212,6 +214,19 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                 default:
                     break;
             }
+        }
+
+        private void safeWarpTo(double UT)
+        {
+            if (TimeWarp.CurrentRate > 1)
+            {
+                Debug.Log("Cannot use \"Timewarp to\" while already timewarping");
+            }
+            else
+            {
+                TimeWarp.fetch.WarpTo(UT, MAX_WARP_RATE, MIN_WARP_RATE);
+            }
+
         }
     }
 }
