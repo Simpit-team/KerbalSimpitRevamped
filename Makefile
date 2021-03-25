@@ -26,10 +26,10 @@ endif
 
 # INSTALLDIR
 # Where to install the plugin
-INSTALLDIR= install
+INSTALLDIR= install/KerbalSimpit/
 # CONFIGDIR
 # Where the plugin's configuration files are stored
-CONFIGDIR=$(KSPDIR)/PluginData/KerbalSimpit
+CONFIGDIR=$(KSPDIR)/GameData/KerbalSimpit/
 
 # Shouldn't need to change variables below here
 MSBUILD=msbuild
@@ -54,8 +54,10 @@ KerbalSimpit.dll:Properties/AssemblyInfo.cs
 	$(MSBUILD) /p:Configuration=$(CONFIG) Main.csproj
 
 install:all
+	mkdir -p $(INSTALLDIR)
 	cp Bin/KerbalSimpit.dll $(INSTALLDIR)
-	cp Localisation/*.cfg $(INSTALLDIR)
+	mkdir -p $(INSTALLDIR)/Localisations
+	cp Localisation/*.cfg $(INSTALLDIR)/Localisations
 
 clean:
 	$(MSBUILD) /p:Configuration=$(CONFIG) /t:Clean Main.csproj

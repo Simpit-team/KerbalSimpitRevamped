@@ -58,12 +58,13 @@ namespace KerbalSimpit.Config
         // public members that aren't persisted in the config file:
         public int EventQueueSize = 32;
 
-        public List <SerialPortNode> SerialPorts = new List <SerialPortNode> {};
-        public List <CustomResourceMessage> CustomResourceMessages = new List<CustomResourceMessage> { };
+        public List<SerialPortNode> SerialPorts = new List<SerialPortNode> { };
+        public List<CustomResourceMessage> CustomResourceMessages = new List<CustomResourceMessage> { };
 
         // Other internal fields follow
         private const string SettingsNodeName = "KerbalSimpit";
-        private const string SettingsFile = "PluginData/Settings.cfg";
+        //private const string SettingsFile = "PluginData/Settings.cfg";
+        private const string SettingsFile = "Settings.cfg";
 
         private string FullSettingsPath;
 
@@ -97,7 +98,8 @@ namespace KerbalSimpit.Config
                     ConfigNode config = node.GetNode(SettingsNodeName);
                     ConfigNode.LoadObjectFromConfig(this, config);
                     ConfigNode[] portNodes = config.GetNodes("SerialPort");
-                    for (int i=0; i<portNodes.Length; i++) {
+                    for (int i = 0; i < portNodes.Length; i++)
+                    {
                         SerialPortNode portNode = new SerialPortNode();
                         ConfigNode.LoadObjectFromConfig(portNode, portNodes[i]);
                         SerialPorts.Add(portNode);
@@ -119,7 +121,9 @@ namespace KerbalSimpit.Config
                 {
                     Debug.Log(String.Format("KerbalSimpit: Settings file couldn't be read: {0}", e));
                 }
-            } else {
+            }
+            else
+            {
                 Debug.Log(String.Format("KerbalSimpit: Settings file not found: {0}", FullSettingsPath));
             }
 
@@ -132,7 +136,8 @@ namespace KerbalSimpit.Config
             {
                 ConfigNode node = new ConfigNode(SettingsNodeName);
                 node = ConfigNode.CreateConfigFromObject(this, node);
-                for (int i=0; i<SerialPorts.Count; i++) {
+                for (int i = 0; i < SerialPorts.Count; i++)
+                {
                     ConfigNode portNode = new ConfigNode("SerialPort");
                     portNode = ConfigNode.CreateConfigFromObject(SerialPorts[i], portNode);
                     node.AddNode(portNode);
@@ -160,7 +165,32 @@ namespace KerbalSimpit.Config
 
         private void CreateDefaultSettings()
         {
-            SerialPortNode defaultPort = new SerialPortNode("/dev/ttyS0", 115200);
+
+            // Switch based on OS sourced from stackoverflow: https://softwarerecs.stackexchange.com/a/13722
+            OperatingSystem os = Environment.OSVersion;
+            PlatformID pid = os.Platform;
+
+            String defaultSerialPort = "unknown";
+
+            // Switches based on the OS, to populate the config with a more user friendly default serial port value
+            switch (pid)
+            {
+                case PlatformID.Win32NT:
+                case PlatformID.Win32S:
+                case PlatformID.Win32Windows:
+                case PlatformID.WinCE:
+                    defaultSerialPort = "COM1";
+                    break;
+                case PlatformID.Unix:
+                case PlatformID.MacOSX:
+                    defaultSerialPort = "/dev/ttyS0";
+                    break;
+                default:
+                    Debug.Log("Unknown Platform to populate the default serial port for!");
+                    break;
+            }
+
+            SerialPortNode defaultPort = new SerialPortNode(defaultSerialPort, 115200);
             SerialPorts.Add(defaultPort);
             CustomResourceMessages.Add(new CustomResourceMessage());
             CustomResourceMessages.Add(new CustomResourceMessage());
