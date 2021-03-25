@@ -43,7 +43,7 @@
     <Compile Include="KerbalSimpit\KerbalSimpitPackets.cs" />
     <Compile Include="KerbalSimpit\External\ARPWrapper.cs" />
     <Compile Include="KerbalSimpit\Providers\*.cs" />
-    <Compile Include="KerbalSimpit\Utilities.cs" />
+    <Compile Include="KerbalSimpit\Utilities\*.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="KerbalSimpit\Console\*.cs"/>
     <Compile Include="KerbalSimpit\Localisation_Libs\*.cs"/>
@@ -52,4 +52,9 @@
   <Target Name="FakeBuild">
     <Message Text="Using $(KSPLIBDIR)/UnityEngine.dll"/>
   </Target>
+  <Target Name="Install Mod">
+    <!-- Executes the Batch file to copy the required mod files over to the game installation-->
+    <Exec Command = "WindowsDevInstall.bat"/>
+  </Target>
+  <Target Name="Build and Install" DependsOnTargets="FakeBuild; Install Mod"> </Target>
 </Project>
