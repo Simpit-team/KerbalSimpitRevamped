@@ -59,7 +59,8 @@ namespace KerbalSimpit.Config
         public int EventQueueSize = 32;
 
         public List<SerialPortNode> SerialPorts = new List<SerialPortNode> { };
-    
+        public List<CustomResourceMessage> CustomResourceMessages = new List<CustomResourceMessage> { };
+
         // Other internal fields follow
         private const string SettingsNodeName = "KerbalSimpit";
         //private const string SettingsFile = "PluginData/Settings.cfg";
