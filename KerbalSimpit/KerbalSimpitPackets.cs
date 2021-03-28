@@ -67,6 +67,7 @@ namespace KerbalSimpit
         public static byte CameraRotation = 22;
         public static byte CameraTranslation = 23;
         public static byte WarpChange = 24;
+        public static byte CustomLog = 25;
     }
 
     public static class CameraControlBits
@@ -130,5 +131,12 @@ namespace KerbalSimpit
         public const byte warpPeriapsis = 17;
         public const byte warpNextMorning = 18;
         public const byte warpCancelAutoWarp = 255;
+    }
+
+    public static class CustomLogBits
+    {
+        public static byte Verbose = 1;
+        public static byte PrintToScreen = 2;
+        public static byte NoHeader = 4;
     }
 }
