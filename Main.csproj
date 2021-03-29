@@ -57,6 +57,7 @@
     <Compile Include="KerbalSimpit\Console\*.cs"/>
     <Compile Include="KerbalSimpit\SimpitGUI\*.cs"/>
     <Compile Include="KerbalSimpit\Localisation_Libs\*.cs"/>
+    <Compile Include="KerbalSimpit\Contrib\UnityMainThreadDispatcher\*.cs"/>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="FakeBuild">
