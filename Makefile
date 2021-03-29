@@ -57,7 +57,7 @@ install:all
 	mkdir -p $(INSTALLDIR)
 	cp Bin/KerbalSimpit.dll $(INSTALLDIR)
 	mkdir -p $(INSTALLDIR)/Localisations
-	cp Localisation/*.cfg $(INSTALLDIR)/Localisations
+	cp KerbalSimpit/Localisation/*.cfg $(INSTALLDIR)/Localisations
 
 clean:
 	$(MSBUILD) /p:Configuration=$(CONFIG) /t:Clean Main.csproj
