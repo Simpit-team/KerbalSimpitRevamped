@@ -142,6 +142,11 @@ namespace KerbalSimpit.Providers
             }
         }
 
+        public void resendSOI()
+        {
+            CurrentSoI = "";
+        }
+
         public void AltitudeProvider()
         {
             myAlt.alt = (float)FlightGlobals.ActiveVessel.altitude;

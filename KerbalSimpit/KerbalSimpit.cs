@@ -316,6 +316,14 @@ namespace KerbalSimpit
                     Debug.Log(String.Format("KerbalSimpit: Serial port {0} subscribing to channel {1}", portID, idx));
                 }
                 toSerialArray[idx].Add(SerialPorts[portID].sendPacket);
+
+                // Since the SOI name is only updated when it changes, it is not sent after the channel registration.
+                // For now, when the channel subscribed is the current SOI, force the sending of a SOI packet.
+                if(idx == OutboundPackets.SoIName)
+                {
+                    Providers.KerbalSimpitTelemetryProvider telemetry = (Providers.KerbalSimpitTelemetryProvider) FindObjectOfType(typeof(Providers.KerbalSimpitTelemetryProvider));
+                    telemetry.resendSOI();
+                }
             }
         }
 
