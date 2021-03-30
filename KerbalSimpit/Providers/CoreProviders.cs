@@ -11,6 +11,7 @@ namespace KerbalSimpit.Providers
         private EventData<byte, object> echoRequestEvent;
         private EventData<byte, object> echoReplyEvent;
         private EventData<byte, object> customLogEvent;
+        private EventData<byte, object> sceneChangeEvent;
 
         public void Start()
         {
@@ -20,6 +21,11 @@ namespace KerbalSimpit.Providers
             if (echoReplyEvent != null) echoReplyEvent.Add(EchoReplyCallback);
             customLogEvent = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + InboundPackets.CustomLog);
             if (customLogEvent != null) customLogEvent.Add(CustomLogCallback);
+
+            sceneChangeEvent = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.SceneChange);
+
+            GameEvents.onFlightReady.Add(FlightReadyHandler);
+            GameEvents.onGameSceneSwitchRequested.Add(FlightShutdownHandler);
         }
 
         public void OnDestroy()
@@ -27,6 +33,9 @@ namespace KerbalSimpit.Providers
             if (echoRequestEvent != null) echoRequestEvent.Remove(EchoRequestCallback);
             if (echoReplyEvent != null) echoReplyEvent.Remove(EchoReplyCallback);
             if (customLogEvent != null) customLogEvent.Remove(CustomLogCallback);
+
+            GameEvents.onFlightReady.Remove(FlightReadyHandler);
+            GameEvents.onGameSceneSwitchRequested.Remove(FlightShutdownHandler);
         }
 
         public void EchoRequestCallback(byte ID, object Data)
@@ -60,6 +69,26 @@ namespace KerbalSimpit.Providers
             if ((logStatus & CustomLogBits.Verbose) == 0 || KSPit.Config.Verbose)
             {
                 Debug.Log(message);
+            }
+        }
+
+        private void FlightReadyHandler()
+        {
+            if (sceneChangeEvent != null)
+            {
+                sceneChangeEvent.Fire(OutboundPackets.SceneChange, 0x00);
+            }
+        }
+
+        private void FlightShutdownHandler(GameEvents.FromToAction
+                                           <GameScenes, GameScenes> scenes)
+        {
+            if (scenes.from == GameScenes.FLIGHT)
+            {
+                if (sceneChangeEvent != null)
+                {
+                    sceneChangeEvent.Fire(OutboundPackets.SceneChange, 0x01);
+                }
             }
         }
     }
