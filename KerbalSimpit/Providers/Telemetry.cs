@@ -37,6 +37,20 @@ namespace KerbalSimpit.Providers
             public float vertical;
         }
 
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        [Serializable]
+        public struct OrbitInfoStruct
+        {
+            public float eccentricity;
+            public float semiMajorAxis;
+            public float inclination;
+            public float longAscendingNode;
+            public float argPeriapsis;
+            public float trueAnomaly;
+            public float meanAnomaly;
+            public float period;
+        }
+
         [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
         public struct AirspeedStruct
         {
@@ -84,9 +98,10 @@ namespace KerbalSimpit.Providers
         private DeltaVStruct myDeltaVStruct;
         private DeltaVEnvStruct myDeltaVEnvStruct;
         private BurnTimeStruct myBurnTimeStruct;
+        private OrbitInfoStruct myOrbitInfoStruct;
 
         private EventData<byte, object> altitudeChannel, apsidesChannel,
-            apsidesTimeChannel, velocityChannel, soiChannel, airspeedChannel,
+            apsidesTimeChannel, ortbitInfoChannel, velocityChannel, soiChannel, airspeedChannel,
             maneuverChannel, deltaVChannel, deltaVEnvChannel, burnTimeChannel;
 
         private string CurrentSoI;
@@ -99,6 +114,8 @@ namespace KerbalSimpit.Providers
             apsidesChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial33");
             KSPit.AddToDeviceHandler(ApsidesTimeProvider);
             apsidesTimeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial34");
+            KSPit.AddToDeviceHandler(OrbitInfoProvider);
+            ortbitInfoChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.OrbitInfo);
             KSPit.AddToDeviceHandler(VelocityProvider);
             maneuverChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial35");
             KSPit.AddToDeviceHandler(ManeuverProvider);
@@ -122,6 +139,7 @@ namespace KerbalSimpit.Providers
             KSPit.RemoveToDeviceHandler(AltitudeProvider);
             KSPit.RemoveToDeviceHandler(ApsidesProvider);
             KSPit.RemoveToDeviceHandler(ApsidesTimeProvider);
+            KSPit.RemoveToDeviceHandler(OrbitInfoProvider);
             KSPit.RemoveToDeviceHandler(VelocityProvider);
             KSPit.RemoveToDeviceHandler(AirspeedProvider);
             KSPit.RemoveToDeviceHandler(ManeuverProvider);
@@ -169,6 +187,20 @@ namespace KerbalSimpit.Providers
             myVelocity.surface = (float)FlightGlobals.ActiveVessel.srfSpeed;
             myVelocity.vertical = (float)FlightGlobals.ActiveVessel.verticalSpeed;
             if (velocityChannel != null) velocityChannel.Fire(OutboundPackets.Velocities, myVelocity);
+        }
+
+        public void OrbitInfoProvider()
+        {
+            Orbit currentOrbit = FlightGlobals.ActiveVessel.orbit;
+            myOrbitInfoStruct.eccentricity = (float) currentOrbit.eccentricity;
+            myOrbitInfoStruct.semiMajorAxis = (float)currentOrbit.semiMajorAxis;
+            myOrbitInfoStruct.inclination = (float)currentOrbit.inclination;
+            myOrbitInfoStruct.longAscendingNode = (float)currentOrbit.LAN;
+            myOrbitInfoStruct.argPeriapsis = (float)currentOrbit.argumentOfPeriapsis;
+            myOrbitInfoStruct.trueAnomaly = (float)currentOrbit.trueAnomaly;
+            myOrbitInfoStruct.meanAnomaly = (float)currentOrbit.meanAnomaly;
+            myOrbitInfoStruct.period = (float)currentOrbit.period;
+            if (ortbitInfoChannel != null) ortbitInfoChannel.Fire(OutboundPackets.OrbitInfo, myOrbitInfoStruct);
         }
 
         public void AirspeedProvider()
