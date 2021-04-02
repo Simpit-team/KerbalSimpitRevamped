@@ -186,23 +186,32 @@ namespace KerbalSimpit.Providers
             {
                 return null; //This happen in EVA for instance.
             }
-
             DeltaVStageInfo currentStageInfo = null;
-            if (FlightGlobals.ActiveVessel.currentStage == FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count)
+
+            try
             {
-                // Rocket has not taken off, use first stage with deltaV (to avoid stage of only stabilizer)
-                for (int i = FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count - 1; i >= 0; i--)
+                if (FlightGlobals.ActiveVessel.currentStage == FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count)
                 {
-                    currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(i);
-                    if (currentStageInfo.deltaVActual > 0)
+                    // Rocket has not taken off, use first stage with deltaV (to avoid stage of only stabilizer)
+                    for (int i = FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count - 1; i >= 0; i--)
                     {
-                        break;
+                        currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(i);
+                        if (currentStageInfo.deltaVActual > 0)
+                        {
+                            break;
+                        }
                     }
                 }
+                else
+                {
+                    currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(FlightGlobals.ActiveVessel.currentStage);
+                }
             }
-            else
+            catch (NullReferenceException)
             {
-                currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(FlightGlobals.ActiveVessel.currentStage);
+                // This happens when reverting a flight.
+                // FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo is not null but using it produce a
+                // NullReferenceException in KSP code. This is probably due to the fact that the rocket is not fully initialized.
             }
 
             return currentStageInfo;
