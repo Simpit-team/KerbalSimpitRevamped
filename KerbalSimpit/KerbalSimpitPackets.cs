@@ -69,6 +69,7 @@ namespace KerbalSimpit
         public static byte CameraTranslation = 23;
         public static byte WarpChange = 24;
         public static byte CustomLog = 25;
+        public static byte KeyboardEmulator = 26;
     }
 
     public static class CameraControlBits
@@ -140,4 +141,11 @@ namespace KerbalSimpit
         public static byte PrintToScreen = 2;
         public static byte NoHeader = 4;
     }
+
+    public static class KeyboardEmulatorModifier
+    {
+        public static byte SHIFT_MOD = 1;
+        public static byte CTRL_MOD = 2;
+        public static byte ALT_MOD = 4;
+    };
 }
