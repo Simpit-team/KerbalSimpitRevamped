@@ -26,6 +26,10 @@ namespace KerbalSimpit
         public static byte Ore = 21;
         public static byte Ablator = 22;
         public static byte AblatorStage = 23;
+        public static byte TACLSResource = 24;
+        public static byte TACLSWaste = 25;
+        public static byte CustomResource1 = 26;
+        public static byte CustomResource2 = 27;
 
         // Vessel Movement/Postion
         public static byte Altitude = 30;

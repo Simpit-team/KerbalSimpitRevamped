@@ -25,6 +25,23 @@ namespace KerbalSimpit.Config
         }
     }
 
+    public class CustomResourceMessage
+    {
+        [Persistent]
+        public string resourceName1;
+        [Persistent]
+        public string resourceName2;
+        [Persistent]
+        public string resourceName3;
+        [Persistent]
+        public string resourceName4;
+
+        public CustomResourceMessage()
+        {
+            // Nothing
+        }
+    }
+
     public class KerbalSimpitConfig
     {
         public string DocoUrl = "https://bitbucket.org/pjhardy/kerbalsimpit/wiki/PluginConfiguration.md";
@@ -42,6 +59,7 @@ namespace KerbalSimpit.Config
         public int EventQueueSize = 32;
 
         public List<SerialPortNode> SerialPorts = new List<SerialPortNode> { };
+        public List<CustomResourceMessage> CustomResourceMessages = new List<CustomResourceMessage> { };
 
         // Other internal fields follow
         private const string SettingsNodeName = "KerbalSimpit";
@@ -86,6 +104,13 @@ namespace KerbalSimpit.Config
                         ConfigNode.LoadObjectFromConfig(portNode, portNodes[i]);
                         SerialPorts.Add(portNode);
                     }
+                    ConfigNode[] customResources = config.GetNodes("CustomResourceMessages");
+                    for (int i = 0; i < customResources.Length; i++)
+                    {
+                        CustomResourceMessage customResource = new CustomResourceMessage();
+                        ConfigNode.LoadObjectFromConfig(customResource, customResources[i]);
+                        CustomResourceMessages.Add(customResource);
+                    }
                     // Rewrite Documentation parameter on every run,
                     // so we know it's always pointing at what should
                     // be the right place.
@@ -116,6 +141,12 @@ namespace KerbalSimpit.Config
                     ConfigNode portNode = new ConfigNode("SerialPort");
                     portNode = ConfigNode.CreateConfigFromObject(SerialPorts[i], portNode);
                     node.AddNode(portNode);
+                }
+                for (int i = 0; i < CustomResourceMessages.Count; i++)
+                {
+                    ConfigNode resourceNode = new ConfigNode("CustomResourceMessages");
+                    resourceNode = ConfigNode.CreateConfigFromObject(CustomResourceMessages[i], resourceNode);
+                    node.AddNode(resourceNode);
                 }
                 ConfigNode wrapper = new ConfigNode(SettingsNodeName);
                 wrapper.AddNode(node);
@@ -161,6 +192,8 @@ namespace KerbalSimpit.Config
 
             SerialPortNode defaultPort = new SerialPortNode(defaultSerialPort, 115200);
             SerialPorts.Add(defaultPort);
+            CustomResourceMessages.Add(new CustomResourceMessage());
+            CustomResourceMessages.Add(new CustomResourceMessage());
             SaveSettings();
         }
     }
