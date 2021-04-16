@@ -92,7 +92,10 @@ namespace KerbalSimpit.Providers
             byte newState = getGroups();
             if (newState != currentStateBuffer)
             {
-                if (AGStateChannel != null) AGStateChannel.Fire(OutboundPackets.ActionGroups, newState);
+                if (AGStateChannel != null) {
+                    AGStateChannel.Fire(OutboundPackets.ActionGroups, newState);
+                    currentStateBuffer = newState;
+                }
                 return true;
             } else {
                 return false;
