@@ -89,6 +89,14 @@ namespace KerbalSimpit.Providers
             public float totalBurnTime;
         }
 
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        [Serializable]
+        public struct TempLimitStruct
+        {
+            public byte tempLimitPercentage;
+            public byte skinTempLimitPercentage;
+        }
+
         private AltitudeStruct myAlt;
         private ApsidesStruct myApsides;
         private ApsidesTimeStruct myApsidesTime;
@@ -99,10 +107,11 @@ namespace KerbalSimpit.Providers
         private DeltaVEnvStruct myDeltaVEnvStruct;
         private BurnTimeStruct myBurnTimeStruct;
         private OrbitInfoStruct myOrbitInfoStruct;
+        private TempLimitStruct myTempLimitStruct;
 
         private EventData<byte, object> altitudeChannel, apsidesChannel,
             apsidesTimeChannel, ortbitInfoChannel, velocityChannel, soiChannel, airspeedChannel,
-            maneuverChannel, deltaVChannel, deltaVEnvChannel, burnTimeChannel;
+            maneuverChannel, deltaVChannel, deltaVEnvChannel, burnTimeChannel, tempLimitChannel;
 
         private string CurrentSoI;
 
@@ -132,6 +141,8 @@ namespace KerbalSimpit.Providers
             soiChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial51");
             KSPit.AddToDeviceHandler(AirspeedProvider);
             airspeedChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial32");
+            KSPit.AddToDeviceHandler(TempLimitProvider);
+            tempLimitChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.TempLimit);
         }
 
         public void OnDestroy()
@@ -146,6 +157,7 @@ namespace KerbalSimpit.Providers
             KSPit.RemoveToDeviceHandler(DeltaVProvider);
             KSPit.RemoveToDeviceHandler(DeltaVEnvProvider);
             KSPit.RemoveToDeviceHandler(BurnTimeProvider);
+            KSPit.RemoveToDeviceHandler(TempLimitProvider);
         }
 
         public void Update()
@@ -208,6 +220,30 @@ namespace KerbalSimpit.Providers
             myAirspeed.IAS = (float)FlightGlobals.ActiveVessel.indicatedAirSpeed;
             myAirspeed.MachNumber = (float)FlightGlobals.ActiveVessel.mach;
             if (airspeedChannel != null) airspeedChannel.Fire(OutboundPackets.Airspeed, myAirspeed);
+        }
+
+        public void TempLimitProvider()
+        {
+            double maxTempPercentage = 0.0;
+            double maxSkinTempPercentage = 0.0;
+
+            // Iterate on a copy ?
+            foreach (Part part in FlightGlobals.ActiveVessel.Parts)
+            {
+                maxTempPercentage = Math.Max(maxTempPercentage, 100.0 * part.temperature / part.maxTemp);
+                maxSkinTempPercentage = Math.Max(maxSkinTempPercentage, 100.0 * part.skinTemperature / part.skinMaxTemp);
+            }
+
+            //Prevent the byte to overflow in case of extremely hot vessel
+            if (maxTempPercentage > 255) maxTempPercentage = 255;
+            if (maxSkinTempPercentage > 255) maxSkinTempPercentage = 255;
+
+            myTempLimitStruct.tempLimitPercentage = (byte)Math.Round(maxTempPercentage);
+            myTempLimitStruct.skinTempLimitPercentage = (byte)Math.Round(maxSkinTempPercentage);
+
+            Debug.Log("Sending temp msg with " + myTempLimitStruct.tempLimitPercentage + "% and " + myTempLimitStruct.skinTempLimitPercentage + "%");
+
+            if (tempLimitChannel != null) tempLimitChannel.Fire(OutboundPackets.TempLimit, myTempLimitStruct);
         }
 
         //Return the DeltaVStageInfo of the first stage to consider for deltaV and burn time computation
