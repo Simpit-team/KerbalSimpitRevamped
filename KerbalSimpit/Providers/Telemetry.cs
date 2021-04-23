@@ -241,8 +241,6 @@ namespace KerbalSimpit.Providers
             myTempLimitStruct.tempLimitPercentage = (byte)Math.Round(maxTempPercentage);
             myTempLimitStruct.skinTempLimitPercentage = (byte)Math.Round(maxSkinTempPercentage);
 
-            Debug.Log("Sending temp msg with " + myTempLimitStruct.tempLimitPercentage + "% and " + myTempLimitStruct.skinTempLimitPercentage + "%");
-
             if (tempLimitChannel != null) tempLimitChannel.Fire(OutboundPackets.TempLimit, myTempLimitStruct);
         }
 
