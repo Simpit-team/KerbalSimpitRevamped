@@ -26,6 +26,11 @@ namespace KerbalSimpit
         // toSerialArray[i].Fire()
         public EventData<byte, object>[] toSerialArray =
             new EventData<byte, object>[255];
+        // To be notified when a channel is subscribed (to send a first
+        // non-periodic message for instance), register a callback
+        // for onSerialChannelSubscribedArray[i].
+        public EventData<byte, object>[] onSerialChannelSubscribedArray =
+            new EventData<byte, object>[255];
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)] [Serializable]
         public struct HandshakePacket
@@ -99,6 +104,7 @@ namespace KerbalSimpit
             {
                 this.onSerialReceivedArray[i] = new EventData<byte, object>(String.Format("onSerialReceived{0}", i));
                 this.toSerialArray[i] = new EventData<byte, object>(String.Format("toSerial{0}", i));
+                this.onSerialChannelSubscribedArray[i] = new EventData<byte, object>(String.Format("onSerialChannelSubscribed{0}", i));
             }
 
             this.onSerialReceivedArray[CommonPackets.Synchronisation].Add(this.handshakeCallback);
@@ -317,13 +323,7 @@ namespace KerbalSimpit
                 }
                 toSerialArray[idx].Add(SerialPorts[portID].sendPacket);
 
-                // Since the SOI name is only updated when it changes, it is not sent after the channel registration.
-                // For now, when the channel subscribed is the current SOI, force the sending of a SOI packet.
-                if(idx == OutboundPackets.SoIName)
-                {
-                    Providers.KerbalSimpitTelemetryProvider telemetry = (Providers.KerbalSimpitTelemetryProvider) FindObjectOfType(typeof(Providers.KerbalSimpitTelemetryProvider));
-                    telemetry.resendSOI();
-                }
+                onSerialChannelSubscribedArray[idx].Fire(idx, null);
             }
         }
 
