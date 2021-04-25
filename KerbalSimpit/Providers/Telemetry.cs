@@ -138,7 +138,9 @@ namespace KerbalSimpit.Providers
             // We fire one SoI packet when SoI changes. So no need to use the
             // periodic DeviceHandler infrastructure.
             CurrentSoI = "";
-            soiChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial51");
+            soiChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.SoIName);
+            //When SOIName channel is subscribed to, we need to resend the SOI name.
+            GameEvents.FindEvent<EventData<byte, object>>("onSerialChannelSubscribed" + OutboundPackets.SoIName).Add(resendSOI);
             KSPit.AddToDeviceHandler(AirspeedProvider);
             airspeedChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial32");
             KSPit.AddToDeviceHandler(TempLimitProvider);
@@ -170,6 +172,11 @@ namespace KerbalSimpit.Providers
                     soiChannel.Fire(OutboundPackets.SoIName, Encoding.ASCII.GetBytes(CurrentSoI));
                 }
             }
+        }
+
+        public void resendSOI(byte ID, object Data)
+        {
+            CurrentSoI = "";
         }
 
         public void AltitudeProvider()
