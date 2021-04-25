@@ -103,7 +103,10 @@ namespace KerbalSimpit.Providers
             if (newState != currentStateBuffer || resendState)
             {
                 resendState = false;
-                if (AGStateChannel != null) AGStateChannel.Fire(OutboundPackets.ActionGroups, newState);
+                if (AGStateChannel != null) {
+                    AGStateChannel.Fire(OutboundPackets.ActionGroups, newState);
+                    currentStateBuffer = newState;
+                }
                 return true;
             } else {
                 return false;

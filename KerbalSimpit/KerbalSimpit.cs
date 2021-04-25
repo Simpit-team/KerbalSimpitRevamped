@@ -188,26 +188,6 @@ namespace KerbalSimpit
             }
             Debug.Log("KerbalSimpit: Event dispatch loop exiting");
         }
-            
-        private void FlightReadyHandler()
-        {
-            for (int i=SerialPorts.Length-1; i>=0; i--)
-            {
-                SerialPorts[i].sendPacket(OutboundPackets.SceneChange, 0x00);
-            }
-        }
-
-        private void FlightShutdownHandler(GameEvents.FromToAction
-                                           <GameScenes, GameScenes> scenes)
-        {
-            if (scenes.from == GameScenes.FLIGHT)
-            {
-                for (int i=SerialPorts.Length-1; i>=0; i--)
-                {
-                    SerialPorts[i].sendPacket(OutboundPackets.SceneChange, 0x01);
-                }
-            }
-        }
 
         private KSPSerialPort[] createPortList(KerbalSimpitConfig config)
         {
