@@ -211,6 +211,18 @@ namespace KerbalSimpit
 
             for (int i = SerialPorts.Length-1; i>=0; i--)
             {
+                String portName = SerialPorts[i].PortName;
+                if (portName.StartsWith("COM") || portName.StartsWith("/"))
+                {
+                    // TODO do more validation ? At least it is not undefined
+                }
+                else
+                {
+                    Debug.LogWarning("Simpit : no port name is defined for port " + i + ". Please check the SimPit config file.");
+                    // Display a message for 20s that persist on different scene
+                    ScreenMessages.PostScreenMessage("Simpit : no port name is defined for port " + i + ". Please check the SimPit config file.", 20, true);
+                }
+
                 if (SerialPorts[i].open())
                 {
                     // If the port connected, set connected status to true

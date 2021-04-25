@@ -5,7 +5,7 @@ KerbalSimpit
 	RefreshRate = 125
 	SerialPort
 	{
-		PortName = COM1
+		PortName = 
 		BaudRate = 115200
 	}
 	CustomResourceMessages
