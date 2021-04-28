@@ -55,7 +55,7 @@ namespace KerbalSimpit.Providers
 
         public void TargetProvider()
         {
-            if (FlightGlobals.fetch.VesselTarget != null)
+            if (FlightGlobals.fetch.VesselTarget != null && FlightGlobals.ActiveVessel != null)
             {
                 myTargetInfo.distance = (float)Vector3.Distance(FlightGlobals.fetch.VesselTarget.GetTransform().position, FlightGlobals.ActiveVessel.transform.position);
                 myTargetInfo.velocity = (float)FlightGlobals.ship_tgtVelocity.magnitude;

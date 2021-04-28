@@ -244,6 +244,12 @@ namespace KerbalSimPit.Providers
 
         public void SASInfoProvider()
         {
+            if(FlightGlobals.ActiveVessel == null)
+            {
+                // This can happen when docking/undocking/changing scene, etc.
+                return;
+            }
+
             VesselAutopilot autopilot = FlightGlobals.ActiveVessel.Autopilot;
 
             if(autopilot == null)
