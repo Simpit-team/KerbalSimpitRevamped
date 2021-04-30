@@ -52,7 +52,8 @@ namespace KerbalSimpit
         // External Environment
         public static byte TargetInfo = 50;
         public static byte SoIName = 51;
-        public static byte SceneChange = 52;   
+        public static byte SceneChange = 52;
+        public static byte FlightStatus = 53;
     }
 
     public static class InboundPackets
@@ -145,5 +146,13 @@ namespace KerbalSimpit
         public static byte Verbose = 1;
         public static byte PrintToScreen = 2;
         public static byte NoHeader = 4;
+    }
+
+    public static class FlightStatusBits
+    {
+        public static byte isInFlight = 1;
+        public static byte isEva = 2;
+        public static byte isRecoverable = 4;
+        public static byte isInAtmoTW = 8;
     }
 }
