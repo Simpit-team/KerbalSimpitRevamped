@@ -38,50 +38,61 @@ namespace KerbalSimpit.KerbalSimpit.External
 
         public void KeyboardEmulatorCallback(byte ID, object Data)
         {
-            KeyboardEmulatorStruct payload = KerbalSimpitUtils.ByteArrayToStructure<KeyboardEmulatorStruct>((byte[])Data);
-
-            Int32 key32 = payload.key; //To cast it in the enum, we need a Int32 but only a Int16 is sent
-
-            if (Enum.IsDefined(typeof(VirtualKeyCode), key32)){
-                VirtualKeyCode key = (VirtualKeyCode) key32;
-                if ((payload.modifier & KeyboardEmulatorModifier.ALT_MOD) != 0)
-                {
-                    input.Keyboard.KeyDown(VirtualKeyCode.MENU);
-                }
-
-                if ((payload.modifier & KeyboardEmulatorModifier.CTRL_MOD) != 0)
-                {
-                    input.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
-                }
-
-                if ((payload.modifier & KeyboardEmulatorModifier.SHIFT_MOD) != 0)
-                {
-                    input.Keyboard.KeyDown(VirtualKeyCode.SHIFT);
-                }
-
-                Debug.Log("Simpit emulates keypress of " + key);
-                input.Keyboard.KeyPress(key);
-
-                if ((payload.modifier & KeyboardEmulatorModifier.ALT_MOD) != 0)
-                {
-                    input.Keyboard.KeyUp(VirtualKeyCode.MENU);
-                }
-
-                if ((payload.modifier & KeyboardEmulatorModifier.CTRL_MOD) != 0)
-                {
-                    input.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
-                }
-
-                if ((payload.modifier & KeyboardEmulatorModifier.SHIFT_MOD) != 0)
-                {
-                    input.Keyboard.KeyUp(VirtualKeyCode.SHIFT);
-                }
-            } else
+            try
             {
-                Debug.Log("Simpit : I received a message to emulate a keypress of key " + payload.key + " but I do not recognize it. I ignore it.");
+                KeyboardEmulatorStruct payload = KerbalSimpitUtils.ByteArrayToStructure<KeyboardEmulatorStruct>((byte[])Data);
+
+                Int32 key32 = payload.key; //To cast it in the enum, we need a Int32 but only a Int16 is sent
+
+                if (Enum.IsDefined(typeof(VirtualKeyCode), key32)){
+                    VirtualKeyCode key = (VirtualKeyCode) key32;
+                    if ((payload.modifier & KeyboardEmulatorModifier.ALT_MOD) != 0)
+                    {
+                        input.Keyboard.KeyDown(VirtualKeyCode.MENU);
+                    }
+
+                    if ((payload.modifier & KeyboardEmulatorModifier.CTRL_MOD) != 0)
+                    {
+                        input.Keyboard.KeyDown(VirtualKeyCode.CONTROL);
+                    }
+
+                    if ((payload.modifier & KeyboardEmulatorModifier.SHIFT_MOD) != 0)
+                    {
+                        input.Keyboard.KeyDown(VirtualKeyCode.SHIFT);
+                    }
+
+                    Debug.Log("Simpit emulates keypress of " + key);
+                    input.Keyboard.KeyPress(key);
+
+                    if ((payload.modifier & KeyboardEmulatorModifier.ALT_MOD) != 0)
+                    {
+                        input.Keyboard.KeyUp(VirtualKeyCode.MENU);
+                    }
+
+                    if ((payload.modifier & KeyboardEmulatorModifier.CTRL_MOD) != 0)
+                    {
+                        input.Keyboard.KeyUp(VirtualKeyCode.CONTROL);
+                    }
+
+                    if ((payload.modifier & KeyboardEmulatorModifier.SHIFT_MOD) != 0)
+                    {
+                        input.Keyboard.KeyUp(VirtualKeyCode.SHIFT);
+                    }
+                } else
+                {
+                    Debug.Log("Simpit : I received a message to emulate a keypress of key " + payload.key + " but I do not recognize it. I ignore it.");
+                }
+
             }
-
-
+            catch (DllNotFoundException exception)
+            {
+                Debug.LogWarning("Simpit : I received a message to emulate a keypress. This is currently only available on Windows. I ignore it.");
+                if (KSPit.Config.Verbose)
+                {
+                    Debug.LogWarning(exception.Message);
+                    Debug.LogWarning(exception.ToString());
+                }
+            }
 
         }
 
