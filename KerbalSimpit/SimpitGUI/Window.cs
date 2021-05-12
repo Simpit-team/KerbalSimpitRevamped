@@ -25,6 +25,7 @@ namespace KerbalSimpit.SimpitGUI
 		static Rect windowpos;
 		private static bool gui_enabled;
 		private static bool hide_ui;
+		private KSPit simpitInstance;
 
 		static Window instance;
 
@@ -90,24 +91,35 @@ namespace KerbalSimpit.SimpitGUI
 		void Start()
 		{
 			UpdateGUIState();
+			simpitInstance = (KSPit) FindObjectOfType(typeof(KSPit));
+			if(simpitInstance == null)
+            {
+				Debug.Log("Simpit : the GUI could not locate the KSPit instance. GUI will not work");
+            }
 		}
 
 		void WindowGUI(int windowID)
 		{
 			GUILayout.BeginVertical();
 
-			GUILayout.Label("Status : CONNECTED");
-			GUILayout.Label("Port used : " + KSPit.serialPorts.First().Value.portName);
+			GUILayout.Label("Status : " + KSPit.SerialPorts.First().portStatus);
+			GUILayout.Label("Port used : " + KSPit.SerialPorts.First().portName);
 
 			GUILayout.BeginHorizontal();
 			if (GUILayout.Button("Start"))
 			{
-				Debug.Log("TODO : Start the connection");
+				if(simpitInstance != null)
+                {
+					simpitInstance.OpenPorts();
+				}
 			}
 			GUILayout.FlexibleSpace();
 			if (GUILayout.Button("Close"))
 			{
-				Debug.Log("TODO : Close the connection");
+				if (simpitInstance != null)
+				{
+					simpitInstance.ClosePorts();
+				}
 			}
 			GUILayout.EndHorizontal();
 
