@@ -37,6 +37,20 @@ namespace KerbalSimpit.Providers
             public float vertical;
         }
 
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        [Serializable]
+        public struct OrbitInfoStruct
+        {
+            public float eccentricity;
+            public float semiMajorAxis;
+            public float inclination;
+            public float longAscendingNode;
+            public float argPeriapsis;
+            public float trueAnomaly;
+            public float meanAnomaly;
+            public float period;
+        }
+
         [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
         public struct AirspeedStruct
         {
@@ -75,6 +89,14 @@ namespace KerbalSimpit.Providers
             public float totalBurnTime;
         }
 
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        [Serializable]
+        public struct TempLimitStruct
+        {
+            public byte tempLimitPercentage;
+            public byte skinTempLimitPercentage;
+        }
+
         private AltitudeStruct myAlt;
         private ApsidesStruct myApsides;
         private ApsidesTimeStruct myApsidesTime;
@@ -84,10 +106,12 @@ namespace KerbalSimpit.Providers
         private DeltaVStruct myDeltaVStruct;
         private DeltaVEnvStruct myDeltaVEnvStruct;
         private BurnTimeStruct myBurnTimeStruct;
+        private OrbitInfoStruct myOrbitInfoStruct;
+        private TempLimitStruct myTempLimitStruct;
 
         private EventData<byte, object> altitudeChannel, apsidesChannel,
-            apsidesTimeChannel, velocityChannel, soiChannel, airspeedChannel,
-            maneuverChannel, deltaVChannel, deltaVEnvChannel, burnTimeChannel;
+            apsidesTimeChannel, ortbitInfoChannel, velocityChannel, soiChannel, airspeedChannel,
+            maneuverChannel, deltaVChannel, deltaVEnvChannel, burnTimeChannel, tempLimitChannel;
 
         private string CurrentSoI;
 
@@ -99,6 +123,8 @@ namespace KerbalSimpit.Providers
             apsidesChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial33");
             KSPit.AddToDeviceHandler(ApsidesTimeProvider);
             apsidesTimeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial34");
+            KSPit.AddToDeviceHandler(OrbitInfoProvider);
+            ortbitInfoChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.OrbitInfo);
             KSPit.AddToDeviceHandler(VelocityProvider);
             maneuverChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial35");
             KSPit.AddToDeviceHandler(ManeuverProvider);
@@ -112,9 +138,13 @@ namespace KerbalSimpit.Providers
             // We fire one SoI packet when SoI changes. So no need to use the
             // periodic DeviceHandler infrastructure.
             CurrentSoI = "";
-            soiChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial51");
+            soiChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.SoIName);
+            //When SOIName channel is subscribed to, we need to resend the SOI name.
+            GameEvents.FindEvent<EventData<byte, object>>("onSerialChannelSubscribed" + OutboundPackets.SoIName).Add(resendSOI);
             KSPit.AddToDeviceHandler(AirspeedProvider);
             airspeedChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial32");
+            KSPit.AddToDeviceHandler(TempLimitProvider);
+            tempLimitChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.TempLimit);
         }
 
         public void OnDestroy()
@@ -122,12 +152,14 @@ namespace KerbalSimpit.Providers
             KSPit.RemoveToDeviceHandler(AltitudeProvider);
             KSPit.RemoveToDeviceHandler(ApsidesProvider);
             KSPit.RemoveToDeviceHandler(ApsidesTimeProvider);
+            KSPit.RemoveToDeviceHandler(OrbitInfoProvider);
             KSPit.RemoveToDeviceHandler(VelocityProvider);
             KSPit.RemoveToDeviceHandler(AirspeedProvider);
             KSPit.RemoveToDeviceHandler(ManeuverProvider);
             KSPit.RemoveToDeviceHandler(DeltaVProvider);
             KSPit.RemoveToDeviceHandler(DeltaVEnvProvider);
             KSPit.RemoveToDeviceHandler(BurnTimeProvider);
+            KSPit.RemoveToDeviceHandler(TempLimitProvider);
         }
 
         public void Update()
@@ -140,6 +172,11 @@ namespace KerbalSimpit.Providers
                     soiChannel.Fire(OutboundPackets.SoIName, Encoding.ASCII.GetBytes(CurrentSoI));
                 }
             }
+        }
+
+        public void resendSOI(byte ID, object Data)
+        {
+            CurrentSoI = "";
         }
 
         public void AltitudeProvider()
@@ -171,11 +208,47 @@ namespace KerbalSimpit.Providers
             if (velocityChannel != null) velocityChannel.Fire(OutboundPackets.Velocities, myVelocity);
         }
 
+        public void OrbitInfoProvider()
+        {
+            Orbit currentOrbit = FlightGlobals.ActiveVessel.orbit;
+            myOrbitInfoStruct.eccentricity = (float) currentOrbit.eccentricity;
+            myOrbitInfoStruct.semiMajorAxis = (float)currentOrbit.semiMajorAxis;
+            myOrbitInfoStruct.inclination = (float)currentOrbit.inclination;
+            myOrbitInfoStruct.longAscendingNode = (float)currentOrbit.LAN;
+            myOrbitInfoStruct.argPeriapsis = (float)currentOrbit.argumentOfPeriapsis;
+            myOrbitInfoStruct.trueAnomaly = (float)currentOrbit.trueAnomaly;
+            myOrbitInfoStruct.meanAnomaly = (float)currentOrbit.meanAnomaly;
+            myOrbitInfoStruct.period = (float)currentOrbit.period;
+            if (ortbitInfoChannel != null) ortbitInfoChannel.Fire(OutboundPackets.OrbitInfo, myOrbitInfoStruct);
+        }
+
         public void AirspeedProvider()
         {
             myAirspeed.IAS = (float)FlightGlobals.ActiveVessel.indicatedAirSpeed;
             myAirspeed.MachNumber = (float)FlightGlobals.ActiveVessel.mach;
             if (airspeedChannel != null) airspeedChannel.Fire(OutboundPackets.Airspeed, myAirspeed);
+        }
+
+        public void TempLimitProvider()
+        {
+            double maxTempPercentage = 0.0;
+            double maxSkinTempPercentage = 0.0;
+
+            // Iterate on a copy ?
+            foreach (Part part in FlightGlobals.ActiveVessel.Parts)
+            {
+                maxTempPercentage = Math.Max(maxTempPercentage, 100.0 * part.temperature / part.maxTemp);
+                maxSkinTempPercentage = Math.Max(maxSkinTempPercentage, 100.0 * part.skinTemperature / part.skinMaxTemp);
+            }
+
+            //Prevent the byte to overflow in case of extremely hot vessel
+            if (maxTempPercentage > 255) maxTempPercentage = 255;
+            if (maxSkinTempPercentage > 255) maxSkinTempPercentage = 255;
+
+            myTempLimitStruct.tempLimitPercentage = (byte)Math.Round(maxTempPercentage);
+            myTempLimitStruct.skinTempLimitPercentage = (byte)Math.Round(maxSkinTempPercentage);
+
+            if (tempLimitChannel != null) tempLimitChannel.Fire(OutboundPackets.TempLimit, myTempLimitStruct);
         }
 
         //Return the DeltaVStageInfo of the first stage to consider for deltaV and burn time computation
@@ -186,23 +259,32 @@ namespace KerbalSimpit.Providers
             {
                 return null; //This happen in EVA for instance.
             }
-
             DeltaVStageInfo currentStageInfo = null;
-            if (FlightGlobals.ActiveVessel.currentStage == FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count)
+
+            try
             {
-                // Rocket has not taken off, use first stage with deltaV (to avoid stage of only stabilizer)
-                for (int i = FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count - 1; i >= 0; i--)
+                if (FlightGlobals.ActiveVessel.currentStage == FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count)
                 {
-                    currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(i);
-                    if (currentStageInfo.deltaVActual > 0)
+                    // Rocket has not taken off, use first stage with deltaV (to avoid stage of only stabilizer)
+                    for (int i = FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo.Count - 1; i >= 0; i--)
                     {
-                        break;
+                        currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(i);
+                        if (currentStageInfo.deltaVActual > 0)
+                        {
+                            break;
+                        }
                     }
                 }
+                else
+                {
+                    currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(FlightGlobals.ActiveVessel.currentStage);
+                }
             }
-            else
+            catch (NullReferenceException)
             {
-                currentStageInfo = FlightGlobals.ActiveVessel.VesselDeltaV.GetStage(FlightGlobals.ActiveVessel.currentStage);
+                // This happens when reverting a flight.
+                // FlightGlobals.ActiveVessel.VesselDeltaV.OperatingStageInfo is not null but using it produce a
+                // NullReferenceException in KSP code. This is probably due to the fact that the rocket is not fully initialized.
             }
 
             return currentStageInfo;

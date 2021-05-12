@@ -26,6 +26,10 @@ namespace KerbalSimpit
         public static byte Ore = 21;
         public static byte Ablator = 22;
         public static byte AblatorStage = 23;
+        public static byte TACLSResource = 24;
+        public static byte TACLSWaste = 25;
+        public static byte CustomResource1 = 26;
+        public static byte CustomResource2 = 27;
 
         // Vessel Movement/Postion
         public static byte Altitude = 30;
@@ -34,6 +38,8 @@ namespace KerbalSimpit
         public static byte Apsides = 33;
         public static byte ApsidesTime = 34;
         public static byte ManeuverData = 35;
+        public static byte SASInfo = 36;
+        public static byte OrbitInfo = 37;
 
         // Vessel Details
         public static byte ActionGroups = 40;
@@ -41,11 +47,13 @@ namespace KerbalSimpit
         public static byte DeltaVEnv = 42;
         public static byte BurnTime = 43;
         public static byte CustomActionGroups = 44;
+        public static byte TempLimit = 45;
 
         // External Environment
         public static byte TargetInfo = 50;
         public static byte SoIName = 51;
-        public static byte SceneChange = 52;   
+        public static byte SceneChange = 52;
+        public static byte FlightStatus = 53;
     }
 
     public static class InboundPackets
@@ -138,5 +146,13 @@ namespace KerbalSimpit
         public static byte Verbose = 1;
         public static byte PrintToScreen = 2;
         public static byte NoHeader = 4;
+    }
+
+    public static class FlightStatusBits
+    {
+        public static byte isInFlight = 1;
+        public static byte isEva = 2;
+        public static byte isRecoverable = 4;
+        public static byte isInAtmoTW = 8;
     }
 }

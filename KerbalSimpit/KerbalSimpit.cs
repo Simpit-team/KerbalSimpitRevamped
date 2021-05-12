@@ -26,6 +26,11 @@ namespace KerbalSimpit
         // toSerialArray[i].Fire()
         public EventData<byte, object>[] toSerialArray =
             new EventData<byte, object>[255];
+        // To be notified when a channel is subscribed (to send a first
+        // non-periodic message for instance), register a callback
+        // for onSerialChannelSubscribedArray[i].
+        public EventData<byte, object>[] onSerialChannelSubscribedArray =
+            new EventData<byte, object>[255];
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)] [Serializable]
         public struct HandshakePacket
@@ -99,6 +104,7 @@ namespace KerbalSimpit
             {
                 this.onSerialReceivedArray[i] = new EventData<byte, object>(String.Format("onSerialReceived{0}", i));
                 this.toSerialArray[i] = new EventData<byte, object>(String.Format("toSerial{0}", i));
+                this.onSerialChannelSubscribedArray[i] = new EventData<byte, object>(String.Format("onSerialChannelSubscribed{0}", i));
             }
 
             this.onSerialReceivedArray[CommonPackets.Synchronisation].Add(this.handshakeCallback);
@@ -182,26 +188,6 @@ namespace KerbalSimpit
             }
             Debug.Log("KerbalSimpit: Event dispatch loop exiting");
         }
-            
-        private void FlightReadyHandler()
-        {
-            for (int i=SerialPorts.Length-1; i>=0; i--)
-            {
-                SerialPorts[i].sendPacket(OutboundPackets.SceneChange, 0x00);
-            }
-        }
-
-        private void FlightShutdownHandler(GameEvents.FromToAction
-                                           <GameScenes, GameScenes> scenes)
-        {
-            if (scenes.from == GameScenes.FLIGHT)
-            {
-                for (int i=SerialPorts.Length-1; i>=0; i--)
-                {
-                    SerialPorts[i].sendPacket(OutboundPackets.SceneChange, 0x01);
-                }
-            }
-        }
 
         private KSPSerialPort[] createPortList(KerbalSimpitConfig config)
         {
@@ -225,6 +211,18 @@ namespace KerbalSimpit
 
             for (int i = SerialPorts.Length-1; i>=0; i--)
             {
+                String portName = SerialPorts[i].PortName;
+                if (portName.StartsWith("COM") || portName.StartsWith("/"))
+                {
+                    // TODO do more validation ? At least it is not undefined
+                }
+                else
+                {
+                    Debug.LogWarning("Simpit : no port name is defined for port " + i + ". Please check the SimPit config file.");
+                    // Display a message for 20s that persist on different scene
+                    ScreenMessages.PostScreenMessage("Simpit : no port name is defined for port " + i + ". Please check the SimPit config file.", 20, true);
+                }
+
                 if (SerialPorts[i].open())
                 {
                     // If the port connected, set connected status to true
@@ -299,7 +297,13 @@ namespace KerbalSimpit
                     Array.Copy(payload, 1, verarray, 0,
                                (payload.Length-1));
                     string VersionString = System.Text.Encoding.UTF8.GetString(verarray);
-                    Debug.Log(String.Format("KerbalSimpit: ACK received on port {0}. Handshake complete, Arduino library version '{1}'.", SerialPorts[portID].PortName, VersionString));
+                    Debug.Log(String.Format("KerbalSimpit: ACK received on port {0}. Handshake complete, Resetting channels, Arduino library version '{1}'.", SerialPorts[portID].PortName, VersionString));
+
+                    //When handshake is complete, unregister all channels to avoid duplication of messages when new channels are subscribed after an Arduino reset
+                    for(int idx = 0; idx < 255; idx++)
+                    {
+                        toSerialArray[idx].Remove(SerialPorts[portID].sendPacket);
+                    }
                     break;
             }
         }
@@ -316,6 +320,8 @@ namespace KerbalSimpit
                     Debug.Log(String.Format("KerbalSimpit: Serial port {0} subscribing to channel {1}", portID, idx));
                 }
                 toSerialArray[idx].Add(SerialPorts[portID].sendPacket);
+
+                onSerialChannelSubscribedArray[idx].Fire(idx, null);
             }
         }
 

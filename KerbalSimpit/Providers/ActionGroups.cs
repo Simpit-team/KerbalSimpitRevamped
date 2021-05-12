@@ -54,6 +54,10 @@ namespace KerbalSimpit.Providers
 
         private CAGStatusStruct lastCAGStatus;
 
+        // If set to true, the state should be sent at the next update even if no changes
+        // are detected (for instance to initialise it after a new registration).
+        private bool resendState = false;
+
         private static KSPActionGroup[] ActionGroupIDs = new KSPActionGroup[] {
             KSPActionGroup.None,
             KSPActionGroup.Custom01,
@@ -81,6 +85,7 @@ namespace KerbalSimpit.Providers
             if (toggleChannel != null) toggleChannel.Add(toggleCAGCallback);
 
             CAGStateChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial44");
+            GameEvents.FindEvent<EventData<byte, object>>("onSerialChannelSubscribed" + OutboundPackets.CustomActionGroups).Add(resendActionGroup);
 
             lastCAGStatus = new CAGStatusStruct();
         }
@@ -95,8 +100,9 @@ namespace KerbalSimpit.Providers
         private bool UpdateCurrentState()
         {
             CAGStatusStruct newState = getCAGState();
-            if (!newState.Equals(lastCAGStatus))
+            if (!newState.Equals(lastCAGStatus) || resendState)
             {
+                resendState = false;
                 if (CAGStateChannel != null)
                 {
                     //Debug.Log(String.Format("Sending CAG status : (" + newState.status[0] + ") (" + newState.status[1] + ") "));
@@ -109,6 +115,11 @@ namespace KerbalSimpit.Providers
             {
                 return false;
             }
+        }
+
+        public void resendActionGroup(byte ID, object Data)
+        {
+            resendState = true;
         }
 
         public void Update()

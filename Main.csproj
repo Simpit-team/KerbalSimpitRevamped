@@ -51,6 +51,7 @@
     <Compile Include="KerbalSimpit\KerbalSimpitConfig.cs" />
     <Compile Include="KerbalSimpit\KerbalSimpitPackets.cs" />
     <Compile Include="KerbalSimpit\External\ARPWrapper.cs" />
+    <Compile Include="KerbalSimpit\External\CRPWrapper.cs" />
     <Compile Include="KerbalSimpit\Providers\*.cs" />
     <Compile Include="KerbalSimpit\Utilities\*.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

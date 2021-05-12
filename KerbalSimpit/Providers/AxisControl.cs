@@ -34,15 +34,25 @@ namespace KerbalSimPit.Providers
             public byte mask;
         }
 
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        [Serializable]
+        public struct SASModeInfoStruct
+        {
+            public byte currentSASMode;
+            public ushort SASModeAvailability;
+        }
+
         // Inbound messages
         private EventData<byte, object> RotationChannel, TranslationChannel,
-            WheelChannel, ThrottleChannel, AutopilotChannel;
+            WheelChannel, ThrottleChannel, SASInfoChannel, AutopilotChannel;
 
         private RotationalStruct myRotation, newRotation;
 
         private TranslationalStruct myTranslation, newTranslation;
 
         private WheelStruct myWheel, newWheel;
+
+        private SASModeInfoStruct mySASInfo, newSASInfo;
 
         private short myThrottle;
         private volatile bool myThrottleFlag;
@@ -63,6 +73,11 @@ namespace KerbalSimPit.Providers
             AutopilotChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived20");
             if (AutopilotChannel != null) AutopilotChannel.Add(autopilotModeCallback);
 
+            SASInfoChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.SASInfo);
+            KSPit.AddToDeviceHandler(SASInfoProvider);
+            mySASInfo.currentSASMode = 255; // value for not enabled
+            mySASInfo.SASModeAvailability = 0;
+
             lastActiveVessel = FlightGlobals.ActiveVessel;
             FlightGlobals.ActiveVessel.OnPostAutopilotUpdate += AutopilotUpdater;
             GameEvents.onVesselChange.Add(OnVesselChange);
@@ -75,6 +90,8 @@ namespace KerbalSimPit.Providers
             if (WheelChannel != null) WheelChannel.Remove(wheelCallback);
             if (ThrottleChannel!= null) ThrottleChannel.Remove(throttleCallback);
             if (AutopilotChannel!= null) AutopilotChannel.Remove(autopilotModeCallback);
+
+            KSPit.RemoveToDeviceHandler(SASInfoProvider);
 
             lastActiveVessel.OnPostAutopilotUpdate -= AutopilotUpdater;
             GameEvents.onVesselChange.Remove(OnVesselChange);
@@ -157,11 +174,19 @@ namespace KerbalSimPit.Providers
         public void autopilotModeCallback(byte ID, object Data)
         {
             byte[] payload = (byte[])Data;
+
+            VesselAutopilot autopilot = FlightGlobals.ActiveVessel.Autopilot;
+
+            if(autopilot == null)
+            {
+                Debug.Log("KerbalSimpit : Ignoring a SAS MODE Message since I could not find the autopilot");
+            }
+
             mySASMode = (VesselAutopilot.AutopilotMode)(payload[0]);
 
-            if (FlightGlobals.ActiveVessel.Autopilot.CanSetMode(mySASMode))
+            if (autopilot.CanSetMode(mySASMode))
             {
-                FlightGlobals.ActiveVessel.Autopilot.SetMode((VesselAutopilot.AutopilotMode)mySASMode);
+                autopilot.SetMode(mySASMode);
                 if (KSPit.Config.Verbose)
                 {
                     Debug.Log(String.Format("KerbalSimpit: payload is {0}", mySASMode));
@@ -214,6 +239,50 @@ namespace KerbalSimPit.Providers
             if (myThrottleFlag)
             {
                 fcs.mainThrottle = (float)myThrottle/ Int16.MaxValue;
+            }
+        }
+
+        public void SASInfoProvider()
+        {
+            if(FlightGlobals.ActiveVessel == null)
+            {
+                // This can happen when docking/undocking/changing scene, etc.
+                return;
+            }
+
+            VesselAutopilot autopilot = FlightGlobals.ActiveVessel.Autopilot;
+
+            if(autopilot == null)
+            {
+                return;
+            }
+
+            if (autopilot.Enabled)
+            {
+                newSASInfo.currentSASMode = (byte)autopilot.Mode;
+            } else
+            {
+                newSASInfo.currentSASMode = 255; //special value to indicate a disabled SAS
+            }
+
+            newSASInfo.SASModeAvailability = 0;
+            foreach (VesselAutopilot.AutopilotMode i in Enum.GetValues(typeof(VesselAutopilot.AutopilotMode)))
+            {
+                if (autopilot.CanSetMode(i))
+                {
+                    newSASInfo.SASModeAvailability = (ushort) (newSASInfo.SASModeAvailability | (1 << (byte)i));
+                }
+            }
+
+            if(mySASInfo.currentSASMode != newSASInfo.currentSASMode ||
+                mySASInfo.SASModeAvailability != newSASInfo.SASModeAvailability)
+            {
+                if (SASInfoChannel != null)
+                {
+                    mySASInfo = newSASInfo;
+                    Debug.Log("I'm in mode " + mySASInfo.currentSASMode + " with availability " + Convert.ToString(mySASInfo.SASModeAvailability, 2));
+                    SASInfoChannel.Fire(OutboundPackets.SASInfo, mySASInfo);
+                }
             }
         }
     }

@@ -23,6 +23,10 @@ namespace KerbalSimpit.Providers
         private volatile byte activateBuffer, deactivateBuffer,
             toggleBuffer, currentStateBuffer;
 
+        // If set to true, the state should be sent at the next update even if no changes
+        // are detected (for instance to initialise it after a new registration).
+        private bool resendState = false;
+
         public void Start()
         {
             activateBuffer = 0;
@@ -38,6 +42,7 @@ namespace KerbalSimpit.Providers
             if (AGToggleChannel != null) AGToggleChannel.Add(actionToggleCallback);
 
             AGStateChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial40");
+            GameEvents.FindEvent<EventData<byte, object>>("onSerialChannelSubscribed" + OutboundPackets.ActionGroups).Add(resendActionGroup);
         }
 
         public void OnDestroy()
@@ -45,6 +50,11 @@ namespace KerbalSimpit.Providers
             if (AGActivateChannel != null) AGActivateChannel.Remove(actionActivateCallback);
             if (AGDeactivateChannel != null) AGDeactivateChannel.Remove(actionDeactivateCallback);
             if (AGToggleChannel != null) AGToggleChannel.Remove(actionToggleCallback);
+        }
+
+        public void resendActionGroup(byte ID, object Data)
+        {
+            resendState = true;
         }
 
         public void Update()
@@ -90,9 +100,13 @@ namespace KerbalSimpit.Providers
         private bool updateCurrentState()
         {
             byte newState = getGroups();
-            if (newState != currentStateBuffer)
+            if (newState != currentStateBuffer || resendState)
             {
-                if (AGStateChannel != null) AGStateChannel.Fire(OutboundPackets.ActionGroups, newState);
+                resendState = false;
+                if (AGStateChannel != null) {
+                    AGStateChannel.Fire(OutboundPackets.ActionGroups, newState);
+                    currentStateBuffer = newState;
+                }
                 return true;
             } else {
                 return false;
