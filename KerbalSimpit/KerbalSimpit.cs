@@ -176,7 +176,7 @@ namespace KerbalSimpit
 
             foreach(KSPSerialPort port in SerialPorts)
             {
-                if(port.portStatus != KSPSerialPort.ConnectionStatus.CLOSED)
+                if(port.portStatus != KSPSerialPort.ConnectionStatus.CLOSED && port.portStatus != KSPSerialPort.ConnectionStatus.ERROR)
                 {
                     //Port already opened. Nothing to do.
                     continue;
@@ -220,7 +220,7 @@ namespace KerbalSimpit
 
             foreach (KSPSerialPort port in SerialPorts)
             {
-                if(port.portStatus == KSPSerialPort.ConnectionStatus.CLOSED)
+                if(port.portStatus == KSPSerialPort.ConnectionStatus.CLOSED || port.portStatus == KSPSerialPort.ConnectionStatus.ERROR)
                 {
                     // Port is already closed. Nothing to do.
                     continue;

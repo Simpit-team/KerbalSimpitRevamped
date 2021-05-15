@@ -80,7 +80,7 @@ namespace KerbalSimpit.Console
             foreach (KSPSerialPort port in KSPit.SerialPorts)
             {
                 // If the port is connected, print this message
-                if(port.portStatus != KSPSerialPort.ConnectionStatus.CLOSED)
+                if(port.portStatus != KSPSerialPort.ConnectionStatus.CLOSED || port.portStatus != KSPSerialPort.ConnectionStatus.ERROR)
                 {
                     // Formats in the value of the port name, and the status of the port, into the localised string
                     Debug.Log(Localizer.Format(SERIAL_STATUS_MESSAGE, port.PortName, SERIAL_PORT_CONNECTED));

@@ -36,7 +36,8 @@ namespace KerbalSimpit.Serial
             WAITING_HANDSHAKE, // The port is opened, waiting for the controler to start the handshake
             HANDSHAKE, // The port is opened, the first handshake packet was received, waiting for the SYN/ACK
             CONNECTED, // The connection is established and a message was received from the controler in the last IDLE_TIMEOUT seconds
-            IDLE // The connection is established and no message was received from the controler in the last IDLE_TIMEOUT seconds. This can indicate a failure on the controler side or a controler that only read data.
+            IDLE, // The connection is established and no message was received from the controler in the last IDLE_TIMEOUT seconds. This can indicate a failure on the controler side or a controler that only read data.
+            ERROR, // The port could not be openned.
         }
 
         public ConnectionStatus portStatus;
@@ -144,7 +145,7 @@ namespace KerbalSimpit.Serial
                     Debug.Log(String.Format("KerbalSimpit: Error opening serial port {0}: {1}", PortName, e.Message));
 
                     // If the port was not connected to, set connected status to false
-                    portStatus = ConnectionStatus.CLOSED;
+                    portStatus = ConnectionStatus.ERROR;
                 }
             }
             return Port.IsOpen;
