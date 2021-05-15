@@ -102,8 +102,18 @@ namespace KerbalSimpit.SimpitGUI
 		{
 			GUILayout.BeginVertical();
 
-			GUILayout.Label("Status : " + KSPit.SerialPorts.First().portStatus);
-			GUILayout.Label("Port used : " + KSPit.SerialPorts.First().PortName);
+			foreach (Serial.KSPSerialPort port in KSPit.SerialPorts)
+			{
+				if(port.ID == 0)
+				{
+					GUILayout.Label("Status : " + port.portStatus);
+					GUILayout.Label("Port used : " + port.PortName);
+				} else
+				{
+					GUILayout.Label("Status (" + port.ID + ") : " + port.portStatus);
+					GUILayout.Label("Port used (" + port.ID + ") : " + port.PortName);
+				}
+			}
 
 			GUILayout.BeginHorizontal();
 			if (GUILayout.Button("Start"))
