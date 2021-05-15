@@ -47,43 +47,8 @@ namespace KerbalSimpit
         private bool DoEventDispatching = false;
         private Thread EventDispatchThread;
 
-        const int IDLE_TIMEOUT = 10; //Timeout to consider the connection as idle, in seconds.
-
-        // Enum for the different states a port can have
-        public enum ConnectionStatus
-        {
-            CLOSED, // The port is closed, SimPit does not use it.
-            WAITING, // The port is opened, waiting for the controler to start the handshake
-            HANDSHAKE, // The port is opened, the first handshake packet was received, waiting for the SYN/ACK
-            CONNECTED, // The connection is established and a message was received from the controler in the last IDLE_TIMEOUT seconds
-            IDLE // NOT CURRENTLY IN USE. The connection is established and no message was received from the controler in the last IDLE_TIMEOUT seconds. This can indicate a failure on the controler side or a controler that only read data.
-        }
-
         // List of all the serial ports. Each object has a KSPSerialPortInstance and a associated status.
-        public static List<portData> SerialPorts = new List<portData>();
-
-        // Structure to store the name of the port, and its status. 
-        public class portData
-        {
-            // Name of the port
-            public string portName;
-            // Ports connection status
-            public ConnectionStatus portStatus;
-            // Reference to the KSPSerialPort
-            public KSPSerialPort port;
-            // ID of the port
-            public int portID;
-
-            // Set the above values
-            public portData(string portName, KSPSerialPort port, int portID)
-            {
-                this.portName = portName;
-                this.portStatus = ConnectionStatus.CLOSED;
-                this.port = port;
-                this.portID = portID;
-            }
-
-        }
+        public static List<KSPSerialPort> SerialPorts = new List<KSPSerialPort>();
 
         private Console.KerbalSimpitConsole KSPitConsole;
 
@@ -153,7 +118,7 @@ namespace KerbalSimpit
 
         public static void SendToSerialPort(byte PortID, byte Type, object Data)
         {
-            SerialPorts[PortID].port.sendPacket(Type, Data);
+            SerialPorts[PortID].sendPacket(Type, Data);
         }
 
         public void SendSerialData(byte Channel, object Data)
@@ -196,50 +161,46 @@ namespace KerbalSimpit
 
         private void fillSerialPortsList(KerbalSimpitConfig config)
         {
-            SerialPorts = new List<portData>();
+            SerialPorts = new List<KSPSerialPort>();
             int count = config.SerialPorts.Count;
             for (byte i = 0; i<count; i++)
             {
                 KSPSerialPort newPort = new KSPSerialPort(this, config.SerialPorts[i].PortName,
                                                           config.SerialPorts[i].BaudRate,
                                                           i);
-                SerialPorts.Add(new portData(config.SerialPorts[i].PortName, newPort, i));
+                SerialPorts.Add(newPort);
             }
         }
 
         public void OpenPorts() {
 
-            foreach(portData port in SerialPorts)
+            foreach(KSPSerialPort port in SerialPorts)
             {
-                if(port.portStatus != ConnectionStatus.CLOSED)
+                if(port.portStatus != KSPSerialPort.ConnectionStatus.CLOSED)
                 {
                     //Port already opened. Nothing to do.
                     continue;
                 }
 
-                String portName = port.portName;
+                String portName = port.PortName;
                 if (portName.StartsWith("COM") || portName.StartsWith("/"))
                 {
                     // TODO do more validation ? At least it is not undefined
                 }
                 else
                 {
-                    Debug.LogWarning("Simpit : no port name is defined for port " + port.portID + ". Please check the SimPit config file.");
+                    Debug.LogWarning("Simpit : no port name is defined for port " + port.ID + ". Please check the SimPit config file.");
                     // Display a message for 20s that persist on different scene
-                    ScreenMessages.PostScreenMessage("Simpit : no port name is defined for port " + port.portID + ". Please check the SimPit config file.", 20, true);
+                    ScreenMessages.PostScreenMessage("Simpit : no port name is defined for port " + port.ID + ". Please check the SimPit config file.", 20, true);
                 }
 
-                if (port.port.open())
+                if (port.open())
                 {
-                    // If the port connected, set connected status to waiting for the handshake
-                    port.portStatus = ConnectionStatus.WAITING;
                     if (Config.Verbose){
                         Debug.Log(String.Format("KerbalSimpit: Opened {0}", portName));
                     }
                 } else {
                     if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Unable to open {0}", portName));
-                    // If the port was not connected to, set connected status to false
-                    port.portStatus = ConnectionStatus.CLOSED;
                 }
             }
 
@@ -257,16 +218,15 @@ namespace KerbalSimpit
 
             DoEventDispatching = false;
 
-            foreach (portData port in SerialPorts)
+            foreach (KSPSerialPort port in SerialPorts)
             {
-                if(port.portStatus == ConnectionStatus.CLOSED)
+                if(port.portStatus == KSPSerialPort.ConnectionStatus.CLOSED)
                 {
                     // Port is already closed. Nothing to do.
                     continue;
                 }
 
-                port.port.close();
-                port.portStatus = ConnectionStatus.CLOSED;
+                port.close();
             }
 
         }
@@ -279,29 +239,29 @@ namespace KerbalSimpit
             switch(payload[0])
             {
                 case 0x00:
-                    if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: SYN received on port {0}. Replying.", SerialPorts[portID].portName));
-                    SerialPorts[portID].portStatus = ConnectionStatus.HANDSHAKE;
+                    if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: SYN received on port {0}. Replying.", SerialPorts[portID].PortName));
+                    SerialPorts[portID].portStatus = KSPSerialPort.ConnectionStatus.HANDSHAKE;
                     hs.HandShakeType = 0x01;
-                    SerialPorts[portID].port.sendPacket(CommonPackets.Synchronisation, hs);
+                    SerialPorts[portID].sendPacket(CommonPackets.Synchronisation, hs);
                     break;
                 case 0x01:
-                    if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: SYNACK received on port {0}. Replying.", SerialPorts[portID].portName));
-                    SerialPorts[portID].portStatus = ConnectionStatus.CONNECTED;
+                    if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: SYNACK received on port {0}. Replying.", SerialPorts[portID].PortName));
+                    SerialPorts[portID].portStatus = KSPSerialPort.ConnectionStatus.CONNECTED;
                     hs.HandShakeType = 0x02;
-                    SerialPorts[portID].port.sendPacket(CommonPackets.Synchronisation, hs);
+                    SerialPorts[portID].sendPacket(CommonPackets.Synchronisation, hs);
                     break;
                 case 0x02:
                     byte[] verarray = new byte[payload.Length-1];
                     Array.Copy(payload, 1, verarray, 0,
                                (payload.Length-1));
                     string VersionString = System.Text.Encoding.UTF8.GetString(verarray);
-                    Debug.Log(String.Format("KerbalSimpit: ACK received on port {0}. Handshake complete, Resetting channels, Arduino library version '{1}'.", SerialPorts[portID].portName, VersionString));
-                    SerialPorts[portID].portStatus = ConnectionStatus.CONNECTED;
+                    Debug.Log(String.Format("KerbalSimpit: ACK received on port {0}. Handshake complete, Resetting channels, Arduino library version '{1}'.", SerialPorts[portID].PortName, VersionString));
+                    SerialPorts[portID].portStatus = KSPSerialPort.ConnectionStatus.CONNECTED;
 
                     //When handshake is complete, unregister all channels to avoid duplication of messages when new channels are subscribed after an Arduino reset
                     for (int idx = 0; idx < 255; idx++)
                     {
-                        toSerialArray[idx].Remove(SerialPorts[portID].port.sendPacket);
+                        toSerialArray[idx].Remove(SerialPorts[portID].sendPacket);
                     }
                     break;
             }
@@ -318,7 +278,7 @@ namespace KerbalSimpit
                 {
                     Debug.Log(String.Format("KerbalSimpit: Serial port {0} subscribing to channel {1}", portID, idx));
                 }
-                toSerialArray[idx].Add(SerialPorts[portID].port.sendPacket);
+                toSerialArray[idx].Add(SerialPorts[portID].sendPacket);
 
                 onSerialChannelSubscribedArray[idx].Fire(idx, null);
             }
@@ -331,7 +291,7 @@ namespace KerbalSimpit
             for (int i=payload.Length-1; i>=0; i--)
             {
                 idx = payload[i];
-                toSerialArray[idx].Remove(SerialPorts[portID].port.sendPacket);
+                toSerialArray[idx].Remove(SerialPorts[portID].sendPacket);
             }
         }
     }

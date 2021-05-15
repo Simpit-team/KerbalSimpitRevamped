@@ -9,6 +9,7 @@ using Command_Lib = KerbalSimpit.Localisation_Libs.commandLibValues;
 using KSP.Localization;
 using KerbalSimpit;
 using UnityEngine;
+using KerbalSimpit.Serial;
 
 namespace KerbalSimpit.Console
 {
@@ -76,19 +77,19 @@ namespace KerbalSimpit.Console
             Debug.Log(SERIAL_STATUS_HEADER);
 
             // For each of the serial ports in use/can be used by the code, print its status
-            foreach (KSPit.portData port in KSPit.SerialPorts)
+            foreach (KSPSerialPort port in KSPit.SerialPorts)
             {
                 // If the port is connected, print this message
-                if(port.portStatus != KSPit.ConnectionStatus.CLOSED)
+                if(port.portStatus != KSPSerialPort.ConnectionStatus.CLOSED)
                 {
                     // Formats in the value of the port name, and the status of the port, into the localised string
-                    Debug.Log(Localizer.Format(SERIAL_STATUS_MESSAGE, port.portName, SERIAL_PORT_CONNECTED));
+                    Debug.Log(Localizer.Format(SERIAL_STATUS_MESSAGE, port.PortName, SERIAL_PORT_CONNECTED));
                 }
                 // If it is not connected, print this message
                 else
                 {
                     // Formats in the value of the port name, and the status of the port, into the localised string
-                    Debug.Log(Localizer.Format(SERIAL_STATUS_MESSAGE, port.portName, SERIAL_PORT_DISCONNECTED));
+                    Debug.Log(Localizer.Format(SERIAL_STATUS_MESSAGE, port.PortName, SERIAL_PORT_DISCONNECTED));
                 }
             }
 

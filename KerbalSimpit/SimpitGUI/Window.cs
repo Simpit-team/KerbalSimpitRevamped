@@ -103,7 +103,7 @@ namespace KerbalSimpit.SimpitGUI
 			GUILayout.BeginVertical();
 
 			GUILayout.Label("Status : " + KSPit.SerialPorts.First().portStatus);
-			GUILayout.Label("Port used : " + KSPit.SerialPorts.First().portName);
+			GUILayout.Label("Port used : " + KSPit.SerialPorts.First().PortName);
 
 			GUILayout.BeginHorizontal();
 			if (GUILayout.Button("Start"))
