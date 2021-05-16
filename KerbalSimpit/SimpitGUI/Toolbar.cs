@@ -52,7 +52,7 @@ namespace KerbalSimpit.SimpitGUI
 		{
 			if (ApplicationLauncher.Ready && button == null)
 			{
-				var tex = GameDatabase.Instance.GetTexture("KerbalSimpit/PluginData/icon", false);
+				var tex = GameDatabase.Instance.GetTexture("KerbalSimpit/icon_simpit", false);
 				button = ApplicationLauncher.Instance.AddModApplication(onToggle, onToggle, null, null, null, null, ApplicationLauncher.AppScenes.ALWAYS, tex);
 				UpdateVisibility();
 			}
