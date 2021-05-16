@@ -26,6 +26,22 @@ namespace KerbalSimpit.Serial
         private int BaudRate;
         public  byte ID;
 
+        const int IDLE_TIMEOUT = 10; //Timeout to consider the connection as idle, in seconds.
+        private long lastTimeMsgReceveived;
+
+        // Enum for the different states a port can have
+        public enum ConnectionStatus
+        {
+            CLOSED, // The port is closed, SimPit does not use it.
+            WAITING_HANDSHAKE, // The port is opened, waiting for the controler to start the handshake
+            HANDSHAKE, // The port is opened, the first handshake packet was received, waiting for the SYN/ACK
+            CONNECTED, // The connection is established and a message was received from the controler in the last IDLE_TIMEOUT seconds
+            IDLE, // The connection is established and no message was received from the controler in the last IDLE_TIMEOUT seconds. This can indicate a failure on the controler side or a controler that only read data.
+            ERROR, // The port could not be openned.
+        }
+
+        public ConnectionStatus portStatus;
+
         private readonly object queueLock = new object();
         private Queue<byte[]> packetQueue = new Queue<byte[]>();
 
@@ -77,6 +93,7 @@ namespace KerbalSimpit.Serial
             PortName = pn;
             BaudRate = br;
             ID = idx;
+            portStatus = ConnectionStatus.CLOSED;
 
             DoSerial = false;
             // Note that we initialise the packet buffer once, and reuse it.
@@ -115,6 +132,10 @@ namespace KerbalSimpit.Serial
                         SerialReadThread = new Thread(AsyncReaderWorker);
                     }
                     DoSerial = true;
+
+                    // If the port connected, set connected status to waiting for the handshake
+                    portStatus = ConnectionStatus.WAITING_HANDSHAKE;
+
                     SerialReadThread.Start();
                     SerialWriteThread.Start();
                     while (!SerialReadThread.IsAlive || !SerialWriteThread.IsAlive);
@@ -122,6 +143,9 @@ namespace KerbalSimpit.Serial
                 catch (Exception e)
                 {
                     Debug.Log(String.Format("KerbalSimpit: Error opening serial port {0}: {1}", PortName, e.Message));
+
+                    // If the port was not connected to, set connected status to false
+                    portStatus = ConnectionStatus.ERROR;
                 }
             }
             return Port.IsOpen;
@@ -131,6 +155,7 @@ namespace KerbalSimpit.Serial
         public void close() {
             if (Port.IsOpen)
             {
+                portStatus = KSPSerialPort.ConnectionStatus.CLOSED;
                 DoSerial = false;
                 Thread.Sleep(500);
                 Port.Close();
@@ -251,6 +276,11 @@ namespace KerbalSimpit.Serial
             while (DoSerial)
             {
                 SerialWrite();
+
+                if( portStatus == ConnectionStatus.CONNECTED && (lastTimeMsgReceveived + IDLE_TIMEOUT*1000) < (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond))
+                {
+                    portStatus = ConnectionStatus.IDLE;
+                }
             }
             Debug.Log(String.Format("KerbalSimpit: Write thread for port {0} exiting.", PortName));
         }
@@ -369,7 +399,14 @@ namespace KerbalSimpit.Serial
             byte[] buf = new byte[Size];
             Array.Copy(Payload, buf, Size);
 
-            // Changed to refer to the instance of KSPit the plugin is using
+            lastTimeMsgReceveived = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            if (portStatus == ConnectionStatus.IDLE && Type != CommonPackets.Synchronisation)
+            {
+                //I received a non-handshake packet. The connection is active
+                portStatus = ConnectionStatus.CONNECTED;
+            }
+
+
             this.k_simpit.onSerialReceivedArray[Type].Fire(ID, buf);
         }
     }

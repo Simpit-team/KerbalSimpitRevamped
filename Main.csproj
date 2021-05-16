@@ -35,6 +35,15 @@
       <HintPath>$(KSPLIBDIR)/UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>$(KSPLIBDIR)/UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(KSPLIBDIR)/UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(KSPLIBDIR)/UnityEngine.UI.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KerbalSimpit\KerbalSimpit.cs" />
@@ -47,6 +56,7 @@
     <Compile Include="KerbalSimpit\Utilities\*.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="KerbalSimpit\Console\*.cs"/>
+    <Compile Include="KerbalSimpit\SimpitGUI\*.cs"/>
     <Compile Include="KerbalSimpit\Localisation_Libs\*.cs"/>
     <Compile Include="KerbalSimpit\Contrib\UnityMainThreadDispatcher\*.cs"/>
   </ItemGroup>

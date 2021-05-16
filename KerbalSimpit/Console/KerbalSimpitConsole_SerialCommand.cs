@@ -9,6 +9,7 @@ using Command_Lib = KerbalSimpit.Localisation_Libs.commandLibValues;
 using KSP.Localization;
 using KerbalSimpit;
 using UnityEngine;
+using KerbalSimpit.Serial;
 
 namespace KerbalSimpit.Console
 {
@@ -55,29 +56,13 @@ namespace KerbalSimpit.Console
             if(commandArgs.arguments[0] == SERIAL_START_COMMAND)
             {
                 Debug.Log("Serial start called");
-                // If the serial port has already been connected to, run this
-                if (KSPit.runConnect)
-                {
-                    if (KSPit.serialPorts.First().Value.portConnected == false)
-                    {
-                        this.k_simpit.OpenPorts();
-                    }
-                }
-                // Else if they have not been connected to before, run this
-                else
-                {
-                    this.k_simpit.initPorts();
-                }
-                
+                this.k_simpit.OpenPorts();
             }
 
             // If the command is a serial stop command
             if(commandArgs.arguments[0] == SERIAL_STOP_COMMAND)
             {
-                if(KSPit.serialPorts.First().Value.portConnected == true)
-                {
-                    this.k_simpit.ClosePorts();
-                }
+                this.k_simpit.ClosePorts();
             }
         }
 
@@ -92,19 +77,19 @@ namespace KerbalSimpit.Console
             Debug.Log(SERIAL_STATUS_HEADER);
 
             // For each of the serial ports in use/can be used by the code, print its status
-            foreach (KeyValuePair<string, KSPit.portData> entry in KSPit.serialPorts)
+            foreach (KSPSerialPort port in KSPit.SerialPorts)
             {
                 // If the port is connected, print this message
-                if(entry.Value.portConnected == true)
+                if(port.portStatus != KSPSerialPort.ConnectionStatus.CLOSED || port.portStatus != KSPSerialPort.ConnectionStatus.ERROR)
                 {
                     // Formats in the value of the port name, and the status of the port, into the localised string
-                    Debug.Log(Localizer.Format(SERIAL_STATUS_MESSAGE, entry.Value.portName, SERIAL_PORT_CONNECTED));
+                    Debug.Log(Localizer.Format(SERIAL_STATUS_MESSAGE, port.PortName, SERIAL_PORT_CONNECTED));
                 }
                 // If it is not connected, print this message
                 else
                 {
                     // Formats in the value of the port name, and the status of the port, into the localised string
-                    Debug.Log(Localizer.Format(SERIAL_STATUS_MESSAGE, entry.Value.portName, SERIAL_PORT_DISCONNECTED));
+                    Debug.Log(Localizer.Format(SERIAL_STATUS_MESSAGE, port.PortName, SERIAL_PORT_DISCONNECTED));
                 }
             }
 
