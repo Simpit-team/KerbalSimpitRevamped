@@ -11,7 +11,7 @@ namespace KerbalSimpit.SimpitGUI
 	[KSPAddon(KSPAddon.Startup.MainMenu, true)]
 	public class AppButton : MonoBehaviour
 	{
-		const ApplicationLauncher.AppScenes buttonScenes = ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT;
+		const ApplicationLauncher.AppScenes buttonScenes = ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW;
 		private static ApplicationLauncherButton button;
 
 		public static Callback Toggle = delegate { };
