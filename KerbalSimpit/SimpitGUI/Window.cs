@@ -104,35 +104,56 @@ namespace KerbalSimpit.SimpitGUI
 
 			foreach (Serial.KSPSerialPort port in KSPit.SerialPorts)
 			{
-				if(port.ID == 0)
+				// For all port (except the first one), add a prefix to indicate which port we refer to.
+				// For the first one, nothing is written so that for the vast majority if users (that only use a single controler), they are not bothered by port ID.
+				String portName = "";
+				if (port.ID > 0)
 				{
-					GUILayout.Label("Status : " + port.portStatus);
-					GUILayout.Label("Port used : " + port.PortName);
-				} else
-				{
-					GUILayout.Label("Status (" + port.ID + ") : " + port.portStatus);
-					GUILayout.Label("Port used (" + port.ID + ") : " + port.PortName);
+					portName = "(" + port.ID + ") ";
 				}
+
+				GUILayout.Label("Status " + portName + ": " + port.portStatus);
+				GUILayout.Label("Port used " + portName + ": " + port.PortName);
+
+				GUILayout.BeginHorizontal();
+				if (GUILayout.Button("Start " + portName))
+				{
+					if (simpitInstance != null)
+					{
+						simpitInstance.OpenPort(port.ID);
+					}
+				}
+				GUILayout.FlexibleSpace();
+				if (GUILayout.Button("Close " + portName))
+				{
+					if (simpitInstance != null)
+					{
+						simpitInstance.ClosePort(port.ID);
+					}
+				}
+				GUILayout.EndHorizontal();
 			}
 
-			GUILayout.BeginHorizontal();
-			if (GUILayout.Button("Start"))
-			{
-				if(simpitInstance != null)
-                {
-					simpitInstance.OpenPorts();
-				}
-			}
-			GUILayout.FlexibleSpace();
-			if (GUILayout.Button("Close"))
-			{
-				if (simpitInstance != null)
+			if (KSPit.SerialPorts.Count > 1) {
+				//only put the Start all/Close all button if there is several ports
+				GUILayout.BeginHorizontal();
+				if (GUILayout.Button("Start all"))
 				{
-					simpitInstance.ClosePorts();
+					if(simpitInstance != null)
+					{
+						simpitInstance.OpenPorts();
+					}
 				}
+				GUILayout.FlexibleSpace();
+				if (GUILayout.Button("Close all"))
+				{
+					if (simpitInstance != null)
+					{
+						simpitInstance.ClosePorts();
+					}
+				}
+				GUILayout.EndHorizontal();
 			}
-			GUILayout.EndHorizontal();
-
 
 			GUILayout.EndVertical();
 			UnityEngine.GUI.DragWindow(new Rect(0, 0, 1000, 20));

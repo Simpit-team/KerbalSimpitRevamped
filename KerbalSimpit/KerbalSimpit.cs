@@ -172,63 +172,100 @@ namespace KerbalSimpit
             }
         }
 
-        public void OpenPorts() {
+        public void OpenPort(int portID)
+        {
 
-            foreach(KSPSerialPort port in SerialPorts)
+            if(portID >= SerialPorts.Count)
             {
-                if(port.portStatus != KSPSerialPort.ConnectionStatus.CLOSED && port.portStatus != KSPSerialPort.ConnectionStatus.ERROR)
-                {
-                    //Port already opened. Nothing to do.
-                    continue;
-                }
+                Debug.Log("Simpit OpenPort called for port " + portID + " but I only have " + SerialPorts.Count + " ports");
+                return;
+            }
 
-                String portName = port.PortName;
-                if (portName.StartsWith("COM") || portName.StartsWith("/"))
-                {
-                    // TODO do more validation ? At least it is not undefined
-                }
-                else
-                {
-                    Debug.LogWarning("Simpit : no port name is defined for port " + port.ID + ". Please check the SimPit config file.");
-                    // Display a message for 20s that persist on different scene
-                    ScreenMessages.PostScreenMessage("Simpit : no port name is defined for port " + port.ID + ". Please check the SimPit config file.", 20, true);
-                }
+            KSPSerialPort port = SerialPorts[portID];
+            if(port.portStatus != KSPSerialPort.ConnectionStatus.CLOSED && port.portStatus != KSPSerialPort.ConnectionStatus.ERROR)
+            {
+                //Port already opened. Nothing to do.
+                return;
+            }
 
-                if (port.open())
+            String portName = port.PortName;
+            if (portName.StartsWith("COM") || portName.StartsWith("/"))
+            {
+                // TODO do more validation ? At least it is not undefined
+            }
+            else
+            {
+                Debug.LogWarning("Simpit : no port name is defined for port " + port.ID + ". Please check the SimPit config file.");
+                // Display a message for 20s that persist on different scene
+                ScreenMessages.PostScreenMessage("Simpit : no port name is defined for port " + port.ID + ". Please check the SimPit config file.", 20, true);
+                return;
+            }
+
+            if (port.open())
+            {
+                if (Config.Verbose)
                 {
-                    if (Config.Verbose){
-                        Debug.Log(String.Format("KerbalSimpit: Opened {0}", portName));
-                    }
-                } else {
-                    if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Unable to open {0}", portName));
+                    Debug.Log(String.Format("KerbalSimpit: Opened {0}", portName));
                 }
+            }
+            else
+            {
+                if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Unable to open {0}", portName));
             }
 
             if(!DoEventDispatching)
                 StartEventDispatch();
+        }
 
+        public void OpenPorts() {
+            for (int index = 0; index < SerialPorts.Count; index++)
+            {
+                OpenPort(index);
+            }
+        }
+
+        public void ClosePort(int portID)
+        {
+
+            if (portID >= SerialPorts.Count)
+            {
+                Debug.Log("Simpit OpenPort called for port " + portID + " but I only have " + SerialPorts.Count + " ports");
+                return;
+            }
+
+            KSPSerialPort port = SerialPorts[portID];
+            if (port.portStatus == KSPSerialPort.ConnectionStatus.CLOSED || port.portStatus == KSPSerialPort.ConnectionStatus.ERROR)
+            {
+                // Port is already closed. Nothing to do.
+                return;
+            }
+
+            //If all port are closed except this one, we can stop the event dispatching
+            bool canStopEventDispatch = true;
+            foreach (KSPSerialPort otherPort in SerialPorts)
+            {
+                if(otherPort.ID != portID && (otherPort.portStatus != KSPSerialPort.ConnectionStatus.CLOSED && port.portStatus != KSPSerialPort.ConnectionStatus.ERROR))
+                {
+                    canStopEventDispatch = false;
+                }
+            }
+            if (canStopEventDispatch)
+            {
+                // Sets this to false, to signal to the workers to stop running.
+                // Without this, they will cause many problems, and prevent the Arduino from being reconnected
+                // Also, without this if the Arduino is disconnected the workers will throw so many errors, that
+                // they seem to be the cause of KSP crashing not long after
+                DoEventDispatching = false;
+            }
+
+            port.close();
         }
 
         public void ClosePorts() {
-
-            // Sets this to false, to signal to the workers to stop running.
-            // Without this, they will cause many problems, and prevent the Arduino from being reconnected
-            // Also, without this if the Arduino is disconnected the workers will throw so many errors, that
-            // they seem to be the cause of KSP crashing not long after 
-
-            DoEventDispatching = false;
-
-            foreach (KSPSerialPort port in SerialPorts)
+            for (int index = 0; index < SerialPorts.Count; index++)
             {
-                if(port.portStatus == KSPSerialPort.ConnectionStatus.CLOSED || port.portStatus == KSPSerialPort.ConnectionStatus.ERROR)
-                {
-                    // Port is already closed. Nothing to do.
-                    continue;
-                }
-
-                port.close();
+                ClosePort(index);
             }
-
         }
 
         private void handshakeCallback(byte portID, object data)
