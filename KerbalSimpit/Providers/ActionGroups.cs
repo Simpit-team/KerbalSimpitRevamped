@@ -217,32 +217,17 @@ namespace KerbalSimpit.Providers
         {
             CAGStatusStruct result = new CAGStatusStruct();
 
+            for (int i = 1; i < ActionGroupIDs.Length; i++) //Ignoring 0 since there is no Action Group 0
+            {
+                if (FlightGlobals.ActiveVessel.ActionGroups[ActionGroupIDs[i]])
+                {
+                    result.status[i / 8] |= (byte)(1 << (i % 8)); //Set the selected bit to 1
+                }
+            }
+
             if (AGXPresent)
             {
-                Type AGXFlight = Type.GetType("ActionGroupsExtended.AGXFlight, AGExt");
-
-                Dictionary<int, bool> groupActivatedState = (Dictionary<int, bool>) AGXFlight.InvokeMember("groupActivatedState",
-                    BindingFlags.GetField | BindingFlags.Public | BindingFlags.Static, null, null, null);
-
-                foreach (KeyValuePair<int, bool> item in groupActivatedState)
-                {
-                    int group = item.Key;
-                    if(group > 250)
-                    {
-                        Debug.Log("Simpit : ignoring an action that is above the 250 actions allowed with AGExt");
-                    } else
-                    {
-                        if (item.Value)
-                        {
-                            result.status[group / 8] |= (byte)(1 << group % 8); //Set the selected bit to 1
-                        }
-                    }
-                }
-
-                /*
-                // The following code use the 'official' AGExt External API, but each call actually log one line
-                // So each tick, this generate 250 log line. To avoid this, another method is used (see above)
-                for (int group = 1; group <= 250; group++) //Ignoring 0 since there is no Action Group 0
+                for (int group = 11; group <= 250; group++) // Only call AGExt for additionnal actions
                 {
                     bool activated = (bool) AGXExternal.InvokeMember("AGXGroupState",
                         BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Static, null, null, new System.Object[] { group });
@@ -251,16 +236,9 @@ namespace KerbalSimpit.Providers
                     {
                         result.status[group / 8] |= (byte) (1 << group % 8); //Set the selected bit to 1
                     }
-                }*/
-            } else
-            {
-                for(int i = 1; i < ActionGroupIDs.Length; i++) //Ignoring 0 since there is no Action Group 0
-                {
-                    if (FlightGlobals.ActiveVessel.ActionGroups[ActionGroupIDs[i]]){
-                        result.status[i / 8] |= (byte)(1 << (i%8)); //Set the selected bit to 1
-                    }
                 }
             }
+
             return result;
         }
     }
