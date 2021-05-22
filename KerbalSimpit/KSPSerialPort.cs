@@ -162,6 +162,25 @@ namespace KerbalSimpit.Serial
             }
         }
 
+        private void handleError()
+        {
+            try
+            {
+                DoSerial = false;
+                Thread.Sleep(500);
+                if (Port.IsOpen)
+                    Port.Close();
+            }
+            catch (Exception)
+            {
+
+            }
+            finally
+            {
+                portStatus = KSPSerialPort.ConnectionStatus.ERROR;
+            }
+        }
+
         // Construct a KerbalSimpit packet, and enqueue it.
         // Note that callers of this method are rarely in the main
         // game thread, hence using a threadsafe queue implementation.
@@ -268,8 +287,16 @@ namespace KerbalSimpit.Serial
                 }
                 if (dequeued != null && Port.IsOpen)
                 {
-                    Port.Write(dequeued, 0, dequeued.Length);
-                    dequeued = null;
+                    try
+                    {
+                        Port.Write(dequeued, 0, dequeued.Length);
+                        dequeued = null;
+                    }
+                    catch (System.IO.IOException exc)
+                    {
+                        Debug.Log(String.Format("KerbalSimpit: IOException in serial worker for {0}: {1}", PortName, exc.ToString()));
+                        handleError();
+                    }
                 }
             };
             Debug.Log(String.Format("KerbalSimpit: Starting write thread for port {0}", PortName));
@@ -302,6 +329,7 @@ namespace KerbalSimpit.Serial
                 catch(System.IO.IOException exc)
                 {
                     Debug.Log(String.Format("KerbalSimpit: IOException in serial worker for {0}: {1}", PortName, exc.ToString()));
+                    handleError();
                 }
                 Thread.Sleep(10); // TODO: Tune this.
             };
@@ -332,6 +360,7 @@ namespace KerbalSimpit.Serial
                             catch(System.IO.IOException exc)
                             {
                                 Debug.Log(String.Format("KerbalSimpit: IOException in serial worker for {0}: {1}", PortName, exc.ToString()));
+                                handleError();
                             }
                         }, null);
                 }
