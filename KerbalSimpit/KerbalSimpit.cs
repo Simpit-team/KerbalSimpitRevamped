@@ -234,7 +234,7 @@ namespace KerbalSimpit
             }
 
             KSPSerialPort port = SerialPorts[portID];
-            if (port.portStatus == KSPSerialPort.ConnectionStatus.CLOSED || port.portStatus == KSPSerialPort.ConnectionStatus.ERROR)
+            if (port.portStatus == KSPSerialPort.ConnectionStatus.CLOSED)
             {
                 // Port is already closed. Nothing to do.
                 return;

@@ -144,6 +144,12 @@ namespace KerbalSimpit.Serial
                 DoSerial = false;
                 Thread.Sleep(500);
                 Port.Close();
+            } else if(portStatus == KSPSerialPort.ConnectionStatus.ERROR)
+            {
+                portStatus = KSPSerialPort.ConnectionStatus.CLOSED;
+                DoSerial = false;
+                Thread.Sleep(500);
+                Port.Close();
             }
         }
 
