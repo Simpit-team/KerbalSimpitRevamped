@@ -74,9 +74,6 @@ namespace KerbalSimpit.Serial
         private volatile bool DoSerial;
         private Thread SerialReadThread, SerialWriteThread;
 
-        // If we're opening a COM serial port, assume we're running on Windows.
-        private bool isWindows = false;
-
         // Constructors:
         // pn: port number
         // br: baud rate
@@ -105,16 +102,8 @@ namespace KerbalSimpit.Serial
             Port = new SerialPort(PortName, BaudRate, Parity.None,
                                   8, StopBits.One);
 
-            if (System.Text.RegularExpressions.Regex.IsMatch(pn, "^COM[0-9]?",
-                                                             System.Text.RegularExpressions.RegexOptions.IgnoreCase))
-            {
-                isWindows = true;
-                if (KSPit.Config.Verbose)
-                    Debug.Log(String.Format("KerbalSimpit: Using serial polling thread for {0}", pn));
-            } else {
-                if (KSPit.Config.Verbose)
-                    Debug.Log(String.Format("KerbalSimpit: Using async reader thread for {0}", pn));
-            }
+            if (KSPit.Config.Verbose)
+                Debug.Log(String.Format("KerbalSimpit: Using serial polling thread for {0}", pn));
         }
 
         // Open the serial port
@@ -125,12 +114,8 @@ namespace KerbalSimpit.Serial
                 {
                     Port.Open();
                     SerialWriteThread = new Thread(SerialWriteQueueRunner);
-                    if (isWindows)
-                    {
-                        SerialReadThread = new Thread(SerialPollingWorker);
-                    } else {
-                        SerialReadThread = new Thread(AsyncReaderWorker);
-                    }
+                    SerialReadThread = new Thread(SerialPollingWorker);
+
                     DoSerial = true;
 
                     // If the port connected, set connected status to waiting for the handshake
@@ -339,43 +324,6 @@ namespace KerbalSimpit.Serial
                 SerialRead();
             }
             Debug.Log(String.Format("KerbalSimpit: Poll thread for port {0} exiting.", PortName));
-        }
-
-        // This method spawns a new thread to read data from the serial connection
-        private void AsyncReaderWorker()
-        {
-            byte[] buffer = new byte[MaxPacketSize];
-            Action SerialRead = null;
-            SerialRead = delegate {
-                try
-                {
-                    Port.BaseStream.BeginRead(buffer, 0, buffer.Length, delegate(IAsyncResult ar) {
-                            try
-                            {
-                                int actualLength = Port.BaseStream.EndRead(ar);
-                                byte[] received = new byte[actualLength];
-                                Buffer.BlockCopy(buffer, 0, received, 0, actualLength);
-                                ReceivedDataEvent(received, actualLength);
-                            }
-                            catch(System.IO.IOException exc)
-                            {
-                                Debug.Log(String.Format("KerbalSimpit: IOException in serial worker for {0}: {1}", PortName, exc.ToString()));
-                                handleError();
-                            }
-                        }, null);
-                }
-                catch (InvalidOperationException)
-                {
-                    Debug.Log(String.Format("KerbalSimpit: Trying to read port {0} that isn't open, sleeping", PortName));
-                    Thread.Sleep(500);
-                }
-            };
-            Debug.Log(String.Format("KerbalSimpit: Starting async read thread for port {0}", PortName));
-            while (DoSerial)
-            {
-                SerialRead();
-            }
-            Debug.Log(String.Format("KerbalSimpit: async read thread for port {0} exiting.", PortName));
         }
 
         // Handle data read in worker thread
