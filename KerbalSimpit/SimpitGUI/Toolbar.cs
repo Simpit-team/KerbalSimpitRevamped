@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using KSP.UI.Screens;
+using KerbalSimpit.Serial;
 
 namespace KerbalSimpit.SimpitGUI
 {
@@ -13,6 +14,8 @@ namespace KerbalSimpit.SimpitGUI
 	{
 		const ApplicationLauncher.AppScenes buttonScenes = ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW;
 		private static ApplicationLauncherButton button;
+
+		private static Texture2D iconRed, iconOrange, iconGreen;
 
 		public static Callback Toggle = delegate { };
 
@@ -39,6 +42,10 @@ namespace KerbalSimpit.SimpitGUI
 
 		public void Start()
 		{
+			iconRed = GameDatabase.Instance.GetTexture("KerbalSimpit/Simpit_icon_red", false);
+			iconOrange = GameDatabase.Instance.GetTexture("KerbalSimpit/Simpit_icon_orange", false);
+			iconGreen = GameDatabase.Instance.GetTexture("KerbalSimpit/Simpit_icon_green", false);
+
 			GameObject.DontDestroyOnLoad(this);
 			GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
 		}
@@ -52,9 +59,30 @@ namespace KerbalSimpit.SimpitGUI
 		{
 			if (ApplicationLauncher.Ready && button == null)
 			{
-				var tex = GameDatabase.Instance.GetTexture("KerbalSimpit/icon_simpit", false);
-				button = ApplicationLauncher.Instance.AddModApplication(onToggle, onToggle, null, null, null, null, ApplicationLauncher.AppScenes.ALWAYS, tex);
+				button = ApplicationLauncher.Instance.AddModApplication(onToggle, onToggle, null, null, null, null, ApplicationLauncher.AppScenes.ALWAYS, iconRed);
 				UpdateVisibility();
+			}
+		}
+
+		void Update()
+		{
+			KSPSerialPort.ConnectionStatus status = KSPit.SerialPorts[0].portStatus;
+			if (status == KSPSerialPort.ConnectionStatus.CLOSED || status == KSPSerialPort.ConnectionStatus.ERROR)
+			{
+				button.SetTexture(iconRed);
+			}
+			else if (status == KSPSerialPort.ConnectionStatus.WAITING_HANDSHAKE || status == KSPSerialPort.ConnectionStatus.HANDSHAKE)
+			{
+				button.SetTexture(iconOrange);
+			}
+			else if (status == KSPSerialPort.ConnectionStatus.CONNECTED || status == KSPSerialPort.ConnectionStatus.IDLE)
+			{
+				button.SetTexture(iconGreen);
+			}
+			else
+			{
+				//All cases should be covered, this should not happen.
+				button.SetTexture(iconRed);
 			}
 		}
 	}
