@@ -162,5 +162,7 @@ namespace KerbalSimpit
         public static byte SHIFT_MOD = 1;
         public static byte CTRL_MOD = 2;
         public static byte ALT_MOD = 4;
+        public static byte KEY_DOWN_MOD = 8;
+        public static byte KEY_UP_MOD = 16;
     };
 }

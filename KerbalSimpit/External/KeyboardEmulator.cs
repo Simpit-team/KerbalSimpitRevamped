@@ -58,11 +58,22 @@ namespace KerbalSimpit.KerbalSimpit.External
 
                     if ((payload.modifier & KeyboardEmulatorModifier.SHIFT_MOD) != 0)
                     {
-                        input.Keyboard.KeyDown(VirtualKeyCode.SHIFT);
+                        // Use LSHIFT instead of SHIFT since some function (like SHIFT+Tab to cycle through bodies in map view) only work with left shift.
+                        // This requires a custom version of the WindowsInput library to properly handle it.
+                        input.Keyboard.KeyDown(VirtualKeyCode.LSHIFT);
                     }
 
-                    Debug.Log("Simpit emulates keypress of " + key);
-                    input.Keyboard.KeyPress(key);
+                    if ((payload.modifier & KeyboardEmulatorModifier.KEY_DOWN_MOD) != 0)
+                    {
+                        Debug.Log("Simpit emulates key down of " + key);
+                        input.Keyboard.KeyDown(key);
+                    } else if ((payload.modifier & KeyboardEmulatorModifier.KEY_UP_MOD) != 0) {
+                        Debug.Log("Simpit emulates key up of " + key);
+                        input.Keyboard.KeyUp(key);
+                    } else {
+                        Debug.Log("Simpit emulates keypress of " + key);
+                        input.Keyboard.KeyPress(key);
+                    }
 
                     if ((payload.modifier & KeyboardEmulatorModifier.ALT_MOD) != 0)
                     {
@@ -76,7 +87,7 @@ namespace KerbalSimpit.KerbalSimpit.External
 
                     if ((payload.modifier & KeyboardEmulatorModifier.SHIFT_MOD) != 0)
                     {
-                        input.Keyboard.KeyUp(VirtualKeyCode.SHIFT);
+                        input.Keyboard.KeyUp(VirtualKeyCode.LSHIFT);
                     }
                 } else
                 {
