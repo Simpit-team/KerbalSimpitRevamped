@@ -115,6 +115,15 @@ namespace WindowsInput
         /// <returns>This <see cref="InputBuilder"/> instance.</returns>
         public InputBuilder AddKeyDown(VirtualKeyCode keyCode)
         {
+            KeyboardFlag flags = 0;
+            ushort scanCode = (UInt16)(NativeMethods.MapVirtualKey((UInt32)keyCode, 0) & 0xFFU);
+
+            if (keyCode == VirtualKeyCode.LSHIFT)
+            {
+                flags |= KeyboardFlag.ScanCode;
+                scanCode = 0x2A;
+            }
+
             var down =
                 new INPUT
                     {
@@ -125,8 +134,8 @@ namespace WindowsInput
                                     new KEYBDINPUT
                                         {
                                             KeyCode = (UInt16) keyCode,
-                                            Scan = (UInt16)(NativeMethods.MapVirtualKey((UInt32)keyCode, 0) & 0xFFU),
-                                            Flags = IsExtendedKey(keyCode) ? (UInt32) KeyboardFlag.ExtendedKey : 0,
+                                            Scan = scanCode,
+                                            Flags = (UInt32) (IsExtendedKey(keyCode) ? KeyboardFlag.ExtendedKey | flags : flags),
                                             Time = 0,
                                             ExtraInfo = IntPtr.Zero
                                         }
@@ -144,6 +153,15 @@ namespace WindowsInput
         /// <returns>This <see cref="InputBuilder"/> instance.</returns>
         public InputBuilder AddKeyUp(VirtualKeyCode keyCode)
         {
+            KeyboardFlag flags = KeyboardFlag.KeyUp;
+            ushort scanCode = (UInt16)(NativeMethods.MapVirtualKey((UInt32)keyCode, 0) & 0xFFU);
+
+            if (keyCode == VirtualKeyCode.LSHIFT)
+            {
+                flags |= KeyboardFlag.ScanCode;
+                scanCode = 0x2A;
+            }
+
             var up =
                 new INPUT
                     {
@@ -154,10 +172,10 @@ namespace WindowsInput
                                     new KEYBDINPUT
                                         {
                                             KeyCode = (UInt16) keyCode,
-                                            Scan = (UInt16)(NativeMethods.MapVirtualKey((UInt32)keyCode, 0) & 0xFFU),
+                                            Scan = scanCode,
                                             Flags = (UInt32) (IsExtendedKey(keyCode)
-                                                                  ? KeyboardFlag.KeyUp | KeyboardFlag.ExtendedKey
-                                                                  : KeyboardFlag.KeyUp),
+                                                                  ? flags | KeyboardFlag.ExtendedKey
+                                                                  : flags),
                                             Time = 0,
                                             ExtraInfo = IntPtr.Zero
                                         }
