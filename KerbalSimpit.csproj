@@ -1,0 +1,170 @@
+﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{ACABD7D1-82A2-4702-BAB2-A6DF2EF93602}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <NoStandardLibraries>false</NoStandardLibraries>
+    <AssemblyName>KerbalSimpit</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>KerbalSimpit</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(KSPDIR)\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>$(KSPDIR)\KSP_x64_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="UnityEngine">
+      <HintPath>$(KSPDIR)\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(KSPDIR)\KSP_x64_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(KSPDIR)\KSP_x64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(KSPDIR)\KSP_x64_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(KSPDIR)\KSP_x64_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(KSPDIR)\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include=".gitignore" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".github\ISSUE_TEMPLATE\bug_report.md" />
+    <None Include=".github\ISSUE_TEMPLATE\feature_request.md" />
+    <None Include=".git\config" />
+    <None Include=".git\description" />
+    <None Include=".git\FETCH_HEAD" />
+    <None Include=".git\HEAD" />
+    <None Include=".git\hooks\applypatch-msg.sample" />
+    <None Include=".git\hooks\commit-msg.sample" />
+    <None Include=".git\hooks\fsmonitor-watchman.sample" />
+    <None Include=".git\hooks\post-update.sample" />
+    <None Include=".git\hooks\pre-applypatch.sample" />
+    <None Include=".git\hooks\pre-commit.sample" />
+    <None Include=".git\hooks\pre-merge-commit.sample" />
+    <None Include=".git\hooks\pre-push.sample" />
+    <None Include=".git\hooks\pre-rebase.sample" />
+    <None Include=".git\hooks\pre-receive.sample" />
+    <None Include=".git\hooks\prepare-commit-msg.sample" />
+    <None Include=".git\hooks\update.sample" />
+    <None Include=".git\index" />
+    <None Include=".git\info\exclude" />
+    <None Include=".git\logs\HEAD" />
+    <None Include=".git\logs\refs\heads\master" />
+    <None Include=".git\logs\refs\remotes\origin\main" />
+    <None Include=".git\objects\pack\pack-62ec298f40115f33bb9923ed82b728228692a422.idx" />
+    <None Include=".git\objects\pack\pack-62ec298f40115f33bb9923ed82b728228692a422.pack" />
+    <None Include=".git\packed-refs" />
+    <None Include=".git\refs\heads\master" />
+    <None Include=".git\refs\remotes\origin\main" />
+    <None Include=".vs\KerbalSimpitRevamped\v16\.suo" />
+    <None Include=".vs\ProjectSettings.json" />
+    <None Include=".vs\slnx.sqlite" />
+    <None Include=".vs\VSWorkspaceState.json" />
+    <None Include="bamboo-build.sh" />
+    <None Include="BUILDING.md" />
+    <None Include="CHANGELOG.md" />
+    <None Include="distrib\PluginData\Settings.cfg.sample" />
+    <None Include="KerbalSimpit.version.m4" />
+    <None Include="LICENSE.md" />
+    <None Include="Properties\AssemblyInfo.cs.m4" />
+    <None Include="README.md" />
+    <None Include="version-info.m4" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="KerbalSimpit\Console\KerbalSimpitConsole.cs" />
+    <Compile Include="KerbalSimpit\Console\KerbalSimpitConsole_HelpCommand.cs" />
+    <Compile Include="KerbalSimpit\Console\KerbalSimpitConsole_SerialCommand.cs" />
+    <Compile Include="KerbalSimpit\Contrib\UnityMainThreadDispatcher\UnityMainThreadDispatcher.cs" />
+    <Compile Include="KerbalSimpit\External\ARPWrapper.cs" />
+    <Compile Include="KerbalSimpit\External\CRPWrapper.cs" />
+    <Compile Include="KerbalSimpit\External\KeyboardEmulator.cs" />
+    <Compile Include="KerbalSimpit\KerbalSimpit.cs" />
+    <Compile Include="KerbalSimpit\KerbalSimpitConfig.cs" />
+    <Compile Include="KerbalSimpit\KerbalSimpitPackets.cs" />
+    <Compile Include="KerbalSimpit\KSPSerialPort.cs" />
+    <Compile Include="KerbalSimpit\Localisation_Libs\Command_Lib_Local.cs" />
+    <Compile Include="KerbalSimpit\Providers\ActionGroups.cs" />
+    <Compile Include="KerbalSimpit\Providers\Actions.cs" />
+    <Compile Include="KerbalSimpit\Providers\AxisControl.cs" />
+    <Compile Include="KerbalSimpit\Providers\CameraControl.cs" />
+    <Compile Include="KerbalSimpit\Providers\CoreProviders.cs" />
+    <Compile Include="KerbalSimpit\Providers\Resources.cs" />
+    <Compile Include="KerbalSimpit\Providers\TargetInfo.cs" />
+    <Compile Include="KerbalSimpit\Providers\Telemetry.cs" />
+    <Compile Include="KerbalSimpit\Providers\WarpControl.cs" />
+    <Compile Include="KerbalSimpit\SimpitGUI\Toolbar.cs" />
+    <Compile Include="KerbalSimpit\SimpitGUI\Window.cs" />
+    <Compile Include="KerbalSimpit\Utilities\OrbitalComputations.cs" />
+    <Compile Include="KerbalSimpit\Utilities\Utilities.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include=".git\objects\info\" />
+    <Folder Include=".git\refs\tags\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="KerbalSimpit\Contrib\InputSimulator\WindowsInput\WindowsInput.csproj">
+      <Project>{3549cd6f-80f8-450f-b99e-cf0a736b1f2a}</Project>
+      <Name>WindowsInput</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
+  <ProjectExtensions>
+    <VisualStudio AllowExistingFolder="true" />
+  </ProjectExtensions>
+  <PropertyGroup>
+    <PostBuildEvent>set "MyKSPDIR=%25KSPDIR%25"
+
+if defined MyKSPDIR (
+  if exist "%25MyKSPDIR%25\GameData\KerbalSimpit\$(TargetFileName)" (
+    echo Copying Simpit DLL into the Simpit folder
+    xcopy "$(TargetPath)" "%25MyKSPDIR%25\GameData\KerbalSimpit\$(TargetFileName)" /f /y
+  ) else (
+     echo Simpit is not installed in %25MyKSPDIR%25, I do not copy Simpit DLL
+   )
+) else (
+  echo KSPDIR is not set, I cannot copy Simpit DLL
+)</PostBuildEvent>
+  </PropertyGroup>
+</Project>

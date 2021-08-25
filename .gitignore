@@ -1,16 +1,10 @@
 # Ignore generated files/directories
 Bin/
-SerialBin/
 obj/
 *.zip
 KerbalSimPit.version
 Properties/*.cs
-
-# Ignore our gathered resources
-KSPresources
-
-# Ignore WIP bits
-junk/
+.vs
 
 # Ignore the symlink files, pointing to the game install directory
 install

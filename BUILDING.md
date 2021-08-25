@@ -1,6 +1,16 @@
 # Building Kerbal Simpit
 
-## Requirements - building on Windows/Linux
+There is currently two ways of building Simpit.
+
+## Building using Visual Studio
+
+1. Set the KSPDIR environment variable to the version of KSP you want to build against. KSPDIR should be set to the path containing the KSP executable
+2. Open the KerbalSimpit.sln and compile it.
+3. The DLL is built in bin\Debug by default. If KSPDIR is set and Simpit is installed, the Simpit DLL will be overwritten to update Simpit.
+
+## Building using Linux or Mmono and WSL on Windows
+
+This method is not currently up to date with the addition of the keyboard emulator
 
 1. Have WSL enabled, running Debian 10
 2. Run: sudo apt install build-essential
@@ -16,9 +26,20 @@
 
 6. Try the above steps, and if they do not work, also try installing dotnet, following the install instructions here: https://docs.microsoft.com/en-gb/dotnet/core/install/linux
 
+# Making a release
 
-## Compiling:
+Set the version number
+Update `CHANGELOG.md`.
+Tag the commit with the version and push it
+Create a folder with the DLLS, the icons, the localisation files, etc.
+Zip it and upload to GitHub
+Update CKAN metadata information
 
+Make a matching Arduino lib release ?
+
+TODO Automate it.
+
+# Previous content of BUILDING.md. No longer used.
 
 ## Building a release:
 
