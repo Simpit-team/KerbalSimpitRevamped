@@ -234,6 +234,8 @@ namespace KerbalSimpit.Providers
 
         private byte getGroups()
         {
+            if (FlightGlobals.ActiveVessel == null) return 0;
+
             byte groups = 0;
             if (FlightGlobals.ActiveVessel.ActionGroups[KSPActionGroup.Stage])
             {

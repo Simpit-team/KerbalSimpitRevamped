@@ -181,6 +181,8 @@ namespace KerbalSimpit.Providers
 
         public void AltitudeProvider()
         {
+            if (FlightGlobals.ActiveVessel == null) return;
+
             myAlt.alt = (float)FlightGlobals.ActiveVessel.altitude;
             myAlt.surfalt = (float)FlightGlobals.ActiveVessel.radarAltitude;
             if (altitudeChannel != null) altitudeChannel.Fire(OutboundPackets.Altitude, myAlt);
@@ -188,6 +190,8 @@ namespace KerbalSimpit.Providers
 
         public void ApsidesProvider()
         {
+            if (FlightGlobals.ActiveVessel == null) return;
+
             myApsides.apoapsis = (float)FlightGlobals.ActiveVessel.orbit.ApA;
             myApsides.periapsis = (float)FlightGlobals.ActiveVessel.orbit.PeA;
             if (apsidesChannel != null) apsidesChannel.Fire(OutboundPackets.Apsides, myApsides);
@@ -195,6 +199,8 @@ namespace KerbalSimpit.Providers
 
         public void ApsidesTimeProvider()
         {
+            if (FlightGlobals.ActiveVessel == null) return;
+
             myApsidesTime.apoapsis = (int)FlightGlobals.ActiveVessel.orbit.timeToAp;
             myApsidesTime.periapsis = (int)FlightGlobals.ActiveVessel.orbit.timeToPe;
             if (apsidesTimeChannel != null) apsidesTimeChannel.Fire(OutboundPackets.ApsidesTime, myApsidesTime);
@@ -202,6 +208,8 @@ namespace KerbalSimpit.Providers
 
         public void VelocityProvider()
         {
+            if (FlightGlobals.ActiveVessel == null) return;
+
             myVelocity.orbital = (float)FlightGlobals.ActiveVessel.obt_speed;
             myVelocity.surface = (float)FlightGlobals.ActiveVessel.srfSpeed;
             myVelocity.vertical = (float)FlightGlobals.ActiveVessel.verticalSpeed;
@@ -210,6 +218,8 @@ namespace KerbalSimpit.Providers
 
         public void OrbitInfoProvider()
         {
+            if (FlightGlobals.ActiveVessel == null) return;
+
             Orbit currentOrbit = FlightGlobals.ActiveVessel.orbit;
             myOrbitInfoStruct.eccentricity = (float) currentOrbit.eccentricity;
             myOrbitInfoStruct.semiMajorAxis = (float)currentOrbit.semiMajorAxis;
@@ -224,6 +234,8 @@ namespace KerbalSimpit.Providers
 
         public void AirspeedProvider()
         {
+            if (FlightGlobals.ActiveVessel == null) return;
+
             myAirspeed.IAS = (float)FlightGlobals.ActiveVessel.indicatedAirSpeed;
             myAirspeed.MachNumber = (float)FlightGlobals.ActiveVessel.mach;
             if (airspeedChannel != null) airspeedChannel.Fire(OutboundPackets.Airspeed, myAirspeed);
@@ -231,6 +243,8 @@ namespace KerbalSimpit.Providers
 
         public void TempLimitProvider()
         {
+            if (FlightGlobals.ActiveVessel == null) return;
+
             double maxTempPercentage = 0.0;
             double maxSkinTempPercentage = 0.0;
 
@@ -292,6 +306,8 @@ namespace KerbalSimpit.Providers
 
         public void ManeuverProvider()
         {
+            if (FlightGlobals.ActiveVessel == null) return;
+
             myManeuver.timeToNextManeuver = 0.0f;
             myManeuver.deltaVNextManeuver = 0.0f;
             myManeuver.durationNextManeuver = 0.0f;
