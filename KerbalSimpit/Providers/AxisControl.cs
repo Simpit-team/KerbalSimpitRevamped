@@ -280,7 +280,6 @@ namespace KerbalSimPit.Providers
                 if (SASInfoChannel != null)
                 {
                     mySASInfo = newSASInfo;
-                    Debug.Log("I'm in mode " + mySASInfo.currentSASMode + " with availability " + Convert.ToString(mySASInfo.SASModeAvailability, 2));
                     SASInfoChannel.Fire(OutboundPackets.SASInfo, mySASInfo);
                 }
             }
