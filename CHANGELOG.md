@@ -1,39 +1,45 @@
 # Kerbal Simpit Changelog
 
-## v(to be decided)
+## v(to be decided), not in an official release yet
 
-### (2019-01-06)
+### Features
  
-Added in a number of features:
+Add a GUI to monitor the connection state and open/close ports.
+Add message for Xenon ressource
+Add message for TAC Life support ressources
+Add message for generic ressource, to be configured by the user. Tested with CommunityResourcePack.
+Add message for deltaV and burntime
+Add message for maneuver data
+Add message for current temperature of vessel (with respect to the maximum temporature)
+Add message with all the orbit parameters (not only apoapsis and periapsis).
+Add message for CAG status (broken for CAG > 10 with AGExt)
+Add message to control Timewarp
+Add message to control camera position
+Add message to send a log line to KSP from Arduino
+Add message to emulate a keypress in KSP (to open the map, quicksave, etc.)
+Add message to inform the controler about the current SAS mode
+Add message for flight status (including warp speed, status, crew, com)
 
-Commands to control serial. This has been done by restructuring the KSPit class code,
-to enable code outside of that class to control the serial port stopping/starting.
+Add support for console command to start/stop the connection
+Update of the examples and addition of an example for using the numeric input (throttle, roll, pich, yaw, etc.) or keyboard emulation.
+Add some helper functions in the Arduino lib.
+Reset all subscribed channels when handshake is complete (typical case of Arduino being reset).
+Add warning displayed to the user when no port name is set.
 
-The commands have localization in English and German, so that they are more easily
-usable by those who may not speak English as their first language. 
-This localization has been done in a manner that means it cannot affect the program
-parsing in the commands, unless the localization of a command into another language
-would require the addition of a space. If that happens, then the current command parser I
-implemented would have a right royal paddy, and spit the dummy.
+### Bugfixes
 
-The serial port has been tested to go from being used in KSP, to being used by the Arduino IDE to program,
-back to KSP. I am happy to report that this works, so long as you disconnect from KSP before programming, then
-hit the reset button on the arduino before trying to get KSP to reconnect.
+Fix an error when a non-vessel target is set
+Fix an issue when the command are send to the wrong vessel when switching vessel
+Fix sending of the action state not done when all actions were off
+Fix an issue where the current SOI is not sent when the channel is first requested
+Fix the scene change message not being sent
+Improve I/O Error handling (including crash to desktop when the Arduino is unplugged) and improve Mac compatibility
 
-Help commands have been implemented for the serial commands. The help command is fairly basic, and some
-more changes will need to be made for it to work with potential future changes and additions to the commands.
-However, the basic framework is there, and the help messages are also localised.
+### Known issues
 
-NB: The serial port no longer starts up automatically, at this point in time. The previous
-method of having the KSPit class be automatically loaded/run when the game starts breaks the serial
-start/stop commands.
+When subscribing several times to the same channel, messages are send several times at each tick.
+The IDLE status of a connection is only computed when messages are sent (only an issue when there is no periodic channel subscribed).
 
-I think that is all of the things that I have done, baring that I made a minor change to the makefile, so
-that the install command also copies the localisation files into the gamedata folder as well. Not to mention,
-I added the files I created to the Main.csproj file, so they are compiled.
-
-Note to testers: The command to access the help/serial commands is "/sim [command]"
-The "/sim help" should hopefully provide the details needed. 
 
 ## v1.4.1 (2020-07-02)
 
