@@ -70,39 +70,9 @@
     <Content Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
-    <None Include=".github\ISSUE_TEMPLATE\bug_report.md" />
-    <None Include=".github\ISSUE_TEMPLATE\feature_request.md" />
-    <None Include=".git\config" />
-    <None Include=".git\description" />
-    <None Include=".git\FETCH_HEAD" />
-    <None Include=".git\HEAD" />
-    <None Include=".git\hooks\applypatch-msg.sample" />
-    <None Include=".git\hooks\commit-msg.sample" />
-    <None Include=".git\hooks\fsmonitor-watchman.sample" />
-    <None Include=".git\hooks\post-update.sample" />
-    <None Include=".git\hooks\pre-applypatch.sample" />
-    <None Include=".git\hooks\pre-commit.sample" />
-    <None Include=".git\hooks\pre-merge-commit.sample" />
-    <None Include=".git\hooks\pre-push.sample" />
-    <None Include=".git\hooks\pre-rebase.sample" />
-    <None Include=".git\hooks\pre-receive.sample" />
-    <None Include=".git\hooks\prepare-commit-msg.sample" />
-    <None Include=".git\hooks\update.sample" />
-    <None Include=".git\index" />
-    <None Include=".git\info\exclude" />
-    <None Include=".git\logs\HEAD" />
-    <None Include=".git\logs\refs\heads\master" />
-    <None Include=".git\logs\refs\remotes\origin\main" />
-    <None Include=".git\objects\pack\pack-62ec298f40115f33bb9923ed82b728228692a422.idx" />
-    <None Include=".git\objects\pack\pack-62ec298f40115f33bb9923ed82b728228692a422.pack" />
-    <None Include=".git\packed-refs" />
-    <None Include=".git\refs\heads\master" />
-    <None Include=".git\refs\remotes\origin\main" />
-    <None Include=".vs\KerbalSimpitRevamped\v16\.suo" />
-    <None Include=".vs\ProjectSettings.json" />
-    <None Include=".vs\slnx.sqlite" />
-    <None Include=".vs\VSWorkspaceState.json" />
-    <None Include="bamboo-build.sh" />
+    <None Remove=".git\**" />
+    <None Remove=".github\**" />
+    <None Remove=".vs\**" />
     <None Include="BUILDING.md" />
     <None Include="CHANGELOG.md" />
     <None Include="distrib\PluginData\Settings.cfg.sample" />
@@ -139,10 +109,7 @@
     <Compile Include="KerbalSimpit\Utilities\OrbitalComputations.cs" />
     <Compile Include="KerbalSimpit\Utilities\Utilities.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include=".git\objects\info\" />
-    <Folder Include=".git\refs\tags\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="KerbalSimpit\Contrib\InputSimulator\WindowsInput\WindowsInput.csproj">
       <Project>{3549cd6f-80f8-450f-b99e-cf0a736b1f2a}</Project>
