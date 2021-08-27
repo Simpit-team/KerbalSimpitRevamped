@@ -28,43 +28,12 @@ This method is not currently up to date with the addition of the keyboard emulat
 
 # Making a release
 
-Set the version number
+Set the version number and the KSP compatibility in `VERSION.txt`.
 Update `CHANGELOG.md`.
-Tag the commit with the version and push it
-Create a folder with the DLLS, the icons, the localisation files, etc.
-Zip it and upload to GitHub
-Update CKAN metadata information
+Check that the Arduino repo is up to date (it is assumed to be in the same parent folder than the C# repo) and that there is no non-commited file.
 
-Make a matching Arduino lib release ?
-
-TODO Automate it.
-
-# Previous content of BUILDING.md. No longer used.
-
-## Building a release:
-
-### Prepare the release
-
-* Update `CHANGELOG.md`.
-* Update version in `version-info.m4`.
-* Create a version git tag.
-* Push everything, including tags.
-
-### Build and upload new zip file.
-
-* Run the [KSPIT-KSPIT](https://home.hardy.dropbear.id.au/bamboo/browse/KSPIT-KSPIT)
-  Bamboo build plan. This will generate a release artefact.
-* Run the [KerbalSimpit deployment](https://home.hardy.dropbear.id.au/bamboo/deploy/viewDeploymentProjectEnvironments.action?id=950273)
-  deployment project. This will take the release artefact generated above
-  and upload it to the pool directory on the server.
-
-### Build and deploy metadata.
-
-* Run the [KSPIT-CKAN](https://home.hardy.dropbear.id.au/bamboo/browse/KSPIT-CKAN)
-  Bamboo build plan. This takes version info exported by the KSPIT build,
-  builds a `.netkan` file, and runs netkan over it to generate a CKAN file.
-  It then retrieves the archive from the last build, and adds the new
-  CKAN file to it.
-* Run the [KerbalSimpit CKAN](https://home.hardy.dropbear.id.au/bamboo/deploy/viewDeploymentProjectEnvironments.action?id=950274)
-  deployment project. This takes the refreshed archive from the last step,
-  and uploads it along with the version file.
+Compile the project in Release mode. This will automatically call the `make_release.bat` script that will create a folder and a zip in the "NextReleases" folder. 
+Test that the created folder, once copied into GameData, is working
+Commit and push the last commit
+Create a release on GitHub referecing this commit, tag it as "vX.Y.Z" and upload the created zip.
+Tag the current Arduino commit with the same version tag and push it.

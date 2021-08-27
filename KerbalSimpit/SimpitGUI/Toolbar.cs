@@ -42,9 +42,9 @@ namespace KerbalSimpit.SimpitGUI
 
 		public void Start()
 		{
-			iconRed = GameDatabase.Instance.GetTexture("KerbalSimpit/Simpit_icon_red", false);
-			iconOrange = GameDatabase.Instance.GetTexture("KerbalSimpit/Simpit_icon_orange", false);
-			iconGreen = GameDatabase.Instance.GetTexture("KerbalSimpit/Simpit_icon_green", false);
+			iconRed = GameDatabase.Instance.GetTexture("KerbalSimpitRevamp/Simpit_icon_red", false);
+			iconOrange = GameDatabase.Instance.GetTexture("KerbalSimpitRevamp/Simpit_icon_orange", false);
+			iconGreen = GameDatabase.Instance.GetTexture("KerbalSimpitRevamp/Simpit_icon_green", false);
 
 			GameObject.DontDestroyOnLoad(this);
 			GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);

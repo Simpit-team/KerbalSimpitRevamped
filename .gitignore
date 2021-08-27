@@ -5,6 +5,7 @@ obj/
 KerbalSimPit.version
 Properties/*.cs
 .vs
+NextReleases/*
 
 # Ignore the symlink files, pointing to the game install directory
 install
