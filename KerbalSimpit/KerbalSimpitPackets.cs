@@ -10,50 +10,50 @@ namespace KerbalSimpit
     public static class OutboundPackets
     {
         // Propulsion Resources
-        public static byte LiquidFuel = 1;
-        public static byte LiquidFuelStage = 2;
-        public static byte Oxidizer = 3;
-        public static byte OxidizerStage = 4;
-        public static byte SolidFuel = 5;
-        public static byte SolidFuelStage = 6;
-        public static byte XenonGas = 7;
-        public static byte XenonGasStage = 8;
-        public static byte MonoPropellant = 9;
-        public static byte EvaPropellant = 10;
+        public static byte LiquidFuel = 10;
+        public static byte LiquidFuelStage = 11;
+        public static byte Oxidizer = 12;
+        public static byte OxidizerStage = 13;
+        public static byte SolidFuel = 14;
+        public static byte SolidFuelStage = 15;
+        public static byte XenonGas = 28;
+        public static byte XenonGasStage = 29;
+        public static byte MonoPropellant = 16;
+        public static byte EvaPropellant = 18;
 
         // Vessel Resources
-        public static byte ElectricCharge = 20;
-        public static byte Ore = 21;
-        public static byte Ablator = 22;
-        public static byte AblatorStage = 23;
-        public static byte TACLSResource = 24;
-        public static byte TACLSWaste = 25;
-        public static byte CustomResource1 = 26;
-        public static byte CustomResource2 = 27;
+        public static byte ElectricCharge = 17;
+        public static byte Ore = 19;
+        public static byte Ablator = 20;
+        public static byte AblatorStage = 21;
+        public static byte TACLSResource = 30;
+        public static byte TACLSWaste = 31;
+        public static byte CustomResource1 = 32;
+        public static byte CustomResource2 = 33;
 
         // Vessel Movement/Postion
-        public static byte Altitude = 30;
-        public static byte Velocities = 31;
-        public static byte Airspeed = 32;
-        public static byte Apsides = 33;
-        public static byte ApsidesTime = 34;
-        public static byte ManeuverData = 35;
-        public static byte SASInfo = 36;
-        public static byte OrbitInfo = 37;
+        public static byte Altitude = 8;
+        public static byte Velocities = 22;
+        public static byte Airspeed = 27;
+        public static byte Apsides = 9;
+        public static byte ApsidesTime = 24;
+        public static byte ManeuverData = 34;
+        public static byte SASInfo = 35;
+        public static byte OrbitInfo = 36;
 
         // Vessel Details
-        public static byte ActionGroups = 40;
-        public static byte DeltaV = 41;
-        public static byte DeltaVEnv = 42;
-        public static byte BurnTime = 43;
-        public static byte CustomActionGroups = 44;
-        public static byte TempLimit = 45;
+        public static byte ActionGroups = 37;
+        public static byte DeltaV = 38;
+        public static byte DeltaVEnv = 39;
+        public static byte BurnTime = 40;
+        public static byte CustomActionGroups = 41;
+        public static byte TempLimit = 42;
 
         // External Environment
-        public static byte TargetInfo = 50;
-        public static byte SoIName = 51;
-        public static byte SceneChange = 52;
-        public static byte FlightStatus = 53;
+        public static byte TargetInfo = 25;
+        public static byte SoIName = 26;
+        public static byte SceneChange = 3;
+        public static byte FlightStatus = 43;
     }
 
     public static class InboundPackets
