@@ -62,15 +62,15 @@ namespace KerbalSimPit.Providers
 
         public void Start()
         {
-            RotationChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived16");
+            RotationChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + InboundPackets.VesselRotation);
             if (RotationChannel != null) RotationChannel.Add(vesselRotationCallback);
-            TranslationChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived17");
+            TranslationChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + InboundPackets.VesselTranslation);
             if (TranslationChannel != null) TranslationChannel.Add(vesselTranslationCallback);
-            WheelChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived18");
+            WheelChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + InboundPackets.WheelControl);
             if (WheelChannel != null) WheelChannel.Add(wheelCallback);
-            ThrottleChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived19");
+            ThrottleChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + InboundPackets.VesselThrottle);
             if (ThrottleChannel != null) ThrottleChannel.Add(throttleCallback);
-            AutopilotChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived20");
+            AutopilotChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + InboundPackets.AutopilotMode);
             if (AutopilotChannel != null) AutopilotChannel.Add(autopilotModeCallback);
 
             SASInfoChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.SASInfo);

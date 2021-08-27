@@ -77,14 +77,14 @@ namespace KerbalSimpit.Providers
             AGXPresent = AGXInstalled();
             if (KSPit.Config.Verbose) Debug.Log(String.Format("KerbalSimpit: ActionGroupsExtended installed: {0}", AGXPresent));
 
-            enableChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived10");
+            enableChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + InboundPackets.CAGEnable);
             if (enableChannel != null) enableChannel.Add(enableCAGCallback);
-            disableChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived11");
+            disableChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + InboundPackets.CAGDisable);
             if (disableChannel != null) disableChannel.Add(disableCAGCallback);
-            toggleChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived12");
+            toggleChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + InboundPackets.CAGToggle);
             if (toggleChannel != null) toggleChannel.Add(toggleCAGCallback);
 
-            CAGStateChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial44");
+            CAGStateChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.CustomActionGroups);
             GameEvents.FindEvent<EventData<byte, object>>("onSerialChannelSubscribed" + OutboundPackets.CustomActionGroups).Add(resendActionGroup);
 
             lastCAGStatus = new CAGStatusStruct();

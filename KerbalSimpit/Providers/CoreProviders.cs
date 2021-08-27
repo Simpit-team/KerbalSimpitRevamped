@@ -32,9 +32,9 @@ namespace KerbalSimpit.Providers
 
         public void Start()
         {
-            echoRequestEvent = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived1");
+            echoRequestEvent = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + CommonPackets.EchoRequest);
             if (echoRequestEvent != null) echoRequestEvent.Add(EchoRequestCallback);
-            echoReplyEvent = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived2");
+            echoReplyEvent = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + CommonPackets.EchoResponse);
             if (echoReplyEvent != null) echoReplyEvent.Add(EchoReplyCallback);
             customLogEvent = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + InboundPackets.CustomLog);
             if (customLogEvent != null) customLogEvent.Add(CustomLogCallback);

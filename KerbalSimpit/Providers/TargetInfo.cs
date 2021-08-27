@@ -24,7 +24,7 @@ namespace KerbalSimpit.Providers
             ProviderActive = false;
 
             KSPit.AddToDeviceHandler(TargetProvider);
-            targetChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial50");
+            targetChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.TargetInfo);
         }
 
         public void Update()

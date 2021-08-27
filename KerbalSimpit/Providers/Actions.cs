@@ -34,14 +34,14 @@ namespace KerbalSimpit.Providers
             toggleBuffer = 0;
             currentStateBuffer = 0;
 
-            AGActivateChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived13");
+            AGActivateChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + InboundPackets.ActionGroupActivate);
             if (AGActivateChannel != null) AGActivateChannel.Add(actionActivateCallback);
-            AGDeactivateChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived14");
+            AGDeactivateChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + InboundPackets.ActionGroupDeactivate);
             if (AGDeactivateChannel != null) AGDeactivateChannel.Add(actionDeactivateCallback);
-            AGToggleChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived15");
+            AGToggleChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + +InboundPackets.ActionGroupToggle);
             if (AGToggleChannel != null) AGToggleChannel.Add(actionToggleCallback);
 
-            AGStateChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial40");
+            AGStateChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.ActionGroups);
             GameEvents.FindEvent<EventData<byte, object>>("onSerialChannelSubscribed" + OutboundPackets.ActionGroups).Add(resendActionGroup);
         }
 

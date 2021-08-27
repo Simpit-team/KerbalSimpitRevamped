@@ -71,12 +71,12 @@ namespace KerbalSimPit.Providers
             LoadReflectionFields();
             receivedCameraControlMode = 0;
             oldCameraModeControl = 0;
-            CameraModeChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived21");
+            CameraModeChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + InboundPackets.CameraMode);
             if (CameraModeChannel != null) CameraModeChannel.Add(cameraModeCallback);
 
-            CameraRotationChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived22");
+            CameraRotationChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + InboundPackets.CameraRotation);
             if (CameraRotationChannel != null) CameraRotationChannel.Add(cameraRotationCallback);
-            CameraTranslationChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived23");
+            CameraTranslationChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + InboundPackets.CameraTranslation);
             if (CameraTranslationChannel != null) CameraTranslationChannel.Add(cameraTranslationCallback);
 
         }

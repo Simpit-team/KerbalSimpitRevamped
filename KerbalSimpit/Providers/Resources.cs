@@ -40,46 +40,46 @@ namespace KerbalSimpit.Providers
                 ARPPresent = true;
                 KSPit.AddToDeviceHandler(LFProvider);
                 LFChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial1");
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.LiquidFuel);
                 KSPit.AddToDeviceHandler(LFStageProvider);
                 LFStageChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial2");
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.LiquidFuelStage);
                 KSPit.AddToDeviceHandler(OxProvider);
                 OxChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial3");
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.Oxidizer);
                 KSPit.AddToDeviceHandler(OxStageProvider);
                 OxStageChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial4");
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.OxidizerStage);
                 KSPit.AddToDeviceHandler(SFProvider);
                 SFChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial5");
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.SolidFuel);
                 KSPit.AddToDeviceHandler(SFStageProvider);
                 SFStageChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial6");
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.SolidFuelStage);
                 KSPit.AddToDeviceHandler(XenonProvider);
                 XenonChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial7");
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.XenonGas);
                 KSPit.AddToDeviceHandler(XenonStageProvider);
                 XenonStageChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial8");
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.XenonGasStage);
                 KSPit.AddToDeviceHandler(MonoProvider);
                 MonoChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial9");
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.MonoPropellant);
                 KSPit.AddToDeviceHandler(ElectricProvider);
                 ElectricChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial20");
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.ElectricCharge);
                 KSPit.AddToDeviceHandler(EvaProvider);
                 EvaChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial10");
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.EvaPropellant);
                 KSPit.AddToDeviceHandler(OreProvider);
                 OreChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial21");
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.Ore);
                 KSPit.AddToDeviceHandler(AbProvider);
                 AbChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial22");
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.Ablator);
                 KSPit.AddToDeviceHandler(AbStageProvider);
                 AbStageChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial23");
+                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.AblatorStage);
 
                 ScanForResources();
             } else {

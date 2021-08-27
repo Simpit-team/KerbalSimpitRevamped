@@ -118,23 +118,23 @@ namespace KerbalSimpit.Providers
         public void Start()
         {
             KSPit.AddToDeviceHandler(AltitudeProvider);
-            altitudeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial30");
+            altitudeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.Altitude);
             KSPit.AddToDeviceHandler(ApsidesProvider);
-            apsidesChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial33");
+            apsidesChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.Apsides);
             KSPit.AddToDeviceHandler(ApsidesTimeProvider);
-            apsidesTimeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial34");
+            apsidesTimeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.ApsidesTime);
             KSPit.AddToDeviceHandler(OrbitInfoProvider);
             ortbitInfoChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.OrbitInfo);
             KSPit.AddToDeviceHandler(VelocityProvider);
-            maneuverChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial35");
+            maneuverChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.ManeuverData);
             KSPit.AddToDeviceHandler(ManeuverProvider);
-            velocityChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial31");
+            velocityChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.Velocities);
             KSPit.AddToDeviceHandler(DeltaVProvider);
-            deltaVChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial41");
+            deltaVChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.DeltaV);
             KSPit.AddToDeviceHandler(DeltaVEnvProvider);
-            deltaVEnvChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial42");
+            deltaVEnvChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.DeltaVEnv);
             KSPit.AddToDeviceHandler(BurnTimeProvider);
-            burnTimeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial43");
+            burnTimeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.BurnTime);
             // We fire one SoI packet when SoI changes. So no need to use the
             // periodic DeviceHandler infrastructure.
             CurrentSoI = "";
@@ -142,7 +142,7 @@ namespace KerbalSimpit.Providers
             //When SOIName channel is subscribed to, we need to resend the SOI name.
             GameEvents.FindEvent<EventData<byte, object>>("onSerialChannelSubscribed" + OutboundPackets.SoIName).Add(resendSOI);
             KSPit.AddToDeviceHandler(AirspeedProvider);
-            airspeedChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial32");
+            airspeedChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.Airspeed);
             KSPit.AddToDeviceHandler(TempLimitProvider);
             tempLimitChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.TempLimit);
         }
