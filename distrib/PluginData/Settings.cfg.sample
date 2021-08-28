@@ -1,6 +1,6 @@
 KerbalSimpit
 {
-	Documentation = https://bitbucket.org/pjhardy/kerbalsimpit/wiki/edit/PluginConfiguration
+	Documentation = https://kerbalsimpitrevamped-arduino.readthedocs.io
 	Verbose = False
 	RefreshRate = 125
 	SerialPort
