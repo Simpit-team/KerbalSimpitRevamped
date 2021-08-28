@@ -28,7 +28,7 @@ This method is not currently up to date with the addition of the keyboard emulat
 
 # Making a release
 
-Set the version number and the KSP compatibility in `VERSION.txt`.
+Set the version number and the KSP compatibility in `VERSION.txt`. Set the same version number in the Arduino lib library.properties.
 Update `CHANGELOG.md`.
 Check that the Arduino repo is up to date (it is assumed to be in the same parent folder than the C# repo) and that there is no non-commited file.
 

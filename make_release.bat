@@ -77,6 +77,11 @@ xcopy /q /S %ARDUINOLIB_FOLDER%src %OUTPUT_FOLDER%\KerbalSimpitRevamped-Arduino\
 xcopy /q /S %ARDUINOLIB_FOLDER%examples %OUTPUT_FOLDER%\KerbalSimpitRevamped-Arduino\examples\
 xcopy /q %ARDUINOLIB_FOLDER%keywords.txt %OUTPUT_FOLDER%\KerbalSimpitRevamped-Arduino
 xcopy /q %ARDUINOLIB_FOLDER%library.properties %OUTPUT_FOLDER%\KerbalSimpitRevamped-Arduino
+xcopy /q %ARDUINOLIB_FOLDER%CHANGELOG.rst %OUTPUT_FOLDER%\KerbalSimpitRevamped-Arduino
+xcopy /q %ARDUINOLIB_FOLDER%DEVNOTES.md %OUTPUT_FOLDER%\KerbalSimpitRevamped-Arduino
+xcopy /q %ARDUINOLIB_FOLDER%LICENSE.md %OUTPUT_FOLDER%\KerbalSimpitRevamped-Arduino
+xcopy /q %ARDUINOLIB_FOLDER%README.rst %OUTPUT_FOLDER%\KerbalSimpitRevamped-Arduino
+xcopy /q %ARDUINOLIB_FOLDER%ressource_list.txt %OUTPUT_FOLDER%\KerbalSimpitRevamped-Arduino
 
 
 REM now compress it
