@@ -1,37 +1,24 @@
 # Kerbal Simpit Revamped
 
-This is the repository for my revamped version of the excellent KSP mod Kerbal Simpit, to try and bring it up to date with some of the recent changes to the game. Also, I am planing to look at incorporating some suggested features into this mod, to make it better match what the community wants.
+This is the repository for the revamped version of the excellent KSP mod Kerbal Simpit, to try and bring it up to date with some of the recent changes to the game. This is a [Kerbal Space Program](https://kerbalspaceprogram.com/) plugin to enable communication with devices over a serial connection.
+
+It works with an accompanying [Arduino library](https://github.com/Simpit-team/KerbalSimpitRevamped-Arduino) to make building hardware devices simpler.
 
 We have a Discord Server! [Invite Link](https://discord.gg/ZwcPdNcaRN)
+We have an [online documentation](https://kerbalsimpitrevamped-arduino.readthedocs.io) for using this mod.
 
-## Original Readme Contents - yet to be updated
+Feel free to raise any issue or idea of improvement you have with us, either in Discord or through the GitHub Issues.
 
-This is a [Kerbal Space Program](https://kerbalspaceprogram.com/) plugin
-to enable communication with devices over a serial connection.
+## How to install
 
-It works with an accompanying [Arduino library](https://bitbucket.org/pjhardy/kerbalsimpit-arduino)
-to make building hardware devices simpler.
+This mod comes in two parts : the KSP mod and the Arduino lib.
 
-The [wiki] contains more information on using, and working on the plugin.
+To install the KSP mod, you can either :
+ - install it through [CKAN](https://github.com/KSP-CKAN/CKAN) (not yet available)
+ - go the [release](https://github.com/Simpit-team/KerbalSimpitRevamped/releases) tab and dowload the last one. Copy the `KerbalSimpitRevamp` folder into the `GameData` folder of your KSP install
 
-## TODO
+Don't forget to update your port name in the `KerbalSimpitRevamp\Settings.cfg` file ! You can find the right port name by copying the port name you are using in the Arduino IDE.
 
-* Begin implementing actual data handlers.
-* Flesh out Arduino library, and fix the warnings that break compile on
-  some platforms (like teensy).
-* Runtime configuration of serial ports.
-* Naming of custom action groups? Could allow for digital scribble strips?
-* Add Stage/Total DeltaV Packets
+To install the Arduino lib, you can go to the `KerbalSimpitRevamp` folder installed previously and copy the `KerbalSimpitRevamped-Arduino` into your Arduino library folder (usually under `Documents\Arduino\libraries`). Then you can open your Arduino IDE and you should find some Simpit examples in the example list.
 
-## Planned features
 
-* Small, lightweight communication. Data items are sent individually, on
-an as-needed basis, rather than regular monolithic data packets.
-* Dynamic configuration. Serial ports and speeds are configured through an
-in-game UI. Supported features are then negotiated between the plugin and
-the connected device.
-* Multiple devices. The plugin supports an arbitrary number of serial
-connections, each with individual input and output configuration.
-* Easily extensible. New functionality should be provided to the plugin by
-including small classes with a well-defined interface. It should also
-support extending capabilities by external add-ons.
