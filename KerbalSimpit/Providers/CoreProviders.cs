@@ -90,7 +90,7 @@ namespace KerbalSimpit.Providers
 
             if ((logStatus & CustomLogBits.Verbose) == 0 || KSPit.Config.Verbose)
             {
-                Debug.Log(message);
+                UnityMainThreadDispatcher.Instance().Enqueue(() => Debug.Log(message));
             }
         }
 
