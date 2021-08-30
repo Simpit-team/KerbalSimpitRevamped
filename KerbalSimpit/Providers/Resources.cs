@@ -102,7 +102,7 @@ namespace KerbalSimpit.Providers
                 GetStageResources(XenonID, ref StageXenon);
                 GetTotalResources(MonoPropellantID, ref TotalMono);
                 GetTotalResources(ElectricChargeID, ref TotalElectric);
-                GetTotalResources(EvaPropellantID, ref TotalEva);
+                GetEVAResources(ref TotalEva);
                 GetTotalResources(OreID, ref TotalOre);
                 GetTotalResources(AblatorID, ref TotalAb);
                 GetStageResources(AblatorID, ref StageAb);
@@ -242,6 +242,26 @@ namespace KerbalSimpit.Providers
             } else {
                 DestResourceStruct.Max = 0;
                 DestResourceStruct.Available = 0;
+                return false;
+            }
+        }
+
+        /** Since 1.11, ARP does not work correctly when in EVA. So this is a special case for EVA fuel, only available during EVA,
+         *  to get around this issue
+         */
+        private bool GetEVAResources(ref ResourceStruct DestResourceStruct)
+        {
+            if (FlightGlobals.ActiveVessel == null) return false;
+
+            if (FlightGlobals.ActiveVessel.isEVA && FlightGlobals.ActiveVessel.evaController != null)
+            {
+                DestResourceStruct.Max = (float)FlightGlobals.ActiveVessel.evaController.FuelCapacity;
+                DestResourceStruct.Available = (float)FlightGlobals.ActiveVessel.evaController.Fuel;
+                return true;
+            } else
+            {
+                DestResourceStruct.Available = 0;
+                DestResourceStruct.Max = 0;
                 return false;
             }
         }
