@@ -66,6 +66,8 @@ namespace KerbalSimpit.SimpitGUI
 
 		void Update()
 		{
+			if (button == null) return; // button not yet initialised ?
+
 			KSPSerialPort.ConnectionStatus status = KSPit.SerialPorts[0].portStatus;
 			if (status == KSPSerialPort.ConnectionStatus.CLOSED || status == KSPSerialPort.ConnectionStatus.ERROR)
 			{
