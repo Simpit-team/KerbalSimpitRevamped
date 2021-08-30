@@ -180,6 +180,7 @@ namespace KerbalSimPit.Providers
             if(autopilot == null)
             {
                 Debug.Log("KerbalSimpit : Ignoring a SAS MODE Message since I could not find the autopilot");
+                return;
             }
 
             mySASMode = (VesselAutopilot.AutopilotMode)(payload[0]);
