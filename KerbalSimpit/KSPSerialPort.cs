@@ -55,8 +55,6 @@ namespace KerbalSimpit.Serial
         // This is *total* packet size, including all headers.
         // At least 32 is needed for the CAGSTATUS message.
         private const int MaxPacketSize = 32 + 4;
-        // Buffer for sending outbound packets
-        private byte[] OutboundPacketBuffer;
         private enum ReceiveStates: byte {
             HEADER1, // Waiting for first header byte
             HEADER2, // Waiting for second header byte
@@ -93,11 +91,6 @@ namespace KerbalSimpit.Serial
             portStatus = ConnectionStatus.CLOSED;
 
             DoSerial = false;
-            // Note that we initialise the packet buffer once, and reuse it.
-            // I don't know if that's acceptable C# or not.
-            // But I hope it's faster.
-            OutboundPacketBuffer = new byte[MaxPacketSize];
-            Array.Copy(PacketHeader, OutboundPacketBuffer, PacketHeader.Length);
 
             Port = new SerialPort(PortName, BaudRate, Parity.None,
                                   8, StopBits.One);
@@ -190,17 +183,19 @@ namespace KerbalSimpit.Serial
             } else {
                 buf = ObjectToByteArray(Data);
             }
+
             byte PayloadSize = (byte)Math.Min(buf.Length, (MaxPacketSize-4));
-            // Hopefully just using the length of the array is enough and
-            // we don't need this any more. Fallback: Put it in the first
-            // byte of the outbountpacketbuffer.
-            //byte PacketSize = (byte)(PayloadSize + 4);
-            OutboundPacketBuffer[2] = PayloadSize;
-            OutboundPacketBuffer[3] = Type;
-            Array.Copy(buf, 0, OutboundPacketBuffer, 4, PayloadSize);
+
+            // Create a new buffer to build the message.
+            byte[] outboundBuffer = new byte[PayloadSize + 4];
+            outboundBuffer[0] = PacketHeader[0];
+            outboundBuffer[1] = PacketHeader[1];
+            outboundBuffer[2] = PayloadSize;
+            outboundBuffer[3] = Type;
+            Array.Copy(buf, 0, outboundBuffer, 4, PayloadSize);
             lock(queueLock)
             {
-                packetQueue.Enqueue(OutboundPacketBuffer);
+                packetQueue.Enqueue(outboundBuffer);
                 Monitor.PulseAll(queueLock);
             }
         }
