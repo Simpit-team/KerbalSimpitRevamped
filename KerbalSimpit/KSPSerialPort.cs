@@ -212,6 +212,16 @@ namespace KerbalSimpit.Serial
             ReceivedDataEvent(buffer, idx);
         }
 
+        // Erase all the messages that are not yet sent but scheduled to be sent.
+        public void clearSendingQueue()
+        {
+            lock (queueLock)
+            {
+                Debug.Log("Simpit : I'm removing " + packetQueue.Count() + " messages from the queue.");
+                packetQueue.Clear();
+            }
+        }
+
         // Send arbitrary data. Shouldn't be used.
         private void sendData(object data)
         {

@@ -277,6 +277,15 @@ namespace KerbalSimpit
             {
                 case 0x00:
                     if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: SYN received on port {0}. Replying.", SerialPorts[portID].PortName));
+
+                    //When handshake is started, unregister all channels to avoid duplication of messages when new channels are subscribed after an Arduino reset
+                    for (int idx = 0; idx < 255; idx++)
+                    {
+                        toSerialArray[idx].Remove(SerialPorts[portID].sendPacket);
+                    }
+                    // Remove all messages not yet sent to make sure the next message sent is an SYNACK
+                    SerialPorts[portID].clearSendingQueue();
+
                     SerialPorts[portID].portStatus = KSPSerialPort.ConnectionStatus.HANDSHAKE;
                     hs.HandShakeType = 0x01;
                     SerialPorts[portID].sendPacket(CommonPackets.Synchronisation, hs);
@@ -295,11 +304,6 @@ namespace KerbalSimpit
                     Debug.Log(String.Format("KerbalSimpit: ACK received on port {0}. Handshake complete, Resetting channels, Arduino library version '{1}'.", SerialPorts[portID].PortName, VersionString));
                     SerialPorts[portID].portStatus = KSPSerialPort.ConnectionStatus.CONNECTED;
 
-                    //When handshake is complete, unregister all channels to avoid duplication of messages when new channels are subscribed after an Arduino reset
-                    for (int idx = 0; idx < 255; idx++)
-                    {
-                        toSerialArray[idx].Remove(SerialPorts[portID].sendPacket);
-                    }
                     break;
             }
         }
