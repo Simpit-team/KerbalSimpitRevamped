@@ -34,6 +34,8 @@ Check that the Arduino repo is up to date (it is assumed to be in the same paren
 
 Compile the project in Release mode. This will automatically call the `make_release.bat` script that will create a folder and a zip in the "NextReleases" folder. 
 Test that the created folder, once copied into GameData, is working
-Commit and push the last commit
+Commit and push the last commit. Merge it with master.
 Create a release on GitHub referecing this commit, tag it as "vX.Y.Z" and upload the created zip.
 Tag the current Arduino commit with the same version tag and push it.
+
+Check that CKAN and readthedocs pick up the new version.

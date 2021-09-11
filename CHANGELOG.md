@@ -3,6 +3,12 @@
 ## v(to be decided), not in an official release yet
 
 ### Features
+
+### Bugfixes
+
+## v2.0.0 (2021-09-07)
+
+### Features
  
 Add a GUI to monitor the connection state and open/close ports.
 Add message for Xenon ressource
@@ -34,11 +40,14 @@ Fix sending of the action state not done when all actions were off
 Fix an issue where the current SOI is not sent when the channel is first requested
 Fix the scene change message not being sent
 Improve I/O Error handling (including crash to desktop when the Arduino is unplugged) and improve Mac compatibility
+Fix an issue where EVA Message is not sent in KSP 1.11+ due to an unfixed bug in ARP on those versions
+Fix an issue when the handshake takes a lot of time to happen after an Arduino reset
 
 ### Known issues
 
 When subscribing several times to the same channel, messages are send several times at each tick.
 The IDLE status of a connection is only computed when messages are sent (only an issue when there is no periodic channel subscribed).
+After an Arduino reset, it sometimes takes several seconds to reconnect while spamming the log with "SYN received on port XXX"
 
 
 ## v1.4.1 (2020-07-02)
