@@ -17,7 +17,7 @@ for /f "delims== tokens=1,2" %%G in (%ProjectDir%VERSION.txt) do set %%G=%%H
 
 echo Version read %MAJOR%.%MINOR%.%PATCH%.%BUILD%
 
-set OUTPUT_FOLDER="%ProjectDir%NextReleases\KerbalSimpitRevamp-v%MAJOR%.%MINOR%.%PATCH%\KerbalSimpitRevamp"
+set OUTPUT_FOLDER="%ProjectDir%NextReleases\KerbalSimpitRevamped-v%MAJOR%.%MINOR%.%PATCH%\KerbalSimpitRevamped"
 
 REM clean the output folder by removing and recreating it
 if exist %OUTPUT_FOLDER% RMDIR /S /Q %OUTPUT_FOLDER%
@@ -26,7 +26,7 @@ MKDIR %OUTPUT_FOLDER%
 REM Create the version file
 (
 echo {
-echo   "NAME": "Kerbal Simpit Revamp",
+echo   "NAME": "Kerbal Simpit Revamped",
 echo   "DOWNLOAD": "https://github.com/Simpit-team/KerbalSimpitRevamped/releases",
 echo   "GITHUB": {
 echo     "USERNAME": "Simpit-team",
@@ -42,9 +42,14 @@ echo   "KSP_VERSION_MIN": {
 echo     "MAJOR": %KSPMAJOR%,
 echo     "MINOR": %KSPMINOR%,
 echo     "PATCH": %KSPPATCH%
+echo   },
+echo   "KSP_VERSION_MAX": {
+echo     "MAJOR": %KSPMAJOR%,
+echo     "MINOR": %KSPMINOR%,
+echo     "PATCH": 99
 echo   }
 echo }
-)>"%OUTPUT_FOLDER%\KerbalSimpitRevamp.version"
+)>"%OUTPUT_FOLDER%\KerbalSimpitRevamped.version"
 
 REM Copy all the files
 
@@ -85,4 +90,4 @@ xcopy /q %ARDUINOLIB_FOLDER%ressource_list.txt %OUTPUT_FOLDER%\KerbalSimpitRevam
 
 
 REM now compress it
-tar -C %ProjectDir%NextReleases\KerbalSimpitRevamp-v%MAJOR%.%MINOR%.%PATCH% -acf %ProjectDir%NextReleases\KerbalSimpitRevamp-v%MAJOR%.%MINOR%.%PATCH%.zip KerbalSimpitRevamp
+tar -C %ProjectDir%NextReleases\KerbalSimpitRevamped-v%MAJOR%.%MINOR%.%PATCH% -acf %ProjectDir%NextReleases\KerbalSimpitRevamped-v%MAJOR%.%MINOR%.%PATCH%.zip KerbalSimpitRevamped
