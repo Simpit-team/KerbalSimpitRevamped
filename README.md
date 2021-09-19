@@ -1,3 +1,6 @@
+![Main branch building](https://github.com/Simpit-team/KerbalSimpitRevamped-Arduino/actions/workflows/cy-arduino.yml/badge.svg?branch=develop)
+[![Documentation Status](https://readthedocs.org/projects/kerbalsimpitrevamped-arduino/badge/?version=latest)](https://kerbalsimpitrevamped-arduino.readthedocs.io/en/latest/?badge=latest)
+
 # Kerbal Simpit Revamped
 
 This is the repository for the revamped version of the excellent KSP mod Kerbal Simpit, to try and bring it up to date with some of the recent changes to the game. This is a [Kerbal Space Program](https://kerbalspaceprogram.com/) plugin to enable communication with devices over a serial connection.
@@ -14,11 +17,11 @@ Feel free to raise any issue or idea of improvement you have with us, either in 
 This mod comes in two parts : the KSP mod and the Arduino lib.
 
 To install the KSP mod, you can either :
- - install it through [CKAN](https://github.com/KSP-CKAN/CKAN) (not yet available)
- - go the [release](https://github.com/Simpit-team/KerbalSimpitRevamped/releases) tab and dowload the last one. Copy the `KerbalSimpitRevamp` folder into the `GameData` folder of your KSP install
+ - install it through [CKAN](https://github.com/KSP-CKAN/CKAN) by installing Simpit (version 2.0.0 or after).
+ - go the [release](https://github.com/Simpit-team/KerbalSimpitRevamped/releases) tab and dowload the last one. Copy the `KerbalSimpit` folder into the `GameData` folder of your KSP install
 
-Don't forget to update your port name in the `KerbalSimpitRevamp\Settings.cfg` file ! You can find the right port name by copying the port name you are using in the Arduino IDE.
+Don't forget to update your port name in the `KerbalSimpit\Settings.cfg` file ! Copy it from `Settings.cfg.sample` if it does not already exists. You can find the right port name by copying the port name you are using in the Arduino IDE.
 
-To install the Arduino lib, you can go to the `KerbalSimpitRevamp` folder installed previously and copy the `KerbalSimpitRevamped-Arduino` into your Arduino library folder (usually under `Documents\Arduino\libraries`). Then you can open your Arduino IDE and you should find some Simpit examples in the example list.
+To install the Arduino lib, you can go to the `KerbalSimpit` folder installed previously and copy the `KerbalSimpitRevamped-Arduino` into your Arduino library folder (usually under `Documents\Arduino\libraries`). Then you can open your Arduino IDE and you should find some Simpit examples in the example list. It should be included in the Arduino library manager shortly.
 
 
