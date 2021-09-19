@@ -124,11 +124,11 @@
     <PostBuildEvent>set "MyKSPDIR=%25KSPDIR%25"
 
 if defined MyKSPDIR (
-  if exist "%25MyKSPDIR%25\GameData\KerbalSimpitRevamp\$(TargetFileName)" (
+  if exist "%25MyKSPDIR%25\GameData\KerbalSimpit\$(TargetFileName)" (
     echo Copying Simpit DLL into the Simpit folder
-    xcopy "$(TargetPath)" "%25MyKSPDIR%25\GameData\KerbalSimpitRevamp\$(TargetFileName)" /f /y
+    xcopy "$(TargetPath)" "%25MyKSPDIR%25\GameData\KerbalSimpit\$(TargetFileName)" /f /y
   ) else (
-     echo SimpitRevamp is not installed in %25MyKSPDIR%25, I do not copy Simpit DLL
+     echo Simpit is not installed in %25MyKSPDIR%25, I do not copy Simpit DLL
    )
 ) else (
   echo KSPDIR is not set, I cannot copy Simpit DLL
