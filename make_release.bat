@@ -65,7 +65,6 @@ xcopy /q %ProjectDir%distrib\Localisation\fr-fr.cfg %OUTPUT_FOLDER%
 xcopy /q %ProjectDir%distrib\Localisation\de-de.cfg %OUTPUT_FOLDER%
 
 xcopy /q %ProjectDir%distrib\PluginData\Settings.cfg.sample %OUTPUT_FOLDER%
-rename %OUTPUT_FOLDER%\Settings.cfg.sample Settings.cfg
 
 REM now include the Arduino lib.
 

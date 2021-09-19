@@ -170,25 +170,7 @@ namespace KerbalSimpit.Config
             OperatingSystem os = Environment.OSVersion;
             PlatformID pid = os.Platform;
 
-            String defaultSerialPort = "unknown";
-
-            // Switches based on the OS, to populate the config with a more user friendly default serial port value
-            switch (pid)
-            {
-                case PlatformID.Win32NT:
-                case PlatformID.Win32S:
-                case PlatformID.Win32Windows:
-                case PlatformID.WinCE:
-                    defaultSerialPort = "COM1";
-                    break;
-                case PlatformID.Unix:
-                case PlatformID.MacOSX:
-                    defaultSerialPort = "/dev/ttyS0";
-                    break;
-                default:
-                    Debug.Log("Unknown Platform to populate the default serial port for!");
-                    break;
-            }
+            String defaultSerialPort = "";
 
             SerialPortNode defaultPort = new SerialPortNode(defaultSerialPort, 115200);
             SerialPorts.Add(defaultPort);
