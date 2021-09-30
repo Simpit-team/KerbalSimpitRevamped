@@ -99,7 +99,9 @@
     <Compile Include="KerbalSimpit\Providers\Actions.cs" />
     <Compile Include="KerbalSimpit\Providers\AxisControl.cs" />
     <Compile Include="KerbalSimpit\Providers\CameraControl.cs" />
+    <Compile Include="KerbalSimpit\Providers\FlightProviders.cs" />
     <Compile Include="KerbalSimpit\Providers\CoreProviders.cs" />
+    <Compile Include="KerbalSimpit\Providers\GenericProvider.cs" />
     <Compile Include="KerbalSimpit\Providers\Resources.cs" />
     <Compile Include="KerbalSimpit\Providers\TargetInfo.cs" />
     <Compile Include="KerbalSimpit\Providers\Telemetry.cs" />

@@ -54,6 +54,7 @@ namespace KerbalSimpit
         public static byte SoIName = 26;
         public static byte SceneChange = 3;
         public static byte FlightStatus = 43;
+        public static byte AtmoCondition = 44;
     }
 
     public static class InboundPackets
@@ -155,6 +156,13 @@ namespace KerbalSimpit
         public static byte isEva = 2;
         public static byte isRecoverable = 4;
         public static byte isInAtmoTW = 8;
+    }
+
+    public static class AtmoConditionsBits
+    {
+        public static byte hasAtmosphere = 1;
+        public static byte hasOxygen = 2;
+        public static byte isVesselInAtmosphere = 4;
     }
 
     public static class KeyboardEmulatorModifier
