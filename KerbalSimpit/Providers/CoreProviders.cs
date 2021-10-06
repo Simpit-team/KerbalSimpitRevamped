@@ -131,7 +131,13 @@ namespace KerbalSimpit.Providers
             myFlightStatus.currentTWIndex = (byte) TimeWarp.fetch.current_rate_index;
             myFlightStatus.crewCapacity = (byte) Math.Min(Byte.MaxValue, FlightGlobals.ActiveVessel.GetCrewCapacity());
             myFlightStatus.crewCount = (byte) Math.Min(Byte.MaxValue, FlightGlobals.ActiveVessel.GetCrewCount());
-            myFlightStatus.commNetSignalStrenghPercentage = (byte) Math.Round(100*FlightGlobals.ActiveVessel.connection.SignalStrength);
+
+            if(FlightGlobals.ActiveVessel.connection == null)
+            {
+                myFlightStatus.commNetSignalStrenghPercentage = 0;
+            } else {
+                myFlightStatus.commNetSignalStrenghPercentage = (byte)Math.Round(100 * FlightGlobals.ActiveVessel.connection.SignalStrength);
+            }
 
             if (flightStatusChannel != null) flightStatusChannel.Fire(OutboundPackets.FlightStatus, myFlightStatus);
         }
