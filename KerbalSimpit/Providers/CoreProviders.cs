@@ -126,6 +126,21 @@ namespace KerbalSimpit.Providers
             if (FlightGlobals.ActiveVessel.isEVA) myFlightStatus.flightStatusFlags += FlightStatusBits.isEva;
             if (FlightGlobals.ActiveVessel.IsRecoverable) myFlightStatus.flightStatusFlags += FlightStatusBits.isRecoverable;
             if (TimeWarp.fetch.Mode == TimeWarp.Modes.LOW) myFlightStatus.flightStatusFlags += FlightStatusBits.isInAtmoTW;
+            switch (FlightGlobals.ActiveVessel.CurrentControlLevel)
+            {
+                case Vessel.ControlLevel.NONE:
+                    break;
+                case Vessel.ControlLevel.PARTIAL_UNMANNED:
+                    myFlightStatus.flightStatusFlags += FlightStatusBits.comnetControlLevel0;
+                    break;
+                case Vessel.ControlLevel.PARTIAL_MANNED:
+                    myFlightStatus.flightStatusFlags += FlightStatusBits.comnetControlLevel1;
+                    break;
+                case Vessel.ControlLevel.FULL:
+                    myFlightStatus.flightStatusFlags += FlightStatusBits.comnetControlLevel0;
+                    myFlightStatus.flightStatusFlags += FlightStatusBits.comnetControlLevel1;
+                    break;
+            }
 
             myFlightStatus.vesselSituation = (byte) FlightGlobals.ActiveVessel.situation;
             myFlightStatus.currentTWIndex = (byte) TimeWarp.fetch.current_rate_index;
