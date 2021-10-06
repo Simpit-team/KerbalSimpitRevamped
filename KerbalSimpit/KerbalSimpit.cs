@@ -21,16 +21,16 @@ namespace KerbalSimpit
         // To receive events from serial devices on channel i,
         // register a callback for onSerialReceivedArray[i].
         public EventData<byte, object>[] onSerialReceivedArray =
-            new EventData<byte, object>[255];
+            new EventData<byte, object>[256];
         // To send a packet on channel i, call
         // toSerialArray[i].Fire()
         public EventData<byte, object>[] toSerialArray =
-            new EventData<byte, object>[255];
+            new EventData<byte, object>[256];
         // To be notified when a channel is subscribed (to send a first
         // non-periodic message for instance), register a callback
         // for onSerialChannelSubscribedArray[i].
         public EventData<byte, object>[] onSerialChannelSubscribedArray =
-            new EventData<byte, object>[255];
+            new EventData<byte, object>[256];
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)] [Serializable]
         public struct HandshakePacket
