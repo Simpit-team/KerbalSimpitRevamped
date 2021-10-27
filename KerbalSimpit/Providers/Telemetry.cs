@@ -37,6 +37,14 @@ namespace KerbalSimpit.Providers
             public float vertical;
         }
 
+        [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
+        public struct RotationStruct
+        {
+            public float x;
+            public float y;
+            public float z;
+        }
+
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         [Serializable]
         public struct OrbitInfoStruct
@@ -64,6 +72,9 @@ namespace KerbalSimpit.Providers
             public float deltaVNextManeuver;
             public float durationNextManeuver;
             public float deltaVTotal;
+            public float x;
+            public float y;
+            public float z;
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)][Serializable]
@@ -101,6 +112,7 @@ namespace KerbalSimpit.Providers
         private ApsidesStruct myApsides;
         private ApsidesTimeStruct myApsidesTime;
         private VelocityStruct myVelocity;
+        private RotationStruct myRotation;
         private AirspeedStruct myAirspeed;
         private ManeuverStruct myManeuver;
         private DeltaVStruct myDeltaVStruct;
@@ -111,7 +123,7 @@ namespace KerbalSimpit.Providers
 
         private EventData<byte, object> altitudeChannel, apsidesChannel,
             apsidesTimeChannel, ortbitInfoChannel, velocityChannel, soiChannel, airspeedChannel,
-            maneuverChannel, deltaVChannel, deltaVEnvChannel, burnTimeChannel, tempLimitChannel;
+            maneuverChannel, rotationChannel, deltaVChannel, deltaVEnvChannel, burnTimeChannel, tempLimitChannel;
 
         private string CurrentSoI;
 
@@ -129,6 +141,8 @@ namespace KerbalSimpit.Providers
             maneuverChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.ManeuverData);
             KSPit.AddToDeviceHandler(ManeuverProvider);
             velocityChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.Velocities);
+            KSPit.AddToDeviceHandler(RotationProvider);
+            rotationChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.RotationData);
             KSPit.AddToDeviceHandler(DeltaVProvider);
             deltaVChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.DeltaV);
             KSPit.AddToDeviceHandler(DeltaVEnvProvider);
@@ -154,6 +168,7 @@ namespace KerbalSimpit.Providers
             KSPit.RemoveToDeviceHandler(ApsidesTimeProvider);
             KSPit.RemoveToDeviceHandler(OrbitInfoProvider);
             KSPit.RemoveToDeviceHandler(VelocityProvider);
+            KSPit.RemoveToDeviceHandler(RotationProvider);
             KSPit.RemoveToDeviceHandler(AirspeedProvider);
             KSPit.RemoveToDeviceHandler(ManeuverProvider);
             KSPit.RemoveToDeviceHandler(DeltaVProvider);
@@ -214,6 +229,23 @@ namespace KerbalSimpit.Providers
             myVelocity.surface = (float)FlightGlobals.ActiveVessel.srfSpeed;
             myVelocity.vertical = (float)FlightGlobals.ActiveVessel.verticalSpeed;
             if (velocityChannel != null) velocityChannel.Fire(OutboundPackets.Velocities, myVelocity);
+        }
+
+        public void RotationProvider()
+        {
+            if (FlightGlobals.ActiveVessel == null) return;
+            /*  
+            // Code from KSPIO https://github.com/zitron-git/KSPSerialIO
+            Vector3d attitude = Quaternion.Inverse(Quaternion.Euler(90, 0, 0) * Quaternion.Inverse(ActiveVessel.GetTransform().rotation) * Quaternion.LookRotation(north, up)).eulerAngles;
+            myRotation.x = (float)((attitude.z > 180) ? (attitude.z - 360.0) : attitude.z);
+            myRotation.pitch = (float)((attitude.x > 180) ? (360.0 - attitude.x) : -attitude.x);
+            myRotation.yaw = (float)attitude.y;
+            */
+            Vector3d attitude = ActiveVessel.GetTransform().rotation;
+            myRotation.x = attitude.x;
+            myRotation.y = attitude.y;
+            myRotation.z = attitude.z;
+            if (rotationChannel != null) rotationChannel.Fire(OutboundPackets.RotationData, myRotation)
         }
 
         public void OrbitInfoProvider()
@@ -312,6 +344,9 @@ namespace KerbalSimpit.Providers
             myManeuver.deltaVNextManeuver = 0.0f;
             myManeuver.durationNextManeuver = 0.0f;
             myManeuver.deltaVTotal = 0.0f;
+            myManeuver.x = 0.0f;
+            myManeuver.y = 0.0f;
+            myManeuver.z = 0.0f;
 
             if (FlightGlobals.ActiveVessel.patchedConicSolver != null)
             {
@@ -323,6 +358,9 @@ namespace KerbalSimpit.Providers
                     {
                         myManeuver.timeToNextManeuver = (float)(maneuvers[0].UT - Planetarium.GetUniversalTime());
                         myManeuver.deltaVNextManeuver = (float)maneuvers[0].DeltaV.magnitude;
+                        myManeuver.x = (float)maneuvers[0].ManeuverNodeRotation.roll
+                        myManeuver.y = (float)maneuvers[0].ManeuverNodeRotation.pitch;
+                        myManeuver.z = (float)maneuvers[0].ManeuverNodeRotation.yaw;
 
                         DeltaVStageInfo currentStageInfo = getCurrentStageDeltaV();
                         if (currentStageInfo != null)

@@ -40,6 +40,7 @@ namespace KerbalSimpit
         public static byte ManeuverData = 34;
         public static byte SASInfo = 35;
         public static byte OrbitInfo = 36;
+        public static byte RotationData = 45;
 
         // Vessel Details
         public static byte ActionGroups = 37;
