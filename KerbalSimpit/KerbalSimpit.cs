@@ -340,12 +340,14 @@ namespace KerbalSimpit
             for (int i=payload.Length-1; i>=0; i--)
             {
                 idx = payload[i];
-                if (Config.Verbose)
-                {
-                    Debug.Log(String.Format("KerbalSimpit: Serial port {0} subscribing to channel {1}", portID, idx));
-                }
+
+
                 if (!SerialPorts[portID].isPacketSubscribedTo(idx))
                 {
+                    if (Config.Verbose)
+                    {
+                       Debug.Log(String.Format("KerbalSimpit: Serial port {0} subscribing to channel {1}", portID, idx));
+                    }
                     // Adds the sendPacket method as a callback to the event that is called when a value in the toSerialArray is updated
                     toSerialArray[idx].Add(SerialPorts[portID].sendPacket);
                     onSerialChannelSubscribedArray[idx].Fire(idx, null);

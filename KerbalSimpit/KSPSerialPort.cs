@@ -178,6 +178,7 @@ namespace KerbalSimpit.Serial
             this.subscribedPackets.Add(packetID);
         }
 
+
         public bool isPacketSubscribedTo(int packetID)
         {
             return this.subscribedPackets.Contains(packetID);
