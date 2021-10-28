@@ -26,6 +26,8 @@ namespace KerbalSimpit.Serial
         private int BaudRate;
         public  byte ID;
 
+        private List<int> subscribedPackets = new List<int>();
+
         const int IDLE_TIMEOUT = 10; //Timeout to consider the connection as idle, in seconds.
         private long lastTimeMsgReceveived;
 
@@ -164,6 +166,28 @@ namespace KerbalSimpit.Serial
                 portStatus = KSPSerialPort.ConnectionStatus.ERROR;
             }
         }
+
+
+        public List<int> getPacketSubscriptionList()
+        {
+            return this.subscribedPackets;
+        }
+
+        public void addPacketSubscriptionRecord(int packetID)
+        {
+            this.subscribedPackets.Add(packetID);
+        }
+
+        public void removePacketSubscriptionRecord(int packetID)
+        {
+            this.subscribedPackets.Remove(packetID);
+        }
+
+        public void removeAllPacketSubscriptionRecords()
+        {
+            this.subscribedPackets.Clear();
+        }
+
 
         // Construct a KerbalSimpit packet, and enqueue it.
         // Note that callers of this method are rarely in the main

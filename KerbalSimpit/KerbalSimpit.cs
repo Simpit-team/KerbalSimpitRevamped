@@ -78,6 +78,7 @@ namespace KerbalSimpit
             }
 
             this.onSerialReceivedArray[CommonPackets.Synchronisation].Add(this.handshakeCallback);
+            this.onSerialReceivedArray[InboundPackets.CloseSerialPort].Add(this.serialCalledClose);
             this.onSerialReceivedArray[InboundPackets.RegisterHandler].Add(this.registerCallback);
             this.onSerialReceivedArray[InboundPackets.DeregisterHandler].Add(this.deregisterCallback);
 
@@ -308,6 +309,30 @@ namespace KerbalSimpit
             }
         }
 
+        private void serialCalledClose(byte portID, object data)
+        {
+            // Spit out log that the port wants to be closed
+            if (Config.Verbose)
+            {
+                Debug.Log(String.Format("KerbalSimpit: Serial port {0} asked to be closed", portID));
+            }
+
+            foreach(int packetID in SerialPorts[portID].getPacketSubscriptionList())
+            {
+                
+                // Remove the callback of the serial port from the event caller
+                toSerialArray[packetID].Remove(SerialPorts[portID].sendPacket);
+
+                if (Config.Verbose)
+                {
+                    Debug.Log(String.Format("KerbalSimpit: Serial port {0} unsubscribed from packet {1}", portID, packetID));
+                }
+            }
+
+            SerialPorts[portID].removeAllPacketSubscriptionRecords();
+            ClosePort(portID);
+        }
+
         private void registerCallback(byte portID, object data)
         {
             byte[] payload = (byte[]) data;
@@ -319,9 +344,11 @@ namespace KerbalSimpit
                 {
                     Debug.Log(String.Format("KerbalSimpit: Serial port {0} subscribing to channel {1}", portID, idx));
                 }
+                // Adds the sendPacket method as a callback to the event that is called when a value in the toSerialArray is updated
                 toSerialArray[idx].Add(SerialPorts[portID].sendPacket);
-
                 onSerialChannelSubscribedArray[idx].Fire(idx, null);
+                // Adds a record of the port subscribing to a packet to a list stored in the port instance.
+                SerialPorts[portID].addPacketSubscriptionRecord(idx);
             }
         }
 
@@ -333,6 +360,12 @@ namespace KerbalSimpit
             {
                 idx = payload[i];
                 toSerialArray[idx].Remove(SerialPorts[portID].sendPacket);
+                // Removes the record of a port subscribing to a packet from the port's internal record
+                SerialPorts[portID].removePacketSubscriptionRecord(idx);
+                if (Config.Verbose)
+                {
+                    Debug.Log(String.Format("KerbalSimpit: Serial port {0} ubsubscribed from channel {1}", portID, idx));
+                }
             }
         }
     }
