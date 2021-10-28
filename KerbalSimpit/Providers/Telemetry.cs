@@ -233,19 +233,24 @@ namespace KerbalSimpit.Providers
 
         public void RotationProvider()
         {
-            if (FlightGlobals.ActiveVessel == null) return;
-            /*  
-            // Code from KSPIO https://github.com/zitron-git/KSPSerialIO
-            Vector3d attitude = Quaternion.Inverse(Quaternion.Euler(90, 0, 0) * Quaternion.Inverse(ActiveVessel.GetTransform().rotation) * Quaternion.LookRotation(north, up)).eulerAngles;
-            myRotation.x = (float)((attitude.z > 180) ? (attitude.z - 360.0) : attitude.z);
-            myRotation.pitch = (float)((attitude.x > 180) ? (360.0 - attitude.x) : -attitude.x);
-            myRotation.yaw = (float)attitude.y;
-            */
-            Vector3d attitude = ActiveVessel.GetTransform().rotation;
-            myRotation.x = attitude.x;
-            myRotation.y = attitude.y;
-            myRotation.z = attitude.z;
-            if (rotationChannel != null) rotationChannel.Fire(OutboundPackets.RotationData, myRotation)
+            Vessel activeVessel = FlightGlobals.ActiveVessel;
+            if (activeVessel == null) return;
+
+            //Code from KSPIO https://github.com/zitron-git/KSPSerialIO/blob/062d97e892077ea14737f5e79268c0c4d067f5b6/KSPSerialIO/KSPIO.cs#L929-L940
+            Vector3d north, up, CoM;
+            CoM = activeVessel.CoM;
+            up = (CoM - activeVessel.mainBody.position).normalized;
+            north = Vector3d.Exclude(up, (activeVessel.mainBody.position + activeVessel.mainBody.transform.up * (float)activeVessel.mainBody.Radius) - CoM).normalized;
+
+            Vector3d attitude = Quaternion.Inverse(Quaternion.Euler(90, 0, 0) * Quaternion.Inverse(FlightGlobals.ActiveVessel.GetTransform().rotation) * Quaternion.LookRotation(north, up)).eulerAngles;
+
+            myRotation.z = (float) ((attitude.z > 180) ? (attitude.z - 360.0) : attitude.z);
+            myRotation.x = (float) ((attitude.x > 180) ? (360.0 - attitude.x) : -attitude.x);
+            myRotation.y = (float) attitude.y;
+        
+            //Debug.Log(String.Format("Simpit rotation: {0}, {1}, {2}", myRotation.x, myRotation.y, myRotation.z));
+
+            if (rotationChannel != null) rotationChannel.Fire(OutboundPackets.RotationData, myRotation);
         }
 
         public void OrbitInfoProvider()
@@ -358,9 +363,9 @@ namespace KerbalSimpit.Providers
                     {
                         myManeuver.timeToNextManeuver = (float)(maneuvers[0].UT - Planetarium.GetUniversalTime());
                         myManeuver.deltaVNextManeuver = (float)maneuvers[0].DeltaV.magnitude;
-                        myManeuver.x = (float)maneuvers[0].ManeuverNodeRotation.roll
-                        myManeuver.y = (float)maneuvers[0].ManeuverNodeRotation.pitch;
-                        myManeuver.z = (float)maneuvers[0].ManeuverNodeRotation.yaw;
+                        myManeuver.x = (float)maneuvers[0].nodeRotation.Roll();
+                        myManeuver.y = (float)maneuvers[0].nodeRotation.Pitch();
+                        myManeuver.z = (float)maneuvers[0].nodeRotation.Yaw();
 
                         DeltaVStageInfo currentStageInfo = getCurrentStageDeltaV();
                         if (currentStageInfo != null)
