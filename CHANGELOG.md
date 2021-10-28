@@ -23,7 +23,7 @@ Add message to control Timewarp
 Add message to control camera position
 Add message to send a log line to KSP from Arduino
 Add message to emulate a keypress in KSP (to open the map, quicksave, etc.)
-Add message to inform the controler about the current SAS mode
+Add message to inform the controller about the current SAS mode
 Add message for flight status (including warp speed, status, crew, com)
 
 Add support for console command to start/stop the connection

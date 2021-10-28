@@ -105,7 +105,7 @@ namespace KerbalSimpit.SimpitGUI
 			foreach (Serial.KSPSerialPort port in KSPit.SerialPorts)
 			{
 				// For all port (except the first one), add a prefix to indicate which port we refer to.
-				// For the first one, nothing is written so that for the vast majority if users (that only use a single controler), they are not bothered by port ID.
+				// For the first one, nothing is written so that for the vast majority if users (that only use a single controller), they are not bothered by port ID.
 				String portName = "";
 				if (port.ID > 0)
 				{
