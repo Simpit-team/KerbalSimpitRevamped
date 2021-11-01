@@ -20,6 +20,7 @@ namespace KerbalSimpit.Providers
             public byte crewCapacity;
             public byte crewCount;
             public byte commNetSignalStrenghPercentage;
+            public byte currentStage;
         }
 
         private FlightStatusStruct myFlightStatus;
@@ -153,6 +154,8 @@ namespace KerbalSimpit.Providers
             } else {
                 myFlightStatus.commNetSignalStrenghPercentage = (byte)Math.Round(100 * FlightGlobals.ActiveVessel.connection.SignalStrength);
             }
+
+            myFlightStatus.currentStage = (byte) Math.Min(255, FlightGlobals.ActiveVessel.currentStage);
 
             if (flightStatusChannel != null) flightStatusChannel.Fire(OutboundPackets.FlightStatus, myFlightStatus);
         }
