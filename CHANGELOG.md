@@ -4,6 +4,13 @@
 
 ### Features
 
+Add a generic parseMessage function (in the Arduino lib)
+Add message for atmospheric conditions
+Add the Comnet control level and current stage in a FlightStatus message
+Change internal way to handle message. In particular prevent sending a message if no information has changed for some channels.
+Add a message with information about current vessel rotation and maneuver direction
+
+
 ### Bugfixes
 
 ## v2.0.0 (2021-09-07)
