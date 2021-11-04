@@ -1,6 +1,7 @@
 ![Main branch building](https://github.com/Simpit-team/KerbalSimpitRevamped-Arduino/actions/workflows/cy-arduino.yml/badge.svg?branch=develop)
 [![Documentation Status](https://readthedocs.org/projects/kerbalsimpitrevamped-arduino/badge/?version=latest)](https://kerbalsimpitrevamped-arduino.readthedocs.io/en/latest/?badge=latest)
-![Documentation Status](https://raw.githubusercontent.com/KSP-CKAN/CKAN/master/assets/ckan-indexed.svg)
+![CKAN badge](https://raw.githubusercontent.com/KSP-CKAN/CKAN/master/assets/ckan-indexed.svg)
+[![Documentation Status](https://img.shields.io/discord/775343611780399144.svg?style=flat&logo=discord&label=discord)](https://discord.gg/ZwcPdNcaRN)
 
 # Kerbal Simpit Revamped
 
