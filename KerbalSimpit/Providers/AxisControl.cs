@@ -202,44 +202,58 @@ namespace KerbalSimPit.Providers
 
         public void AutopilotUpdater(FlightCtrlState fcs)
         {
+            // For all axis, we need to control both the usual axis and make sure the matching custom axis are also controlled.
+            // This does not seem possible in 1.12.2 without using 2 different methods to set the axis values.
+            // If any change is made to the following code, please check both (e.g. add a piston to the roll axis and check that setting roll also control the piston).
+            var axisGroupModule = FlightGlobals.ActiveVessel.FindVesselModuleImplementing<AxisGroupsModule>();
+
             if (myRotation.pitch != 0)
             {
-                fcs.pitch = (float)myRotation.pitch/ Int16.MaxValue;
+                fcs.pitch = (float)myRotation.pitch / Int16.MaxValue;
+                axisGroupModule.UpdateAxisGroup(KSPAxisGroup.Pitch, (float)myRotation.pitch / Int16.MaxValue);
             }
             if (myRotation.roll != 0)
             {
                 fcs.roll = (float)myRotation.roll/ Int16.MaxValue;
+                axisGroupModule.UpdateAxisGroup(KSPAxisGroup.Roll, (float)myRotation.roll / Int16.MaxValue);
             }
             if (myRotation.yaw != 0)
             {
                 fcs.yaw = (float)myRotation.yaw/ Int16.MaxValue;
+                axisGroupModule.UpdateAxisGroup(KSPAxisGroup.Yaw, (float)myRotation.yaw / Int16.MaxValue);
             }
 
             if (myTranslation.X != 0)
             {
                 fcs.X = (float)myTranslation.X/ Int16.MaxValue;
+                axisGroupModule.UpdateAxisGroup(KSPAxisGroup.TranslateX, (float)myTranslation.X / Int16.MaxValue);
             }
             if (myTranslation.Y != 0)
             {
                 fcs.Y = (float)myTranslation.Y/ Int16.MaxValue;
+                axisGroupModule.UpdateAxisGroup(KSPAxisGroup.TranslateY, (float)myTranslation.Y / Int16.MaxValue);
             }
             if (myTranslation.Z != 0)
             {
                 fcs.Z = (float)myTranslation.Z/ Int16.MaxValue;
+                axisGroupModule.UpdateAxisGroup(KSPAxisGroup.TranslateZ, (float)myTranslation.Z / Int16.MaxValue);
             }
 
             if (myWheel.steer != 0)
             {
                 fcs.wheelSteer = (float)myWheel.steer/ Int16.MaxValue;
+                axisGroupModule.UpdateAxisGroup(KSPAxisGroup.WheelSteer, (float)myWheel.steer / Int16.MaxValue);
             }
             if (myWheel.throttle != 0)
             {
                 fcs.wheelThrottle = (float)myWheel.throttle/ Int16.MaxValue;
+                axisGroupModule.UpdateAxisGroup(KSPAxisGroup.WheelThrottle, (float)myWheel.throttle / Int16.MaxValue);
             }
 
             if (myThrottleFlag)
             {
-                fcs.mainThrottle = (float)myThrottle/ Int16.MaxValue;
+                // Throttle seems to be handled differently than the other axis. This single line seem to tackle both
+                FlightInputHandler.state.mainThrottle = (float)myThrottle / Int16.MaxValue;
             }
         }
 
