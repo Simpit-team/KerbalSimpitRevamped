@@ -33,6 +33,15 @@ namespace KerbalSimPit.Providers
             public short throttle;
             public byte mask;
         }
+        [StructLayout(LayoutKind.Sequential, Pack = 1)][Serializable]
+        public struct CustomAxixStruct
+        {
+            public short custom1;
+            public short custom2;
+            public short custom3;
+            public short custom4;
+            public byte mask;
+        }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         [Serializable]
@@ -44,13 +53,15 @@ namespace KerbalSimPit.Providers
 
         // Inbound messages
         private EventData<byte, object> RotationChannel, TranslationChannel,
-            WheelChannel, ThrottleChannel, SASInfoChannel, AutopilotChannel;
+            WheelChannel, ThrottleChannel, CustomAxisChannel, SASInfoChannel, AutopilotChannel;
 
         private RotationalStruct myRotation, newRotation;
 
         private TranslationalStruct myTranslation, newTranslation;
 
         private WheelStruct myWheel, newWheel;
+
+        private CustomAxixStruct myCustomAxis, newCustomAxis;
 
         private SASModeInfoStruct mySASInfo, newSASInfo;
 
@@ -70,6 +81,8 @@ namespace KerbalSimPit.Providers
             if (WheelChannel != null) WheelChannel.Add(wheelCallback);
             ThrottleChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + InboundPackets.VesselThrottle);
             if (ThrottleChannel != null) ThrottleChannel.Add(throttleCallback);
+            CustomAxisChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + InboundPackets.VesselCustomAxis);
+            if (CustomAxisChannel != null) CustomAxisChannel.Add(customAxisCallback);
             AutopilotChannel = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + InboundPackets.AutopilotMode);
             if (AutopilotChannel != null) AutopilotChannel.Add(autopilotModeCallback);
 
@@ -88,7 +101,8 @@ namespace KerbalSimPit.Providers
             if (RotationChannel != null) RotationChannel.Remove(vesselRotationCallback);
             if (TranslationChannel != null) TranslationChannel.Remove(vesselTranslationCallback);
             if (WheelChannel != null) WheelChannel.Remove(wheelCallback);
-            if (ThrottleChannel!= null) ThrottleChannel.Remove(throttleCallback);
+            if (ThrottleChannel != null) ThrottleChannel.Remove(throttleCallback);
+            if (CustomAxisChannel != null) CustomAxisChannel.Remove(customAxisCallback);
             if (AutopilotChannel!= null) AutopilotChannel.Remove(autopilotModeCallback);
 
             KSPit.RemoveToDeviceHandler(SASInfoProvider);
@@ -160,6 +174,28 @@ namespace KerbalSimPit.Providers
             if ((newWheel.mask & (byte)2) > 0)
             {
                 myWheel.throttle = newWheel.throttle;
+            }
+        }
+
+        public void customAxisCallback(byte ID, object Data)
+        {
+            newCustomAxis = KerbalSimpitUtils.ByteArrayToStructure<CustomAxixStruct>((byte[])Data);
+
+            if ((newCustomAxis.mask & (byte)1) > 0)
+            {
+                myCustomAxis.custom1 = newCustomAxis.custom1;
+            }
+            if ((newCustomAxis.mask & (byte)2) > 0)
+            {
+                myCustomAxis.custom2 = newCustomAxis.custom2;
+            }
+            if ((newCustomAxis.mask & (byte)4) > 0)
+            {
+                myCustomAxis.custom3 = newCustomAxis.custom3;
+            }
+            if ((newCustomAxis.mask & (byte)8) > 0)
+            {
+                myCustomAxis.custom4 = newCustomAxis.custom4;
             }
         }
 
@@ -254,6 +290,22 @@ namespace KerbalSimPit.Providers
             {
                 // Throttle seems to be handled differently than the other axis. This single line seem to tackle both
                 FlightInputHandler.state.mainThrottle = (float)myThrottle / Int16.MaxValue;
+            }
+            if(myCustomAxis.custom1 != 0)
+            {
+                axisGroupModule.UpdateAxisGroup(KSPAxisGroup.Custom01, (float)myCustomAxis.custom1 / Int16.MaxValue);
+            }
+            if (myCustomAxis.custom2 != 0)
+            {
+                axisGroupModule.UpdateAxisGroup(KSPAxisGroup.Custom02, (float)myCustomAxis.custom2 / Int16.MaxValue);
+            }
+            if (myCustomAxis.custom3 != 0)
+            {
+                axisGroupModule.UpdateAxisGroup(KSPAxisGroup.Custom03, (float)myCustomAxis.custom3 / Int16.MaxValue);
+            }
+            if (myCustomAxis.custom4 != 0)
+            {
+                axisGroupModule.UpdateAxisGroup(KSPAxisGroup.Custom04, (float)myCustomAxis.custom4 / Int16.MaxValue);
             }
         }
 

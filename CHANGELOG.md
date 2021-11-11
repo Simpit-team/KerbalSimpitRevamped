@@ -8,7 +8,10 @@ Add a generic parseMessage function (in the Arduino lib)
 Add message for atmospheric conditions
 Add the Comnet control level and current stage in a FlightStatus message
 Change internal way to handle message. In particular prevent sending a message if no information has changed for some channels.
-Add a message with information about current vessel rotation and maneuver direction
+Add a message with information about current vessel rotation and maneuver direction.
+Add a message to control custom axis
+
+Fix an issue where the messages to control throttle did not work for parts assigned to main throttle.
 
 
 ### Bugfixes

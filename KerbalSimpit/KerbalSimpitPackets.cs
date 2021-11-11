@@ -80,6 +80,7 @@ namespace KerbalSimpit
         public static byte WarpChange = 24;
         public static byte CustomLog = 25;
         public static byte KeyboardEmulator = 26;
+        public static byte VesselCustomAxis = 27;
     }
 
     public static class CameraControlBits
