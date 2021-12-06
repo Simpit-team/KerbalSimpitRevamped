@@ -161,6 +161,7 @@ namespace KerbalSimpit
         public static byte isInAtmoTW = 8;
         public static byte comnetControlLevel0 = 16; // Code the control level on 2 bits (4 possible values)
         public static byte comnetControlLevel1 = 32; // Code the control level on 2 bits (4 possible values)
+        public static byte hasTargetSet = 64;
     }
 
     public static class AtmoConditionsBits

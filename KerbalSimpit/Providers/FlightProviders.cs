@@ -94,6 +94,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                     myFlightStatus.flightStatusFlags += FlightStatusBits.comnetControlLevel1;
                     break;
             }
+            if(FlightGlobals.fetch.VesselTarget != null) myFlightStatus.flightStatusFlags += FlightStatusBits.hasTargetSet;
 
             myFlightStatus.vesselSituation = (byte)FlightGlobals.ActiveVessel.situation;
             myFlightStatus.currentTWIndex = (byte)TimeWarp.fetch.current_rate_index;
