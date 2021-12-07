@@ -13,7 +13,6 @@ namespace KerbalSimpit.Providers
         private EventData<byte, object> echoReplyEvent;
         private EventData<byte, object> customLogEvent;
         private EventData<byte, object> sceneChangeEvent;
-        private EventData<byte, object> flightStatusChannel;
 
         public void Start()
         {
