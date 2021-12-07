@@ -11,6 +11,10 @@ namespace KerbalSimpit.Providers
         {
             public float distance;
             public float velocity;
+            public float heading;
+            public float pitch;
+            public float velocityHeading;
+            public float velocityPitch;
         }
 
         private TargetStruct myTargetInfo;
@@ -61,6 +65,11 @@ namespace KerbalSimpit.Providers
                 {
                     myTargetInfo.distance = (float)Vector3.Distance(FlightGlobals.fetch.VesselTarget.GetTransform().position, FlightGlobals.ActiveVessel.transform.position);
                     myTargetInfo.velocity = (float)FlightGlobals.ship_tgtVelocity.magnitude;
+
+                    Vector3 targetDirection = FlightGlobals.ActiveVessel.targetObject.GetTransform().position - FlightGlobals.ActiveVessel.transform.position;
+                    KerbalSimpitTelemetryProvider.WorldVecToNavHeading(FlightGlobals.ActiveVessel, targetDirection, out myTargetInfo.heading, out myTargetInfo.pitch);
+
+                    KerbalSimpitTelemetryProvider.WorldVecToNavHeading(FlightGlobals.ActiveVessel, FlightGlobals.ship_tgtVelocity, out myTargetInfo.velocityHeading, out myTargetInfo.velocityPitch);
                     if (targetChannel != null) targetChannel.Fire(OutboundPackets.TargetInfo, myTargetInfo);
                 }
             }

@@ -40,9 +40,13 @@ namespace KerbalSimpit.Providers
         [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
         public struct RotationStruct
         {
-            public float x;
-            public float y;
-            public float z;
+            public float heading;
+            public float pitch;
+            public float roll;
+            public float orbitalVelocityHeading;
+            public float orbitalVelocityPitch;
+            public float surfaceVelocityHeading;
+            public float surfaceVelocityPitch;
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -72,9 +76,8 @@ namespace KerbalSimpit.Providers
             public float deltaVNextManeuver;
             public float durationNextManeuver;
             public float deltaVTotal;
-            public float x;
-            public float y;
-            public float z;
+            public float headingNextManeuver;
+            public float pitchNextManeuver;
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)][Serializable]
@@ -231,24 +234,46 @@ namespace KerbalSimpit.Providers
             if (velocityChannel != null) velocityChannel.Fire(OutboundPackets.Velocities, myVelocity);
         }
 
+        // Convert a direction given in world space v into a heading and a pitch, relative to the vessel passed as a paramater
+        public static void WorldVecToNavHeading(Vessel activeVessel, Vector3d v, out float heading, out float pitch)
+        {
+            Vector3d CoM, north, up, east;
+            CoM = activeVessel.CoM;
+            up = (CoM - activeVessel.mainBody.position).normalized;
+            north = Vector3d.Exclude(up, (activeVessel.mainBody.position + activeVessel.mainBody.transform.up * (float)activeVessel.mainBody.Radius) - CoM).normalized;
+            east = Vector3d.Cross(up, north);
+
+            // Code from KSPIO to do angle conversions : https://github.com/zitron-git/KSPSerialIO/blob/062d97e892077ea14737f5e79268c0c4d067f5b6/KSPSerialIO/KSPIO.cs#L1301-L1313
+            pitch = (float)-((Vector3d.Angle(up, v)) - 90.0f);
+            Vector3d progradeFlat = Vector3d.Exclude(up, v);
+            float NAngle = (float)Vector3d.Angle(north, progradeFlat);
+            float EAngle = (float)Vector3d.Angle(east, progradeFlat);
+            if (EAngle < 90)
+                heading = NAngle;
+            else
+                heading = -NAngle + 360;
+        }
+
         public void RotationProvider()
         {
             Vessel activeVessel = FlightGlobals.ActiveVessel;
             if (activeVessel == null) return;
 
-            //Code from KSPIO https://github.com/zitron-git/KSPSerialIO/blob/062d97e892077ea14737f5e79268c0c4d067f5b6/KSPSerialIO/KSPIO.cs#L929-L940
-            Vector3d north, up, CoM;
+            // Code from KSPIO to compute angles and velocities https://github.com/zitron-git/KSPSerialIO/blob/062d97e892077ea14737f5e79268c0c4d067f5b6/KSPSerialIO/KSPIO.cs#L929-L971
+            Vector3d CoM, north, up, east;
             CoM = activeVessel.CoM;
             up = (CoM - activeVessel.mainBody.position).normalized;
             north = Vector3d.Exclude(up, (activeVessel.mainBody.position + activeVessel.mainBody.transform.up * (float)activeVessel.mainBody.Radius) - CoM).normalized;
+            east = Vector3d.Cross(up, north);
 
             Vector3d attitude = Quaternion.Inverse(Quaternion.Euler(90, 0, 0) * Quaternion.Inverse(FlightGlobals.ActiveVessel.GetTransform().rotation) * Quaternion.LookRotation(north, up)).eulerAngles;
 
-            myRotation.z = (float) ((attitude.z > 180) ? (attitude.z - 360.0) : attitude.z);
-            myRotation.x = (float) ((attitude.x > 180) ? (360.0 - attitude.x) : -attitude.x);
-            myRotation.y = (float) attitude.y;
-        
-            //Debug.Log(String.Format("Simpit rotation: {0}, {1}, {2}", myRotation.x, myRotation.y, myRotation.z));
+            myRotation.roll = (float) ((attitude.z > 180) ? (attitude.z - 360.0) : attitude.z);
+            myRotation.pitch = (float) ((attitude.x > 180) ? (360.0 - attitude.x) : -attitude.x);
+            myRotation.heading = (float) attitude.y;
+
+            WorldVecToNavHeading(activeVessel, activeVessel.srf_velocity.normalized, out myRotation.surfaceVelocityHeading, out myRotation.surfaceVelocityPitch);
+            WorldVecToNavHeading(activeVessel, activeVessel.obt_velocity.normalized, out myRotation.orbitalVelocityHeading, out myRotation.orbitalVelocityPitch);
 
             if (rotationChannel != null) rotationChannel.Fire(OutboundPackets.RotationData, myRotation);
         }
@@ -349,9 +374,8 @@ namespace KerbalSimpit.Providers
             myManeuver.deltaVNextManeuver = 0.0f;
             myManeuver.durationNextManeuver = 0.0f;
             myManeuver.deltaVTotal = 0.0f;
-            myManeuver.x = 0.0f;
-            myManeuver.y = 0.0f;
-            myManeuver.z = 0.0f;
+            myManeuver.headingNextManeuver = 0.0f;
+            myManeuver.pitchNextManeuver = 0.0f;
 
             if (FlightGlobals.ActiveVessel.patchedConicSolver != null)
             {
@@ -363,9 +387,8 @@ namespace KerbalSimpit.Providers
                     {
                         myManeuver.timeToNextManeuver = (float)(maneuvers[0].UT - Planetarium.GetUniversalTime());
                         myManeuver.deltaVNextManeuver = (float)maneuvers[0].DeltaV.magnitude;
-                        myManeuver.x = (float)maneuvers[0].nodeRotation.Roll();
-                        myManeuver.y = (float)maneuvers[0].nodeRotation.Pitch();
-                        myManeuver.z = (float)maneuvers[0].nodeRotation.Yaw();
+
+                        WorldVecToNavHeading(FlightGlobals.ActiveVessel, maneuvers[0].GetBurnVector(maneuvers[0].patch), out myManeuver.headingNextManeuver, out myManeuver.pitchNextManeuver);
 
                         DeltaVStageInfo currentStageInfo = getCurrentStageDeltaV();
                         if (currentStageInfo != null)
