@@ -61,6 +61,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
         public byte crewCount;
         public byte commNetSignalStrenghPercentage;
         public byte currentStage;
+        public byte vesselType;
     }
 
     class FlightStatusProvider : GenericProvider<FlightStatusStruct>
@@ -111,6 +112,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
             }
 
             myFlightStatus.currentStage = (byte)Math.Min(255, FlightGlobals.ActiveVessel.currentStage);
+            myFlightStatus.vesselType = (byte) FlightGlobals.ActiveVessel.vesselType;
             return false;
         }
     }
