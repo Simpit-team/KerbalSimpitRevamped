@@ -3,268 +3,97 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 
 using KerbalSimpit.External;
+using KerbalSimpit.KerbalSimpit.Providers;
 
 namespace KerbalSimpit.Providers
 {
-    [KSPAddon(KSPAddon.Startup.Flight, false)]
-    public class KerbalSimpitResourceProvider : MonoBehaviour
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [Serializable]
+    public struct ResourceStruct
     {
-        [StructLayout(LayoutKind.Sequential, Pack=1)][Serializable]
-        public struct ResourceStruct
+        public float Max;
+        public float Available;
+    }
+
+    /// <summary>
+    /// Generic provider for a resource message.
+    /// This abstract class need only a default constructor to be usable, to define the channel ID,
+    /// the resource name and if the computed is performed on the whole vessel or for the current stage only.
+    /// </summary>
+    abstract class GenericResourceProvider : GenericProvider<ResourceStruct>
+    {
+        private int _resourceID;
+        private bool _stageOnly;
+
+        public GenericResourceProvider(byte channelID, string resourceName, bool stageOnly) : base(channelID)
         {
-            public float Max;
-            public float Available;
-        }
+            PartResourceDefinition resource = PartResourceLibrary.Instance.GetDefinition(resourceName);
+            _resourceID = resource.id;
+            _stageOnly = stageOnly;
 
-        private ResourceStruct TotalLF, StageLF, TotalOx, StageOx,
-            TotalSF, StageSF, TotalMono, TotalElectric, TotalEva,
-            TotalOre, TotalAb, StageAb, TotalXenon, StageXenon;
-
-        private EventData<byte, object> LFChannel, LFStageChannel,
-            OxChannel, OxStageChannel, SFChannel, SFStageChannel,
-            MonoChannel, ElectricChannel, EvaChannel, OreChannel,
-            AbChannel, AbStageChannel, XenonChannel, XenonStageChannel;
-
-        // IDs of resources we care about
-        private int LiquidFuelID, OxidizerID, SolidFuelID,
-            MonoPropellantID, ElectricChargeID, EvaPropellantID,
-            OreID, AblatorID, XenonID;
-
-        private bool ARPPresent;
-
-        public void Start()
-        {
-            ARPWrapper.InitKSPARPWrapper();
-            if (ARPWrapper.APIReady)
+            if (!ARPWrapper.APIReady)
             {
-                ARPPresent = true;
-                KSPit.AddToDeviceHandler(LFProvider);
-                LFChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.LiquidFuel);
-                KSPit.AddToDeviceHandler(LFStageProvider);
-                LFStageChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.LiquidFuelStage);
-                KSPit.AddToDeviceHandler(OxProvider);
-                OxChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.Oxidizer);
-                KSPit.AddToDeviceHandler(OxStageProvider);
-                OxStageChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.OxidizerStage);
-                KSPit.AddToDeviceHandler(SFProvider);
-                SFChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.SolidFuel);
-                KSPit.AddToDeviceHandler(SFStageProvider);
-                SFStageChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.SolidFuelStage);
-                KSPit.AddToDeviceHandler(XenonProvider);
-                XenonChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.XenonGas);
-                KSPit.AddToDeviceHandler(XenonStageProvider);
-                XenonStageChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.XenonGasStage);
-                KSPit.AddToDeviceHandler(MonoProvider);
-                MonoChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.MonoPropellant);
-                KSPit.AddToDeviceHandler(ElectricProvider);
-                ElectricChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.ElectricCharge);
-                KSPit.AddToDeviceHandler(EvaProvider);
-                EvaChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.EvaPropellant);
-                KSPit.AddToDeviceHandler(OreProvider);
-                OreChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.Ore);
-                KSPit.AddToDeviceHandler(AbProvider);
-                AbChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.Ablator);
-                KSPit.AddToDeviceHandler(AbStageProvider);
-                AbStageChannel =
-                    GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.AblatorStage);
-
-                ScanForResources();
-            } else {
-                ARPPresent = false;
-                Debug.Log("KerbalSimpit: AlternateResourcePanel not found. Resource providers WILL NOT WORK.");
+                ARPWrapper.InitKSPARPWrapper();
             }
         }
 
-        public void Update()
+        override protected bool updateMessage(ref ResourceStruct message)
         {
-            if (ARPPresent)
+
+            if (_stageOnly && ARPWrapper.KSPARP.LastStageResources.ContainsKey(_resourceID))
             {
-                GetTotalResources(LiquidFuelID, ref TotalLF);
-                GetStageResources(LiquidFuelID, ref StageLF);
-                GetTotalResources(OxidizerID, ref TotalOx);
-                GetStageResources(OxidizerID, ref StageOx);
-                GetTotalResources(SolidFuelID, ref TotalSF);
-                GetStageResources(SolidFuelID, ref StageSF);
-                GetTotalResources(XenonID, ref TotalXenon);
-                GetStageResources(XenonID, ref StageXenon);
-                GetTotalResources(MonoPropellantID, ref TotalMono);
-                GetTotalResources(ElectricChargeID, ref TotalElectric);
-                GetEVAResources(ref TotalEva);
-                GetTotalResources(OreID, ref TotalOre);
-                GetTotalResources(AblatorID, ref TotalAb);
-                GetStageResources(AblatorID, ref StageAb);
+                message.Max = (float)ARPWrapper.KSPARP.LastStageResources[_resourceID].MaxAmountValue;
+                message.Available = (float)ARPWrapper.KSPARP.LastStageResources[_resourceID].AmountValue;
             }
-        }
-
-        public void OnDestroy()
-        {
-            KSPit.RemoveToDeviceHandler(LFProvider);
-            KSPit.RemoveToDeviceHandler(LFStageProvider);
-            KSPit.RemoveToDeviceHandler(OxProvider);
-            KSPit.RemoveToDeviceHandler(OxStageProvider);
-            KSPit.RemoveToDeviceHandler(SFProvider);
-            KSPit.RemoveToDeviceHandler(SFStageProvider);
-            KSPit.RemoveToDeviceHandler(XenonProvider);
-            KSPit.RemoveToDeviceHandler(XenonStageProvider);
-            KSPit.RemoveToDeviceHandler(MonoProvider);
-            KSPit.RemoveToDeviceHandler(ElectricProvider);
-            KSPit.RemoveToDeviceHandler(EvaProvider);
-            KSPit.RemoveToDeviceHandler(OreProvider);
-            KSPit.RemoveToDeviceHandler(AbProvider);
-            KSPit.RemoveToDeviceHandler(AbStageProvider);
-        }
-
-        public void ScanForResources()
-        {
-            if(KSPit.Config.Verbose) Debug.Log("KerbalSimpit: Vessel changed, scanning for resrouces.");
-            LiquidFuelID = GetResourceID("LiquidFuel");
-            OxidizerID = GetResourceID("Oxidizer");
-            SolidFuelID = GetResourceID("SolidFuel");
-            XenonID = GetResourceID("XenonGas");
-            MonoPropellantID = GetResourceID("MonoPropellant");
-            ElectricChargeID = GetResourceID("ElectricCharge");
-            EvaPropellantID = GetResourceID("EVA Propellant");
-            OreID = GetResourceID("Ore");
-            AblatorID = GetResourceID("Ablator");
-        }
-
-        public void LFProvider()
-        {
-            if (LFChannel != null) LFChannel.Fire(OutboundPackets.LiquidFuel, TotalLF);
-        }
-
-        public void LFStageProvider()
-        {
-            if (LFStageChannel != null) LFStageChannel.Fire(OutboundPackets.LiquidFuelStage, StageLF);
-        }
-
-        public void OxProvider()
-        {
-            if (OxChannel != null) OxChannel.Fire(OutboundPackets.Oxidizer, TotalOx);
-        }
-
-        public void OxStageProvider()
-        {
-            if (OxStageChannel != null) OxStageChannel.Fire(OutboundPackets.OxidizerStage, StageOx);
-        }
-
-        public void SFProvider()
-        {
-            if (SFChannel != null) SFChannel.Fire(OutboundPackets.SolidFuel, TotalSF);
-        }
-
-        public void SFStageProvider()
-        {
-            if (SFStageChannel != null) SFStageChannel.Fire(OutboundPackets.SolidFuelStage, StageSF);
-        }
-
-        public void XenonProvider()
-        {
-            if (XenonChannel != null) XenonChannel.Fire(OutboundPackets.XenonGas, TotalXenon);
-        }
-
-        public void XenonStageProvider()
-        {
-            if (XenonStageChannel != null) XenonStageChannel.Fire(OutboundPackets.XenonGasStage, StageXenon);
-        }
-
-        public void MonoProvider()
-        {
-            if (MonoChannel != null) MonoChannel.Fire(OutboundPackets.MonoPropellant, TotalMono);
-        }
-
-        public void ElectricProvider()
-        {
-            if (ElectricChannel != null) ElectricChannel.Fire(OutboundPackets.ElectricCharge, TotalElectric);
-        }
-
-        public void EvaProvider()
-        {
-            if (EvaChannel != null) EvaChannel.Fire(OutboundPackets.EvaPropellant, TotalEva);
-        }
-
-        public void OreProvider()
-        {
-            if (OreChannel != null) OreChannel.Fire(OutboundPackets.Ore, TotalOre);
-        }
-
-        public void AbProvider()
-        {
-            if (AbChannel != null) AbChannel.Fire(OutboundPackets.Ablator, TotalAb);
-        }
-
-        public void AbStageProvider()
-        {
-            if (AbStageChannel != null) AbStageChannel.Fire(OutboundPackets.AblatorStage, StageAb);
-        }
-
-        private int GetResourceID(string resourceName)
-        {
-            PartResourceDefinition resource =
-                PartResourceLibrary.Instance.GetDefinition(resourceName);
-            return resource.id;
-        }
-
-        private bool GetTotalResources(int ResourceID, ref ResourceStruct DestResourceStruct)
-        {
-            if (ARPWrapper.KSPARP.VesselResources.ContainsKey(ResourceID))
+            else if (!_stageOnly && ARPWrapper.KSPARP.VesselResources.ContainsKey(_resourceID))
             {
-                DestResourceStruct.Max = (float)ARPWrapper.KSPARP.VesselResources[ResourceID].MaxAmountValue;
-                DestResourceStruct.Available = (float)ARPWrapper.KSPARP.VesselResources[ResourceID].AmountValue;
-                return true;
-            } else {
-                DestResourceStruct.Max = 0;
-                DestResourceStruct.Available = 0;
-                return false;
+                message.Max = (float)ARPWrapper.KSPARP.VesselResources[_resourceID].MaxAmountValue;
+                message.Available = (float)ARPWrapper.KSPARP.VesselResources[_resourceID].AmountValue;
             }
-        }
-
-        private bool GetStageResources(int ResourceID, ref ResourceStruct DestResourceStruct)
-        {
-            if (ARPWrapper.KSPARP.LastStageResources.ContainsKey(ResourceID))
+            else
             {
-                DestResourceStruct.Max = (float)ARPWrapper.KSPARP.LastStageResources[ResourceID].MaxAmountValue;
-                DestResourceStruct.Available = (float)ARPWrapper.KSPARP.LastStageResources[ResourceID].AmountValue;
-                return true;
-            } else {
-                DestResourceStruct.Max = 0;
-                DestResourceStruct.Available = 0;
-                return false;
+                message.Max = 0;
+                message.Available = 0;
             }
+            return false;
         }
+    }
 
-        /** Since 1.11, ARP does not work correctly when in EVA. So this is a special case for EVA fuel, only available during EVA,
-         *  to get around this issue
-         */
-        private bool GetEVAResources(ref ResourceStruct DestResourceStruct)
+    class LiquidFuelProvider : GenericResourceProvider { public LiquidFuelProvider() : base(OutboundPackets.LiquidFuel, "LiquidFuel", false) { } }
+    class LiquidFuelStageProvider : GenericResourceProvider { public LiquidFuelStageProvider() : base(OutboundPackets.LiquidFuelStage, "LiquidFuel", true) { } }
+    class OxidizerProvider : GenericResourceProvider { public OxidizerProvider() : base(OutboundPackets.Oxidizer, "Oxidizer", false) { } }
+    class OxidizerStageProvider : GenericResourceProvider { public OxidizerStageProvider() : base(OutboundPackets.OxidizerStage, "Oxidizer", true) { } }
+    class SolidFuelProvider : GenericResourceProvider { public SolidFuelProvider() : base(OutboundPackets.SolidFuel, "SolidFuel", false) { } }
+    class SolidFuelStageProvider : GenericResourceProvider { public SolidFuelStageProvider() : base(OutboundPackets.SolidFuelStage, "SolidFuel", true) { } }
+    class MonoPropellantProvider : GenericResourceProvider { public MonoPropellantProvider() : base(OutboundPackets.MonoPropellant, "MonoPropellant", false) { } }
+    class ElectricChargeProvider : GenericResourceProvider { public ElectricChargeProvider() : base(OutboundPackets.ElectricCharge, "ElectricCharge", false) { } }
+    class OreProvider : GenericResourceProvider { public OreProvider() : base(OutboundPackets.Ore, "Ore", false) { } }
+    class AblatorProvider : GenericResourceProvider { public AblatorProvider() : base(OutboundPackets.Ablator, "Ablator", false) { } }
+    class AblatorStageProvider : GenericResourceProvider { public AblatorStageProvider() : base(OutboundPackets.AblatorStage, "Ablator", true) { } }
+    class XenonGasProvider : GenericResourceProvider { public XenonGasProvider() : base(OutboundPackets.XenonGas, "XenonGas", false) { } }
+    class XenonGasStageProvider : GenericResourceProvider { public XenonGasStageProvider() : base(OutboundPackets.XenonGasStage, "XenonGas", true) { } }
+
+
+    /** Since 1.11, ARP does not work correctly when in EVA. So this is a special case for EVA fuel, only available during EVA,
+     *  to get around this issue
+     */
+    class EVAProvider : GenericProvider<ResourceStruct>
+    {
+        EVAProvider() : base(OutboundPackets.EvaPropellant) { }
+
+        override protected bool updateMessage(ref ResourceStruct message)
         {
+            message.Available = 0;
+            message.Max = 0;
             if (FlightGlobals.ActiveVessel == null) return false;
 
             if (FlightGlobals.ActiveVessel.isEVA && FlightGlobals.ActiveVessel.evaController != null)
             {
-                DestResourceStruct.Max = (float)FlightGlobals.ActiveVessel.evaController.FuelCapacity;
-                DestResourceStruct.Available = (float)FlightGlobals.ActiveVessel.evaController.Fuel;
-                return true;
-            } else
-            {
-                DestResourceStruct.Available = 0;
-                DestResourceStruct.Max = 0;
-                return false;
+                message.Max = (float)FlightGlobals.ActiveVessel.evaController.FuelCapacity;
+                message.Available = (float)FlightGlobals.ActiveVessel.evaController.Fuel;
             }
+
+            return false;
         }
     }
 }
-
