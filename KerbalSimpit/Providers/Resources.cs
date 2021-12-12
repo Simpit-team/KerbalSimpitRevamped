@@ -24,28 +24,35 @@ namespace KerbalSimpit.Providers
     {
         private int _resourceID;
         private bool _stageOnly;
+        private bool _isARPInstalled;
 
         public GenericResourceProvider(byte channelID, string resourceName, bool stageOnly) : base(channelID)
         {
             PartResourceDefinition resource = PartResourceLibrary.Instance.GetDefinition(resourceName);
             _resourceID = resource.id;
             _stageOnly = stageOnly;
+            _isARPInstalled = true;
 
             if (!ARPWrapper.APIReady)
             {
                 ARPWrapper.InitKSPARPWrapper();
+            }
+            if (!ARPWrapper.APIReady)
+            {
+                Debug.Log("KerbalSimpit: AlternateResourcePanel not found. Resource providers WILL NOT WORK.");
+                _isARPInstalled = false;
             }
         }
 
         override protected bool updateMessage(ref ResourceStruct message)
         {
 
-            if (_stageOnly && ARPWrapper.KSPARP.LastStageResources.ContainsKey(_resourceID))
+            if (_isARPInstalled && _stageOnly && ARPWrapper.KSPARP.LastStageResources.ContainsKey(_resourceID))
             {
                 message.Max = (float)ARPWrapper.KSPARP.LastStageResources[_resourceID].MaxAmountValue;
                 message.Available = (float)ARPWrapper.KSPARP.LastStageResources[_resourceID].AmountValue;
             }
-            else if (!_stageOnly && ARPWrapper.KSPARP.VesselResources.ContainsKey(_resourceID))
+            else if (_isARPInstalled && !_stageOnly && ARPWrapper.KSPARP.VesselResources.ContainsKey(_resourceID))
             {
                 message.Max = (float)ARPWrapper.KSPARP.VesselResources[_resourceID].MaxAmountValue;
                 message.Available = (float)ARPWrapper.KSPARP.VesselResources[_resourceID].AmountValue;
