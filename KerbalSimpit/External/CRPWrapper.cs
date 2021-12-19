@@ -236,13 +236,22 @@ namespace KerbalSimpit.External
 
         private int? GetResourceID(string resourceName)
         {
-            if(resourceName == "" || resourceName == "none")
+            if(resourceName == "" || resourceName == "none" || resourceName.Length <= 1)
             {
                 //Default values of the resourceName, in this case no resource is requested.
                 return null;
             }
 
-            PartResourceDefinition resource = PartResourceLibrary.Instance.GetDefinition(resourceName);
+            PartResourceDefinition resource = null;
+            try
+            {
+                resource = PartResourceLibrary.Instance.GetDefinition(resourceName);
+            }
+            catch (NullReferenceException)
+            {
+                Debug.Log("Simpit : I raised a NullReferenceException when looking for resource '" + resourceName + "'");
+            }
+
             if (resource == null) {
                 Debug.Log("Simpit : I'm looking for resource " + resourceName + " and I did *not* found it.");
                 return null;
