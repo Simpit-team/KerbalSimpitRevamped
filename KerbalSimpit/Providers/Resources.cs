@@ -31,7 +31,15 @@ namespace KerbalSimpit.Providers
             PartResourceDefinition resource = PartResourceLibrary.Instance.GetDefinition(resourceName);
             _resourceID = resource.id;
             _stageOnly = stageOnly;
-            _isARPInstalled = true;
+            _isARPInstalled = false;
+
+        }
+
+        // Add to the Start Method the initialisation of the ARPWrapper
+        public new void Start()
+        {
+            base.Start();
+
 
             if (!ARPWrapper.APIReady)
             {
@@ -41,7 +49,12 @@ namespace KerbalSimpit.Providers
             {
                 Debug.Log("KerbalSimpit: AlternateResourcePanel not found. Resource providers WILL NOT WORK.");
                 _isARPInstalled = false;
+            } else
+            {
+                Debug.Log("KerbalSimpit: AlternateResourcePanel found. Resource providers will work.");
+                _isARPInstalled = true;
             }
+
         }
 
         override protected bool updateMessage(ref ResourceStruct message)
