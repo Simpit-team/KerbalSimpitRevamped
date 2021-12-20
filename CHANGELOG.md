@@ -6,6 +6,13 @@
 
 ### Bugfixes
 
+## v2.1.1 (2021-12-20)
+
+### Bugfixes
+
+Fix an issue when ARP is not correctly detected (seen on Mac)
+Fix an issue when a custom ressource is not found and a NullReference issue is not caught
+
 ## v2.1.0 (2021-12-12)
 
 ### Features
