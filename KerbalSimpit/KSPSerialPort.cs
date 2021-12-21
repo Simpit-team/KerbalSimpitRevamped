@@ -97,6 +97,10 @@ namespace KerbalSimpit.Serial
             Port = new SerialPort(PortName, BaudRate, Parity.None,
                                   8, StopBits.One);
 
+            // To allow communication from a Pi Pico, the DTR seems to be mandatory to allow the connection
+            // This does not seem to prevent communication from Arduino.
+            Port.DtrEnable = true;
+
             if (KSPit.Config.Verbose)
                 Debug.Log(String.Format("KerbalSimpit: Using serial polling thread for {0}", pn));
         }

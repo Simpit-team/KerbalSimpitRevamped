@@ -4,6 +4,8 @@
 
 ### Features
 
+Allow DTR flag to the serial connection (seems to have no impact with Arduino connection and allow connection from a Pi Pico).
+
 ### Bugfixes
 
 ## v2.1.1 (2021-12-20)
