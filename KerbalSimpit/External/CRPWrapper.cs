@@ -236,7 +236,7 @@ namespace KerbalSimpit.External
 
         private int? GetResourceID(string resourceName)
         {
-            if(resourceName == "" || resourceName == "none" || resourceName.Length <= 1)
+            if(String.IsNullOrEmpty(resourceName) || resourceName == "none" || resourceName.Length <= 1)
             {
                 //Default values of the resourceName, in this case no resource is requested.
                 return null;
