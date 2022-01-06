@@ -55,7 +55,7 @@ namespace KerbalSimpit
         public void Start()
         {
             // Simple log message to check that this was actually running
-            Debug.Log("KerbalSimpit Has put a message into the console!");
+            Debug.Log("KerbalSimpit is starting");
             DontDestroyOnLoad(this);
 
             // Init the ports when an instance of this class is created
@@ -63,7 +63,7 @@ namespace KerbalSimpit
 
             // Init the console
             this.KSPitConsole = new Console.KerbalSimpitConsole(this);
-            Debug.Log("Trying to start the terminal");
+            if (Config.Verbose) Debug.Log("KerbalSimpit: Trying to start the simpit console");
             this.KSPitConsole.Start();
         }
 
@@ -83,6 +83,14 @@ namespace KerbalSimpit
             this.onSerialReceivedArray[InboundPackets.DeregisterHandler].Add(this.deregisterCallback);
 
             Config = new KerbalSimpitConfig();
+            if (Config.Verbose)
+            {
+                Debug.Log("KerbalSimpit is in verbose mode");
+            }
+            else
+            {
+                Debug.Log("KerbalSimpit is not in verbose mode");
+            }
 
             fillSerialPortsList(Config);
             if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Found {0} serial ports", SerialPorts.Count));
@@ -353,6 +361,10 @@ namespace KerbalSimpit
                     onSerialChannelSubscribedArray[idx].Fire(idx, null);
                     // Adds a record of the port subscribing to a packet to a list stored in the port instance.
                     SerialPorts[portID].addPacketSubscriptionRecord(idx);
+                }
+                else
+                {
+                    if (Config.Verbose) Debug.Log(String.Format("KerbalSimpit: Serial port {0} trying to subscribe to channel {1} but is already subscribed. Ignoring it", portID, idx));
                 }
             }
         }
