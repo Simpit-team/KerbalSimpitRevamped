@@ -59,19 +59,30 @@ namespace KerbalSimpit.Providers
 
         public void TargetProvider()
         {
-            if (FlightGlobals.fetch.VesselTarget != null && FlightGlobals.ActiveVessel != null)
+            try
             {
-                if(FlightGlobals.fetch.VesselTarget.GetTransform() != null && FlightGlobals.ActiveVessel.transform != null)
+                if (FlightGlobals.fetch.VesselTarget != null && FlightGlobals.ActiveVessel != null && FlightGlobals.ship_tgtVelocity != null && FlightGlobals.ActiveVessel.targetObject != null)
                 {
-                    myTargetInfo.distance = (float)Vector3.Distance(FlightGlobals.fetch.VesselTarget.GetTransform().position, FlightGlobals.ActiveVessel.transform.position);
-                    myTargetInfo.velocity = (float)FlightGlobals.ship_tgtVelocity.magnitude;
+                    if (FlightGlobals.fetch.VesselTarget.GetTransform() != null && FlightGlobals.ActiveVessel.transform != null)
+                    {
+                        myTargetInfo.distance = (float)Vector3.Distance(FlightGlobals.fetch.VesselTarget.GetTransform().position, FlightGlobals.ActiveVessel.transform.position);
+                        myTargetInfo.velocity = (float)FlightGlobals.ship_tgtVelocity.magnitude;
 
-                    Vector3 targetDirection = FlightGlobals.ActiveVessel.targetObject.GetTransform().position - FlightGlobals.ActiveVessel.transform.position;
-                    KerbalSimpitTelemetryProvider.WorldVecToNavHeading(FlightGlobals.ActiveVessel, targetDirection, out myTargetInfo.heading, out myTargetInfo.pitch);
+                        Vector3 targetDirection = FlightGlobals.ActiveVessel.targetObject.GetTransform().position - FlightGlobals.ActiveVessel.transform.position;
+                        KerbalSimpitTelemetryProvider.WorldVecToNavHeading(FlightGlobals.ActiveVessel, targetDirection, out myTargetInfo.heading, out myTargetInfo.pitch);
 
-                    KerbalSimpitTelemetryProvider.WorldVecToNavHeading(FlightGlobals.ActiveVessel, FlightGlobals.ship_tgtVelocity, out myTargetInfo.velocityHeading, out myTargetInfo.velocityPitch);
-                    if (targetChannel != null) targetChannel.Fire(OutboundPackets.TargetInfo, myTargetInfo);
+                        KerbalSimpitTelemetryProvider.WorldVecToNavHeading(FlightGlobals.ActiveVessel, FlightGlobals.ship_tgtVelocity, out myTargetInfo.velocityHeading, out myTargetInfo.velocityPitch);
+                        if (targetChannel != null) targetChannel.Fire(OutboundPackets.TargetInfo, myTargetInfo);
+                    }
                 }
+            }
+            catch (NullReferenceException e)
+            {
+                // Several issues where caused when a target was not set or when switching vessels and some data is set but not all data needed.
+                // This catch prevent the provider from stopping to work, but we should investigate if it is still triggered somehow
+                Debug.Log("Simpit : Exception raised in TargetProvider");
+                Debug.Log(e.Message);
+                Debug.Log(e.StackTrace);
             }
         }
     }
