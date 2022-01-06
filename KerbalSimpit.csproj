@@ -76,11 +76,9 @@
     <None Include="BUILDING.md" />
     <None Include="CHANGELOG.md" />
     <None Include="distrib\PluginData\Settings.cfg.sample" />
-    <None Include="KerbalSimpit.version.m4" />
     <None Include="LICENSE.md" />
     <None Include="Properties\AssemblyInfo.cs.m4" />
     <None Include="README.md" />
-    <None Include="version-info.m4" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="KerbalSimpit\Console\KerbalSimpitConsole.cs" />
@@ -110,6 +108,7 @@
     <Compile Include="KerbalSimpit\SimpitGUI\Window.cs" />
     <Compile Include="KerbalSimpit\Utilities\OrbitalComputations.cs" />
     <Compile Include="KerbalSimpit\Utilities\Utilities.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -139,5 +138,8 @@ if defined MyKSPDIR (
 if $(ConfigurationName) == Release (
   call "$(ProjectDir)make_release.bat" $(ProjectDir) $(OutDir)
 )</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>call "$(ProjectDir)pre_build_simpit.bat" $(ProjectDir)</PreBuildEvent>
   </PropertyGroup>
 </Project>
