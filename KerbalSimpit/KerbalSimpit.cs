@@ -311,6 +311,7 @@ namespace KerbalSimpit
                                (payload.Length-1));
                     string VersionString = System.Text.Encoding.UTF8.GetString(verarray);
                     Debug.Log(String.Format("KerbalSimpit: ACK received on port {0}. Handshake complete, Resetting channels, Arduino library version '{1}'.", SerialPorts[portID].PortName, VersionString));
+                    SerialPorts[portID].removeAllPacketSubscriptionRecords();
                     SerialPorts[portID].portStatus = KSPSerialPort.ConnectionStatus.CONNECTED;
 
                     break;
@@ -337,7 +338,6 @@ namespace KerbalSimpit
                 }
             }
 
-            SerialPorts[portID].removeAllPacketSubscriptionRecords();
             ClosePort(portID);
         }
 

@@ -137,6 +137,8 @@ namespace KerbalSimpit.Serial
 
         // Close the serial port
         public void close() {
+            removeAllPacketSubscriptionRecords();
+
             if (Port.IsOpen)
             {
                 portStatus = KSPSerialPort.ConnectionStatus.CLOSED;
