@@ -4,9 +4,20 @@
 
 ### Features
 
+### Bugfixes
+
+## v2.1.2 (2022-01-11)
+
+### Features
+
 Allow DTR flag to the serial connection (seems to have no impact with Arduino connection and allow connection from a Pi Pico).
 
 ### Bugfixes
+
+Fix a NullReference that prevented the use of the custom ressource message
+Fix a NullReference happening on Mac on the target provider, when switching vessel
+Fix an issue where after a reconnection, no channel subscription was possible to a previously subscribed channel
+Set the AssemblyVersion correctly in the generated DLL
 
 ## v2.1.1 (2021-12-20)
 
