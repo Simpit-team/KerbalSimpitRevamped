@@ -117,4 +117,41 @@ namespace KerbalSimpit.KerbalSimpit.Providers
         }
     }
     #endregion
+
+
+    #region VesselName
+    class VesselNameProvider : GenericProviderString
+    {
+        VesselNameProvider() : base(OutboundPackets.VesselName) { }
+
+        protected override bool updateMessage(ref String myMsg)
+        {
+            if (FlightGlobals.ActiveVessel == null)
+            {
+                return false;
+            }
+
+            myMsg = FlightGlobals.ActiveVessel.GetDisplayName();
+            return false;
+        }
+    }
+    #endregion
+
+    #region SOIName
+    class SOINameProvider : GenericProviderString
+    {
+        SOINameProvider() : base(OutboundPackets.SoIName) { }
+
+        protected override bool updateMessage(ref String myMsg)
+        {
+            if (FlightGlobals.ActiveVessel == null || FlightGlobals.ActiveVessel.orbit == null || FlightGlobals.ActiveVessel.orbit.referenceBody == null)
+            {
+                return false;
+            }
+
+            myMsg = FlightGlobals.ActiveVessel.orbit.referenceBody.bodyName;
+            return false;
+        }
+    }
+    #endregion
 }

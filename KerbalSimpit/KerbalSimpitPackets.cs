@@ -56,6 +56,7 @@ namespace KerbalSimpit
         public static byte SceneChange = 3;
         public static byte FlightStatus = 43;
         public static byte AtmoCondition = 44;
+        public static byte VesselName = 46;
     }
 
     public static class InboundPackets

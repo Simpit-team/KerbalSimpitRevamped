@@ -125,7 +125,7 @@ namespace KerbalSimpit.Providers
         private TempLimitStruct myTempLimitStruct;
 
         private EventData<byte, object> altitudeChannel, apsidesChannel,
-            apsidesTimeChannel, ortbitInfoChannel, velocityChannel, soiChannel, airspeedChannel,
+            apsidesTimeChannel, ortbitInfoChannel, velocityChannel, airspeedChannel,
             maneuverChannel, rotationChannel, deltaVChannel, deltaVEnvChannel, burnTimeChannel, tempLimitChannel;
 
         private string CurrentSoI;
@@ -152,12 +152,6 @@ namespace KerbalSimpit.Providers
             deltaVEnvChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.DeltaVEnv);
             KSPit.AddToDeviceHandler(BurnTimeProvider);
             burnTimeChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.BurnTime);
-            // We fire one SoI packet when SoI changes. So no need to use the
-            // periodic DeviceHandler infrastructure.
-            CurrentSoI = "";
-            soiChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.SoIName);
-            //When SOIName channel is subscribed to, we need to resend the SOI name.
-            GameEvents.FindEvent<EventData<byte, object>>("onSerialChannelSubscribed" + OutboundPackets.SoIName).Add(resendSOI);
             KSPit.AddToDeviceHandler(AirspeedProvider);
             airspeedChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.Airspeed);
             KSPit.AddToDeviceHandler(TempLimitProvider);
@@ -178,23 +172,6 @@ namespace KerbalSimpit.Providers
             KSPit.RemoveToDeviceHandler(DeltaVEnvProvider);
             KSPit.RemoveToDeviceHandler(BurnTimeProvider);
             KSPit.RemoveToDeviceHandler(TempLimitProvider);
-        }
-
-        public void Update()
-        {
-            if (soiChannel != null)
-            {
-                if (FlightGlobals.ActiveVessel.orbit.referenceBody.bodyName != CurrentSoI)
-                {
-                    CurrentSoI = FlightGlobals.ActiveVessel.orbit.referenceBody.bodyName;
-                    soiChannel.Fire(OutboundPackets.SoIName, Encoding.ASCII.GetBytes(CurrentSoI));
-                }
-            }
-        }
-
-        public void resendSOI(byte ID, object Data)
-        {
-            CurrentSoI = "";
         }
 
         public void AltitudeProvider()
