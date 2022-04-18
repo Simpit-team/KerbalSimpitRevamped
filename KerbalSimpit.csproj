@@ -140,6 +140,6 @@ if $(ConfigurationName) == Release (
 )</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>call "$(ProjectDir)pre_build_simpit.bat" $(ProjectDir)</PreBuildEvent>
+    <PreBuildEvent>call "$(ProjectDir)pre_build_simpit.bat" "$(ProjectDir)"</PreBuildEvent>
   </PropertyGroup>
 </Project>
