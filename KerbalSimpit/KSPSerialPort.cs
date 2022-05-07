@@ -49,25 +49,12 @@ namespace KerbalSimpit.Serial
 
         private SerialPort Port;
     
-        // Header bytes are alternating ones and zeroes, with the exception
-        // of encoding the protocol version in the final four bytes.
-        private readonly byte[] PacketHeader = { 0xAA, 0x50 };
-
-        // Packet buffer related fields
+        // Packet buffer related fields. At least 32 is needed for the CAGSTATUS message.
+        private const int MaxPayloadSize = 32;
         // This is *total* packet size, including all headers.
-        // At least 32 is needed for the CAGSTATUS message.
-        private const int MaxPacketSize = 32 + 4;
-        private enum ReceiveStates: byte {
-            HEADER1, // Waiting for first header byte
-            HEADER2, // Waiting for second header byte
-            SIZE,    // Waiting for payload size
-            TYPE,    // Waiting for packet type
-            PAYLOAD  // Waiting for payload packets
-        }
-        // Serial worker uses these to buffer inbound data
-        private ReceiveStates CurrentState;
-        private byte CurrentPayloadSize;
-        private byte CurrentPayloadType;
+        // Headers are 1 byte of message type, 1 byte of checksum, 1 byte of COBS overhead and 1 byte of terminating null byte.
+        private const int MaxPacketSize = MaxPayloadSize + 4;
+
         private byte CurrentBytesRead;
         private byte[] PayloadBuffer = new byte[255];
         // Semaphore to indicate whether the reader worker should do work
@@ -201,17 +188,158 @@ namespace KerbalSimpit.Serial
         }
 
 
+        /// <summary>
+        /// Decode a COBS-encoded array of bytes (assuming a size < 256 bytes).
+        /// See COBS on Wikipedia for more information : https://en.wikipedia.org/wiki/Consistent_Overhead_Byte_Stuffing
+        /// 
+        /// Will parse the input the first 0 is seen. If this is not the last byte, it will discard the remaining content and return false. 
+        /// </summary>
+        /// <param name="input">Buffer for the input. </param>
+        /// <param name="output">Buffer for the output. Will be allocated in the function. </param>
+        /// <returns>True if the decoding is successful </returns>
+        static bool decodeCOBS(in byte[] input, out byte[] output)
+        {
+            // Output will be the same size as the input, minus 1 byte of overhead and one byte of the terminating null byte.
+            output = new byte[input.Length - 2];
+            if (input.Length >= 255)
+                return false;
+
+            int nextZero = input[0];
+            for (int i = 1; i < input.Length; i++)
+            {
+                if (input[i] == 0)
+                {
+                    return (i == input.Length - 1) && (nextZero == 1);
+                }
+
+                nextZero--;
+                if (nextZero == 0)
+                {
+                    output[i - 1] = 0;
+                    nextZero = input[i];
+                }
+                else
+                {
+                    output[i - 1] = input[i];
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Encode a COBS-encoded array of bytes (assuming a size < 256 bytes).
+        /// See COBS on Wikipedia for more information : https://en.wikipedia.org/wiki/Consistent_Overhead_Byte_Stuffing
+        /// 
+        /// </summary>
+        /// <param name="input">Buffer for the input. </param>
+        /// <param name="output">Buffer for the output. Will be allocated in the function and will be terminated with a null byte. </param>
+        /// <returns>True if the encoding is successful </returns>
+        static bool encodeCOBS(in byte[] input, out byte[] output)
+        {
+            // Output will be the same size as the input, plus 1 byte of overhead and one byte of the terminating null byte.
+            output = new byte[input.Length + 2];
+            if (input.Length >= 255)
+                return false;
+            if (output.Length < input.Length + 2)
+                return false;
+
+            uint lastZero = 0;
+            byte distanceLastZero = 1;
+            for (uint i = 0; i < input.Length; i++)
+            {
+                //coding byte at position i of the inputBuffer, should go at position i+1 of the output buffer.
+                if (input[i] == 0)
+                {
+                    output[lastZero] = distanceLastZero;
+                    lastZero = i + 1;
+                    distanceLastZero = 1;
+                }
+                else
+                {
+                    output[i + 1] = input[i];
+                    distanceLastZero++;
+                }
+            }
+
+            output[lastZero] = distanceLastZero;
+            output[input.Length + 1] = 0;
+            return true;
+        }
+
+        /// <summary>
+        /// Encode a packet (defined as a type and a payload) with a checksum and output a COBS-encoded message ready to be sent
+        /// </summary>
+        /// <param name="packetType"></param>
+        /// <param name="payload"></param>
+        /// <param name="output">Buffer for the output. Will be allocated in the function and will be terminated with a null byte. </param>
+        static void encodePacket(in byte packetType, in byte[] payload, out byte[] output)
+        {
+            byte[] buffer = new byte[payload.Length + 2];
+            buffer[0] = packetType;
+            byte checksum = packetType;
+            for (int i = 0; i < payload.Length; i++)
+            {
+                checksum ^= payload[i];
+                buffer[i + 1] = payload[i];
+            }
+            buffer[payload.Length + 1] = checksum;
+            encodeCOBS(buffer, out output);
+        }
+
+        /// <summary>
+        /// Decode a packet (checking its integrity with COBS and the checksum included in the message) and output the packet type and its payload.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="packetType"></param>
+        /// <param name="payload">Will be allocated in the function to the right size</param>
+        /// <returns>false if the packet is not validated (and should be discarded). </returns>
+        static bool decodePacket(in byte[] input, out byte packetType, out byte[] payload)
+        {
+            if (input.Length <= 4)
+            {
+                // Not enough data to have a packet type, a payload, a checksum and the additionnal byte of COBS encoding
+                packetType = 0;
+                payload = null;
+                return false;
+            }
+            payload = new byte[input.Length - 4];
+
+            byte[] buffer;
+            bool sucess = decodeCOBS(input, out buffer);
+
+            if (!sucess)
+            {
+                // COBS was ill-formed, discarding the message
+                packetType = 0;
+                payload = null;
+                return false;
+            }
+
+            byte checksum = 0;
+            for (int i = 0; i < buffer.Length - 1; i++)
+            {
+                checksum ^= buffer[i];
+            }
+
+            // If checksum do not match, return false
+            if (checksum != buffer[buffer.Length - 1])
+            {
+                packetType = 0;
+                return false;
+            }
+
+            packetType = buffer[0];
+            Array.Copy(buffer, 1, payload, 0, buffer.Length - 2);
+            return true;
+        }
+
+
         // Construct a KerbalSimpit packet, and enqueue it.
         // Note that callers of this method are rarely in the main
         // game thread, hence using a threadsafe queue implementation.
         public void sendPacket(byte Type, object Data)
         {
-            // Note that header sizes are hardcoded here:
-            // packet[0] = first byte of header
-            // packet[1] = second byte of header
-            // packet[2] = payload size
-            // packet[3] = packet type
-            // packet[4-x] = packet payload
             byte[] buf;
             if (Data.GetType().Name == "Byte[]")
             {
@@ -220,32 +348,20 @@ namespace KerbalSimpit.Serial
                 buf = ObjectToByteArray(Data);
             }
 
-            byte PayloadSize = (byte)Math.Min(buf.Length, (MaxPacketSize-4));
+            if(buf.Length > MaxPayloadSize)
+            {
+                Debug.Log("Simpit, packet of type " + Type + " too big. Truncating it");
+                buf = buf.Take(MaxPayloadSize).ToArray();
+            }
 
-            // Create a new buffer to build the message.
-            byte[] outboundBuffer = new byte[PayloadSize + 4];
-            outboundBuffer[0] = PacketHeader[0];
-            outboundBuffer[1] = PacketHeader[1];
-            outboundBuffer[2] = PayloadSize;
-            outboundBuffer[3] = Type;
-            Array.Copy(buf, 0, outboundBuffer, 4, PayloadSize);
+            byte[] outboundBuffer;
+            encodePacket(Type, buf, out outboundBuffer);
+
             lock(queueLock)
             {
                 packetQueue.Enqueue(outboundBuffer);
                 Monitor.PulseAll(queueLock);
             }
-        }
-
-        public void DataReceivedEventHandler(object sender, SerialDataReceivedEventArgs args)
-        {
-            byte[] buffer = new byte[MaxPacketSize];
-            int idx = 0;
-            while (Port.BytesToRead > 0 && idx < MaxPacketSize)
-            {
-                buffer[idx] = (byte)Port.ReadByte();
-                idx++;
-            }
-            ReceivedDataEvent(buffer, idx);
         }
 
         // Erase all the messages that are not yet sent but scheduled to be sent.
@@ -255,16 +371,6 @@ namespace KerbalSimpit.Serial
             {
                 Debug.Log("Simpit : I'm removing " + packetQueue.Count() + " messages from the queue.");
                 packetQueue.Clear();
-            }
-        }
-
-        // Send arbitrary data. Shouldn't be used.
-        private void sendData(object data)
-        {
-            byte[] buf = ObjectToByteArray(data);
-            if (buf != null && Port.IsOpen)
-            {
-                Port.Write(buf, 0, buf.Length);
             }
         }
 
@@ -321,6 +427,7 @@ namespace KerbalSimpit.Serial
                 {
                     try
                     {
+                        //Debug.Log("Simpit : sending " + String.Join<byte>(",", dequeued));
                         Port.Write(dequeued, 0, dequeued.Length);
                         dequeued = null;
                     }
@@ -373,47 +480,36 @@ namespace KerbalSimpit.Serial
             Debug.Log(String.Format("KerbalSimpit: Poll thread for port {0} exiting.", PortName));
         }
 
-        // Handle data read in worker thread
+        // Handle data read in worker thread. Copy data to the PayloadBuffer and when a null byte is read, decode it.
         private void ReceivedDataEvent(byte[] ReadBuffer, int BufferLength)
         {
             for (int x=0; x<BufferLength; x++)
             {
-                switch(CurrentState)
+                PayloadBuffer[CurrentBytesRead] = ReadBuffer[x];
+                CurrentBytesRead++;
+
+                if (ReadBuffer[x] == 0)
                 {
-                    case ReceiveStates.HEADER1:
-                        if (ReadBuffer[x] == PacketHeader[0])
-                        {
-                            CurrentState = ReceiveStates.HEADER2;
-                        }
-                        break;
-                    case ReceiveStates.HEADER2:
-                        if (ReadBuffer[x] == PacketHeader[1])
-                        {
-                            CurrentState = ReceiveStates.SIZE;
-                        } else
-                        {
-                            CurrentState = ReceiveStates.HEADER1;
-                        }
-                        break;
-                    case ReceiveStates.SIZE:
-                        CurrentPayloadSize = ReadBuffer[x];
-                        CurrentState = ReceiveStates.TYPE;
-                        break;
-                    case ReceiveStates.TYPE:
-                        CurrentPayloadType = ReadBuffer[x];
-                        CurrentBytesRead = 0;
-                        CurrentState = ReceiveStates.PAYLOAD;
-                        break;
-                    case ReceiveStates.PAYLOAD:
-                        PayloadBuffer[CurrentBytesRead] = ReadBuffer[x];
-                        CurrentBytesRead++;
-                        if (CurrentBytesRead == CurrentPayloadSize)
-                        {
-                            OnPacketReceived(CurrentPayloadType, PayloadBuffer,
-                                             CurrentBytesRead);
-                            CurrentState = ReceiveStates.HEADER1;
-                        }
-                        break;
+                    if(PayloadBuffer[0] == 0xAA && PayloadBuffer[1] == 0x50)
+                    {
+                        Debug.Log("Simpit : received an ill-formatted message that look like it uses a previous Simpit version. You should update your Arduino lib");
+                        UnityMainThreadDispatcher.Instance().Enqueue(() => ScreenMessages.PostScreenMessage("Simpit : check Arduino version"));
+                    }
+
+                    byte packetType;
+                    byte[] payload;
+                    bool validMsg = decodePacket(PayloadBuffer.Take(CurrentBytesRead).ToArray(), out packetType, out payload);
+
+                    if (validMsg)
+                    {
+                        //Debug.Log("Simpit : receveived valid packet of type " + packetType + " with payload " + payload[0]);
+                        OnPacketReceived(packetType, payload, (byte) payload.Length);
+                    } else
+                    {
+                        Debug.Log("Simpit : discarding an ill-formatted message");
+                    }
+
+                    CurrentBytesRead = 0;
                 }
             }
         }
