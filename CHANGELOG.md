@@ -4,7 +4,13 @@
 
 ### Features
 
+Message encoding changed. This version is not backward compatible with any previous Arduino library version. A warning message is displayed when the Arduino lib is not up to date 
+Add a command from Arduino to cycle between Navball modes.
+Add a message from KSP to send the vessel name (limited to first 32 bytes)
+
 ### Bugfixes
+
+Fix building script from folder with space in their name.
 
 ## v2.1.2 (2022-01-11)
 
