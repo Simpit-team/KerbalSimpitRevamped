@@ -165,12 +165,6 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                 String previousMessage = _message;
                 bool forcedSending = updateMessage(ref _message);
 
-                // Truncate the string if too long
-                if(_message.Length > 32)
-                {
-                    _message = _message.Substring(0, 32);
-                }
-
                 // Check if the new message should be send or not. 3 reasons to send the message :
                 //  - it if different than the last one sent.
                 //  - the updateMessage returned true.
@@ -186,6 +180,9 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                 if (_msgChannel != null)
                 {
                     byte[] msgEncoded = Encoding.ASCII.GetBytes(_message);
+                    if(msgEncoded.Length > 32) {
+                        msgEncoded = msgEncoded.Take(32).ToArray();
+                    }
                     _msgChannel.Fire(_channelID, msgEncoded);
                 }
                 _msgToSend = false;
