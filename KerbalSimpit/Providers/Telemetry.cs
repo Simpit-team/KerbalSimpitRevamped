@@ -128,8 +128,6 @@ namespace KerbalSimpit.Providers
             apsidesTimeChannel, ortbitInfoChannel, velocityChannel, airspeedChannel,
             maneuverChannel, rotationChannel, deltaVChannel, deltaVEnvChannel, burnTimeChannel, tempLimitChannel;
 
-        private string CurrentSoI;
-
         public void Start()
         {
             KSPit.AddToDeviceHandler(AltitudeProvider);
