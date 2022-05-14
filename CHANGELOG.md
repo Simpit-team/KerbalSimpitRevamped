@@ -5,6 +5,7 @@
 ### Features
 
 Message encoding changed. This version is not backward compatible with any previous Arduino library version. A warning message is displayed when the Arduino lib is not up to date 
+Add the gForces data in the airspeed message (/!\ this is not backward compatible with previous versions).
 Add a command from Arduino to cycle between Navball modes.
 Add a message from KSP to send the vessel name (limited to first 32 bytes)
 

@@ -68,6 +68,7 @@ namespace KerbalSimpit.Providers
         {
             public float IAS;
             public float MachNumber;
+            public float gForces;
         }
 
         public struct ManeuverStruct
@@ -275,6 +276,7 @@ namespace KerbalSimpit.Providers
 
             myAirspeed.IAS = (float)FlightGlobals.ActiveVessel.indicatedAirSpeed;
             myAirspeed.MachNumber = (float)FlightGlobals.ActiveVessel.mach;
+            myAirspeed.gForces = (float)FlightGlobals.ActiveVessel.geeForce;
             if (airspeedChannel != null) airspeedChannel.Fire(OutboundPackets.Airspeed, myAirspeed);
         }
 
