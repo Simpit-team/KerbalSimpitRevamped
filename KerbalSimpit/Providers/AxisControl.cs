@@ -4,6 +4,7 @@ using UnityEngine;
 
 using KerbalSimpit;
 using KerbalSimpit.Utilities;
+using KerbalSimpit.KerbalSimpit.Providers;
 
 namespace KerbalSimPit.Providers
 {
@@ -42,6 +43,11 @@ namespace KerbalSimPit.Providers
             public short custom4;
             public byte mask;
         }
+        [StructLayout(LayoutKind.Sequential, Pack = 1)][Serializable]
+        public struct ThrottleStruct
+        {
+            public short throttle;
+        }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         [Serializable]
@@ -70,6 +76,8 @@ namespace KerbalSimPit.Providers
 
         private VesselAutopilot.AutopilotMode mySASMode;
         private Vessel lastActiveVessel;
+
+        protected FlightCtrlState lastFlightCtrlState = new FlightCtrlState();
 
         public void Start()
         {
@@ -307,6 +315,9 @@ namespace KerbalSimPit.Providers
             {
                 axisGroupModule.UpdateAxisGroup(KSPAxisGroup.Custom04, (float)myCustomAxis.custom4 / Int16.MaxValue);
             }
+
+            // Store the last flight command to send them in the dedicated channels
+            lastFlightCtrlState.CopyFrom(fcs);
         }
 
         public void SASInfoProvider()
@@ -349,6 +360,112 @@ namespace KerbalSimPit.Providers
                     mySASInfo = newSASInfo;
                     SASInfoChannel.Fire(OutboundPackets.SASInfo, mySASInfo);
                 }
+            }
+        }
+
+        class RotationCommandProvider : GenericProvider<RotationalStruct>
+        {
+            private KerbalSimpitAxisController controller = null;
+            RotationCommandProvider() : base(OutboundPackets.RotationCmd){ }
+
+            public override void Start()
+            {
+                base.Start();
+                controller = (KerbalSimpitAxisController)FindObjectOfType(typeof(KerbalSimpitAxisController));
+            }
+
+            protected override bool updateMessage(ref RotationalStruct message)
+            {
+                if (controller != null) {
+                    message.pitch = (short)(controller.lastFlightCtrlState.pitch * Int16.MaxValue);
+                    message.yaw = (short)(controller.lastFlightCtrlState.yaw * Int16.MaxValue);
+                    message.roll = (short)(controller.lastFlightCtrlState.roll * Int16.MaxValue);
+                } else {
+                    Debug.Log("Simpit : KerbalSimpitAxisController is not found");
+                }
+
+                return false;
+            }
+        }
+
+        class TranslationCommandProvider : GenericProvider<TranslationalStruct>
+        {
+            private KerbalSimpitAxisController controller = null;
+            TranslationCommandProvider() : base(OutboundPackets.TranslationCmd) { }
+
+            public override void Start()
+            {
+                base.Start();
+                controller = (KerbalSimpitAxisController)FindObjectOfType(typeof(KerbalSimpitAxisController));
+            }
+
+            protected override bool updateMessage(ref TranslationalStruct message)
+            {
+                if (controller != null)
+                {
+                    message.X = (short)(controller.lastFlightCtrlState.X * Int16.MaxValue);
+                    message.Y = (short)(controller.lastFlightCtrlState.Y * Int16.MaxValue);
+                    message.Z = (short)(controller.lastFlightCtrlState.Z * Int16.MaxValue);
+                }
+                else
+                {
+                    Debug.Log("Simpit : KerbalSimpitAxisController is not found");
+                }
+
+                return false;
+            }
+        }
+
+        class WheelCommandProvider : GenericProvider<WheelStruct>
+        {
+            private KerbalSimpitAxisController controller = null;
+            WheelCommandProvider() : base(OutboundPackets.WheelCmd) { }
+
+            public override void Start()
+            {
+                base.Start();
+                controller = (KerbalSimpitAxisController)FindObjectOfType(typeof(KerbalSimpitAxisController));
+            }
+
+            protected override bool updateMessage(ref WheelStruct message)
+            {
+                if (controller != null)
+                {
+                    message.steer = (short)(controller.lastFlightCtrlState.wheelSteer * Int16.MaxValue);
+                    message.throttle = (short)(controller.lastFlightCtrlState.wheelThrottle * Int16.MaxValue);
+                }
+                else
+                {
+                    Debug.Log("Simpit : KerbalSimpitAxisController is not found");
+                }
+
+                return false;
+            }
+        }
+
+        class ThrottleCommandProvider : GenericProvider<ThrottleStruct>
+        {
+            private KerbalSimpitAxisController controller = null;
+            ThrottleCommandProvider() : base(OutboundPackets.ThrottleCmd) { }
+
+            public override void Start()
+            {
+                base.Start();
+                controller = (KerbalSimpitAxisController)FindObjectOfType(typeof(KerbalSimpitAxisController));
+            }
+
+            protected override bool updateMessage(ref ThrottleStruct message)
+            {
+                if (controller != null)
+                {
+                    message.throttle = (short)(controller.lastFlightCtrlState.mainThrottle * Int16.MaxValue);
+                }
+                else
+                {
+                    Debug.Log("Simpit : KerbalSimpitAxisController is not found");
+                }
+
+                return false;
             }
         }
     }

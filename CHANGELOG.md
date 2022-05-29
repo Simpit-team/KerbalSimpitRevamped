@@ -8,6 +8,7 @@ Message encoding changed. This version is not backward compatible with any previ
 Add the gForces data in the airspeed message (same as above, a recompilation is needed since the size of the airspeed message has changed).
 Add a command from Arduino to cycle between Navball modes.
 Add a message from KSP to send the vessel name (limited to first 32 bytes)
+Add messages from KSP to send the current value of roll/pitch/yaw, translation, throttle and wheel commands (taking into account keyboard, SAS and Simpit input).
 
 ### Bugfixes
 

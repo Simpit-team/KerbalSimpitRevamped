@@ -42,6 +42,12 @@ namespace KerbalSimpit
         public static byte OrbitInfo = 36;
         public static byte RotationData = 45;
 
+        // Vessel commands
+        public static byte RotationCmd = 47;
+        public static byte TranslationCmd = 48;
+        public static byte WheelCmd = 49;
+        public static byte ThrottleCmd = 50;
+
         // Vessel Details
         public static byte ActionGroups = 37;
         public static byte DeltaV = 38;

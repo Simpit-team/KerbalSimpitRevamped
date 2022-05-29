@@ -55,7 +55,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
             _forceSending = true;
         }
 
-        public void Start()
+        public virtual void Start()
         {
             KSPit.AddToDeviceHandler(MsgProvider);
             _msgChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + _channelID);
