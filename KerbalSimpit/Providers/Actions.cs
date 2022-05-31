@@ -42,7 +42,7 @@ namespace KerbalSimpit.Providers
             if (AGToggleChannel != null) AGToggleChannel.Add(actionToggleCallback);
 
             AGStateChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.ActionGroups);
-            GameEvents.FindEvent<EventData<byte, object>>("onSerialChannelSubscribed" + OutboundPackets.ActionGroups).Add(resendActionGroup);
+            GameEvents.FindEvent<EventData<byte, object>>("onSerialChannelForceSend" + OutboundPackets.ActionGroups).Add(resendActionGroup);
         }
 
         public void OnDestroy()

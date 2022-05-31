@@ -59,7 +59,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
         {
             KSPit.AddToDeviceHandler(MsgProvider);
             _msgChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + _channelID);
-            GameEvents.FindEvent<EventData<byte, object>>("onSerialChannelSubscribed" + _channelID).Add(forceSending);
+            GameEvents.FindEvent<EventData<byte, object>>("onSerialChannelForceSend" + _channelID).Add(forceSending);
         }
 
         public void OnDestroy()
@@ -138,7 +138,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
         {
             KSPit.AddToDeviceHandler(MsgProvider);
             _msgChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + _channelID);
-            GameEvents.FindEvent<EventData<byte, object>>("onSerialChannelSubscribed" + _channelID).Add(forceSending);
+            GameEvents.FindEvent<EventData<byte, object>>("onSerialChannelForceSend" + _channelID).Add(forceSending);
         }
 
         public void OnDestroy()

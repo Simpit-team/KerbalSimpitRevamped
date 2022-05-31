@@ -85,7 +85,7 @@ namespace KerbalSimpit.Providers
             if (toggleChannel != null) toggleChannel.Add(toggleCAGCallback);
 
             CAGStateChannel = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.CustomActionGroups);
-            GameEvents.FindEvent<EventData<byte, object>>("onSerialChannelSubscribed" + OutboundPackets.CustomActionGroups).Add(resendActionGroup);
+            GameEvents.FindEvent<EventData<byte, object>>("onSerialChannelForceSend" + OutboundPackets.CustomActionGroups).Add(resendActionGroup);
 
             lastCAGStatus = new CAGStatusStruct();
         }
