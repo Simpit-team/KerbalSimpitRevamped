@@ -9,6 +9,7 @@ Add the gForces data in the airspeed message (same as above, a recompilation is 
 Add a command from Arduino to cycle between Navball modes.
 Add a message from KSP to send the vessel name (limited to first 32 bytes)
 Add messages from KSP to send the current value of roll/pitch/yaw, translation, throttle and wheel commands (taking into account keyboard, SAS and Simpit input).
+Add a message from Arduino to request new data to be sent (when data is only sent on change for instance)
 
 ### Bugfixes
 

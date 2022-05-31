@@ -70,6 +70,7 @@ namespace KerbalSimpit
         public static byte CloseSerialPort = 7;
         public static byte RegisterHandler = 8;
         public static byte DeregisterHandler = 9;
+        public static byte RequestMessage = 29;
         public static byte CAGEnable = 10;
         public static byte CAGDisable = 11;
         public static byte CAGToggle = 12;

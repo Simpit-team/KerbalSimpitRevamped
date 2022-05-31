@@ -81,6 +81,7 @@ namespace KerbalSimpit
             this.onSerialReceivedArray[InboundPackets.CloseSerialPort].Add(this.serialCalledClose);
             this.onSerialReceivedArray[InboundPackets.RegisterHandler].Add(this.registerCallback);
             this.onSerialReceivedArray[InboundPackets.DeregisterHandler].Add(this.deregisterCallback);
+            this.onSerialReceivedArray[InboundPackets.RequestMessage].Add(this.requestMessageCallback);
 
             Config = new KerbalSimpitConfig();
             if (Config.Verbose)
@@ -383,6 +384,23 @@ namespace KerbalSimpit
                 {
                     Debug.Log(String.Format("KerbalSimpit: Serial port {0} ubsubscribed from channel {1}", portID, idx));
                 }
+            }
+        }
+
+        private void requestMessageCallback(byte portID, object data)
+        {
+            byte[] payload = (byte[])data;
+            byte channelID = payload[0];
+
+            if (channelID == 0)
+            {
+                foreach (byte packetID in SerialPorts[portID].getPacketSubscriptionList())
+                {
+                    onSerialChannelForceSendArray[packetID].Fire(packetID, null);
+                }
+            } else
+            {
+                onSerialChannelForceSendArray[channelID].Fire(channelID, null);
             }
         }
     }
