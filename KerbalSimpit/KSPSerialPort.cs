@@ -506,7 +506,8 @@ namespace KerbalSimpit.Serial
                         OnPacketReceived(packetType, payload, (byte) payload.Length);
                     } else
                     {
-                        Debug.Log("Simpit : discarding an ill-formatted message");
+                        Debug.Log("Simpit : discarding an ill-formatted message of size " + CurrentBytesRead);
+                        Debug.Log("[" + String.Join<byte>(",", PayloadBuffer.Take(CurrentBytesRead).ToArray()) + "]");
                     }
 
                     CurrentBytesRead = 0;
