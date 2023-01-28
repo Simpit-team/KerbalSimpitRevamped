@@ -4,6 +4,8 @@
 
 ### Features
 
+Add a message sent each time the active vessel change
+
 ### Bugfixes
 
 ## v2.2.0

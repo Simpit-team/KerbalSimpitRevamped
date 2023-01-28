@@ -13,6 +13,7 @@ namespace KerbalSimpit.Providers
         private EventData<byte, object> echoReplyEvent;
         private EventData<byte, object> customLogEvent;
         private EventData<byte, object> sceneChangeEvent;
+        private EventData<byte, object> controlledVesselChangeEvent;
 
         public void Start()
         {
@@ -24,9 +25,33 @@ namespace KerbalSimpit.Providers
             if (customLogEvent != null) customLogEvent.Add(CustomLogCallback);
 
             sceneChangeEvent = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.SceneChange);
+            controlledVesselChangeEvent = GameEvents.FindEvent<EventData<byte, object>>("toSerial" + OutboundPackets.VesselChange);
 
             GameEvents.onFlightReady.Add(FlightReadyHandler);
             GameEvents.onGameSceneSwitchRequested.Add(FlightShutdownHandler);
+
+            //deal with event related to a new vessel being controlled
+
+            GameEvents.onVesselDocking.Add((vesselOld, vesselNew) => {
+                if (controlledVesselChangeEvent != null)
+                {
+                    controlledVesselChangeEvent.Fire(OutboundPackets.VesselChange, VesselChangeValues.docking);
+                }
+            });
+
+            GameEvents.onVesselsUndocking.Add((vesselOld, vesselNew) => {
+                if (controlledVesselChangeEvent != null)
+                {
+                    controlledVesselChangeEvent.Fire(OutboundPackets.VesselChange, VesselChangeValues.undocking);
+                }
+            });
+
+            GameEvents.onVesselSwitching.Add((vesselOld, vesselNew) => {
+                if (controlledVesselChangeEvent != null)
+                {
+                    controlledVesselChangeEvent.Fire(OutboundPackets.VesselChange, VesselChangeValues.switching);
+                }
+            });
         }
 
         public void OnDestroy()

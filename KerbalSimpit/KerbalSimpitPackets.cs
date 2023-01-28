@@ -63,6 +63,7 @@ namespace KerbalSimpit
         public static byte FlightStatus = 43;
         public static byte AtmoCondition = 44;
         public static byte VesselName = 46;
+        public static byte VesselChange = 51;
     }
 
     public static class InboundPackets
@@ -188,4 +189,11 @@ namespace KerbalSimpit
         public static byte KEY_DOWN_MOD = 8;
         public static byte KEY_UP_MOD = 16;
     };
+
+    public static class VesselChangeValues
+    {
+        public static byte switching = 1;
+        public static byte docking = 2;
+        public static byte undocking = 3;
+    }
 }
