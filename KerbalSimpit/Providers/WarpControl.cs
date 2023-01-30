@@ -15,8 +15,6 @@ namespace KerbalSimpit.KerbalSimpit.Providers
 
         private const bool USE_INSTANT_WARP = false;
         private const bool DISPLAY_MESSAGE = false; //When true, each call to Timewarp.SetRate crashes KSP on my computer
-        private const int MAX_WARP_RATE = 1000;
-        private const int MIN_WARP_RATE = 1;
 
         public void Start()
         {
@@ -218,7 +216,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
 
         private void safeWarpTo(double UT)
         {
-            UnityMainThreadDispatcher.Instance().Enqueue(() => TimeWarp.fetch.WarpTo(UT, MAX_WARP_RATE, MIN_WARP_RATE));
+            UnityMainThreadDispatcher.Instance().Enqueue(() => TimeWarp.fetch.WarpTo(UT));
         }
     }
 }
