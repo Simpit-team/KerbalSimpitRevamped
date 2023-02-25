@@ -76,6 +76,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
 
         public void ProcessWarpCommand(byte command)
         {
+            if (KSPit.Config.Verbose) Debug.Log("Simpit : receveid TW command " + command);
             int currentRate = TimeWarp.CurrentRateIndex;
             switch (command)
             {
@@ -129,87 +130,135 @@ namespace KerbalSimpit.KerbalSimpit.Providers
                         Debug.Log("Simpit : Already at min warp rate.");
                     }
                     break;
-                case WarpControlValues.warpNextManeuver:
-                    double timeOfNextManeuver = -1;
-                    if (FlightGlobals.ActiveVessel.patchedConicSolver != null)
-                    {
-                        if (FlightGlobals.ActiveVessel.patchedConicSolver.maneuverNodes != null)
-                        {
-                            List<ManeuverNode> maneuvers = FlightGlobals.ActiveVessel.patchedConicSolver.maneuverNodes;
-
-                            if (maneuvers[0] != null)
-                            {
-                                timeOfNextManeuver = maneuvers[0].UT;
-                            }
-                        }
-                    }
-
-                    if (timeOfNextManeuver > 0)
-                    {
-                        safeWarpTo(timeOfNextManeuver);
-                    }
-                    else
-                    {
-                        Debug.Log("Simpit : Cannot warp to next maneuver since the next maneuver could not be located");
-                    }
-                    break;
-                case WarpControlValues.warpSOIChange:
-                    Orbit.PatchTransitionType orbitType = FlightGlobals.ActiveVessel.GetOrbit().patchEndTransition;
-
-                    if (orbitType == Orbit.PatchTransitionType.ENCOUNTER ||
-                        orbitType == Orbit.PatchTransitionType.ESCAPE)
-                    {
-                        safeWarpTo(FlightGlobals.ActiveVessel.GetOrbit().EndUT);
-                    }
-                    else
-                    {
-                        Debug.Log("Simpit : There is no SOI change to warp to. Orbit type : " + orbitType);
-                    }
-                    break;
-                case WarpControlValues.warpApoapsis:
-                    double timeToApoapsis = FlightGlobals.ActiveVessel.GetOrbit().timeToAp;
-                    if (Double.IsNaN(timeToApoapsis) || Double.IsInfinity(timeToApoapsis))
-                    {
-                        //This can happen in an escape trajectory for instance
-                        Debug.Log("Simpit : Cannot warp to apoasis since there is no apoapsis");
-                    }
-                    else
-                    {
-                        safeWarpTo(Planetarium.GetUniversalTime() + timeToApoapsis);
-                    }
-                    break;
-                case WarpControlValues.warpPeriapsis:
-                    double timeToPeriapsis = FlightGlobals.ActiveVessel.GetOrbit().timeToPe;
-                    if (Double.IsNaN(timeToPeriapsis) || Double.IsInfinity(timeToPeriapsis))
-                    {
-                        //This can happen in an escape trajectory for instance
-                        Debug.Log("Simpit : Cannot warp to periapsis since there is no apoapsis");
-                    }
-                    else
-                    {
-                        safeWarpTo(Planetarium.GetUniversalTime() + timeToPeriapsis);
-                    }
-                    break;
-                case WarpControlValues.warpNextMorning:
-                    Vessel vessel = FlightGlobals.ActiveVessel;
-
-                    if (vessel.situation == Vessel.Situations.LANDED ||
-                        vessel.situation == Vessel.Situations.SPLASHED ||
-                        vessel.situation == Vessel.Situations.PRELAUNCH)
-                    {
-                        double timeToMorning = OrbitalComputations.TimeToDaylight(vessel.latitude, vessel.longitude, vessel.mainBody);
-                        safeWarpTo(Planetarium.GetUniversalTime() + timeToMorning);
-                    }
-                    else
-                    {
-                        Debug.Log("[SimPit] Cannot warp to next morning if not landed or splashed");
-                    }
-                    break;
                 case WarpControlValues.warpCancelAutoWarp:
                     TimeWarp.fetch.CancelAutoWarp();
                     TimeWarp.SetRate(0, USE_INSTANT_WARP, DISPLAY_MESSAGE);
                     break;
                 default:
+                    // In those cases, we need to timewarp to a given time. Let's compute this time (UT)
+                    double timeToWarp = -1;
+
+                    if (command == WarpControlValues.warpNextManeuver || command == WarpControlValues.warpBeforeNextManeuver)
+                    {
+                        if (FlightGlobals.ActiveVessel.patchedConicSolver != null)
+                        {
+                            if (FlightGlobals.ActiveVessel.patchedConicSolver.maneuverNodes != null)
+                            {
+                                List<ManeuverNode> maneuvers = FlightGlobals.ActiveVessel.patchedConicSolver.maneuverNodes;
+
+                                if (maneuvers.Count > 0 && maneuvers[0] != null)
+                                {
+                                    if (command == WarpControlValues.warpBeforeNextManeuver)
+                                    {
+                                        // Warp 30s before the begining of the burn.
+                                        if (maneuvers[0].startBurnIn < 30)
+                                        {
+                                            Debug.Log("Simpit : Already too late to TW 30s before burn time");
+                                        } else
+                                        {
+                                            timeToWarp = Planetarium.GetUniversalTime() + maneuvers[0].startBurnIn - 30;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        timeToWarp = maneuvers[0].UT;
+                                    }
+                                }
+                                else
+                                {
+                                    Debug.Log("Simpit : No maneuver to TW to");
+                                }
+                            }
+                        }
+                    }
+                    else if (command == WarpControlValues.warpSOIChange)
+                    {
+                        Orbit.PatchTransitionType orbitType = FlightGlobals.ActiveVessel.GetOrbit().patchEndTransition;
+
+                        if (orbitType == Orbit.PatchTransitionType.ENCOUNTER ||
+                            orbitType == Orbit.PatchTransitionType.ESCAPE)
+                        {
+                            timeToWarp = FlightGlobals.ActiveVessel.GetOrbit().EndUT;
+                        }
+                        else
+                        {
+                            Debug.Log("Simpit : There is no SOI change to warp to. Orbit type : " + orbitType);
+                        }
+                    }
+                    else if (command == WarpControlValues.warpApoapsis || command == WarpControlValues.warpBeforeApoapsis)
+                    {
+                        double timeToApoapsis = FlightGlobals.ActiveVessel.GetOrbit().timeToAp;
+                        if (Double.IsNaN(timeToApoapsis) || Double.IsInfinity(timeToApoapsis))
+                        {
+                            //This can happen in an escape trajectory for instance
+                            Debug.Log("Simpit : Cannot TW to apoasis since there is no apoapsis");
+                        }
+                        else
+                        {
+                            if (command == WarpControlValues.warpBeforeApoapsis)
+                            {
+                                timeToWarp = (Planetarium.GetUniversalTime() + timeToApoapsis - 30);
+                            }
+                            else
+                            {
+                                timeToWarp = (Planetarium.GetUniversalTime() + timeToApoapsis);
+                            }
+                        }
+                    }
+                    else if (command == WarpControlValues.warpPeriapsis || command == WarpControlValues.warpBeforePeriapsis)
+                    {
+                        double timeToPeriapsis = FlightGlobals.ActiveVessel.GetOrbit().timeToPe;
+                        if (Double.IsNaN(timeToPeriapsis) || Double.IsInfinity(timeToPeriapsis))
+                        {
+                            //This can happen in an escape trajectory for instance
+                            Debug.Log("Simpit : Cannot TW to periasis since there is no Periapsis");
+                        }
+                        else
+                        {
+                            if (command == WarpControlValues.warpBeforePeriapsis)
+                            {
+                                timeToWarp = (Planetarium.GetUniversalTime() + timeToPeriapsis - 30);
+                            }
+                            else
+                            {
+                                timeToWarp = (Planetarium.GetUniversalTime() + timeToPeriapsis);
+                            }
+                        }
+                    }
+                    else if (command == WarpControlValues.warpNextMorning)
+                    {
+                        Vessel vessel = FlightGlobals.ActiveVessel;
+
+                        if (vessel.situation == Vessel.Situations.LANDED ||
+                            vessel.situation == Vessel.Situations.SPLASHED ||
+                            vessel.situation == Vessel.Situations.PRELAUNCH)
+                        {
+                            double timeToMorning = OrbitalComputations.TimeToDaylight(vessel.latitude, vessel.longitude, vessel.mainBody);
+                            timeToWarp = (Planetarium.GetUniversalTime() + timeToMorning);
+                        }
+                        else
+                        {
+                            Debug.Log("SimPit : Cannot warp to next morning if not landed or splashed");
+                        }
+                    } else
+                    {
+                        Debug.Log("Simpit : received an unrecognized TW command : " + command + ". Ignoring it.");
+                        break;
+                    }
+
+                    if (timeToWarp < 0){
+                        Debug.Log("Simpit : cannot compute the time to timewarp to. Ignoring TW command " + command);
+                        break;
+                    }
+
+                    if(timeToWarp < Planetarium.GetUniversalTime())
+                    {
+                        Debug.Log("Simpit : cannot warp in the past. Ignoring TW command " + command);
+                        break;
+                    }
+
+                    if (KSPit.Config.Verbose) Debug.Log("Simpit: TW to UT " + timeToWarp + ". Which is " + (timeToWarp - Planetarium.GetUniversalTime()) + "s away");
+                    safeWarpTo(timeToWarp);
                     break;
             }
         }
