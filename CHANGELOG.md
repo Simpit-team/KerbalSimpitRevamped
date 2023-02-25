@@ -4,9 +4,13 @@
 
 ### Features
 
-Add a message sent each time the active vessel change
+Built again KSP 1.12.5 (latest Steam version)
+Add a message sent each time the active vessel change.
+Add an example of using Keyboard.h and Simpit in the same sketch.
 
 ### Bugfixes
+
+Fix an issue with warping to a given time not working in some cases.
 
 ## v2.2.0
 
