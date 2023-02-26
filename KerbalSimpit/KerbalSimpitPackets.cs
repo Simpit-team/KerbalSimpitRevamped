@@ -87,6 +87,7 @@ namespace KerbalSimpit
         public static byte CameraRotation = 22;
         public static byte CameraTranslation = 23;
         public static byte WarpChange = 24;
+        public static byte TimewarpTo = 29;
         public static byte CustomLog = 25;
         public static byte KeyboardEmulator = 26;
         public static byte VesselCustomAxis = 27;
@@ -148,15 +149,18 @@ namespace KerbalSimpit
         public const byte warpRatePhys4 = 11;
         public const byte warpRateUp = 12;
         public const byte warpRateDown = 13;
-        public const byte warpNextManeuver = 14;
-        public const byte warpSOIChange = 15;
-        public const byte warpApoapsis = 16;
-        public const byte warpPeriapsis = 17;
-        public const byte warpNextMorning = 18;
-        public const byte warpBeforeNextManeuver = 19;
-        public const byte warpBeforeApoapsis = 20;
-        public const byte warpBeforePeriapsis = 21;
         public const byte warpCancelAutoWarp = 255;
+    }
+
+    public static class TimewarpToValues
+    {
+        public const byte timewarpToNow = 0;
+        public const byte timewarpToManeuver = 1;
+        public const byte timewarpToBurn = 2;
+        public const byte timewarpToNextSOI = 3;
+        public const byte timewarpToApoapsis = 4;
+        public const byte timewarpToPeriapsis = 5;
+        public const byte timewarpToNextMorning = 6;
     }
 
     public static class CustomLogBits

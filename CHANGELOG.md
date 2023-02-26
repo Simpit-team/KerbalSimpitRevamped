@@ -4,6 +4,7 @@
 
 ### Features
 
+Split the TimeWarp command in two channels. /!\ This is not backward compatible. Both the KSP and Arduino version must be upgrated for the Timewarp messages to work reliably /!\ This allow the user to specify a given delay when timewarping to a given event. This allow for instance to timewarp 1h before the next morning, 30s before periapsis or 1 min before the start of the burn of the next maneuver.*/
 Built again KSP 1.12.5 (latest Steam version)
 Add a message sent each time the active vessel change.
 Add an example of using Keyboard.h and Simpit in the same sketch.
