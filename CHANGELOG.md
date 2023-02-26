@@ -7,6 +7,7 @@
 Built again KSP 1.12.5 (latest Steam version)
 Add a message sent each time the active vessel change.
 Add an example of using Keyboard.h and Simpit in the same sketch.
+Fix the echo/request channel and custom log message to work on all scene (and not only in flight).
 
 ### Bugfixes
 

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace KerbalSimpit.Providers
 {
-    [KSPAddon(KSPAddon.Startup.Flight, false)]
+    [KSPAddon(KSPAddon.Startup.Instantly, true)]
     public class KerbalSimpitEchoProvider : MonoBehaviour
     {
         private EventData<byte, object> echoRequestEvent;
@@ -17,6 +17,8 @@ namespace KerbalSimpit.Providers
 
         public void Start()
         {
+            DontDestroyOnLoad(this); // Make this provider persistent
+
             echoRequestEvent = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + CommonPackets.EchoRequest);
             if (echoRequestEvent != null) echoRequestEvent.Add(EchoRequestCallback);
             echoReplyEvent = GameEvents.FindEvent<EventData<byte, object>>("onSerialReceived" + CommonPackets.EchoResponse);
