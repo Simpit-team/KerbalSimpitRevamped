@@ -36,7 +36,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
         public void OnDestroy()
         {
             if (WarpChannel != null) WarpChannel.Remove(WarpCommandCallback);
-            if (TimewarpToChannel != null) WarpChannel.Remove(TimewarpToChannel);
+            if (TimewarpToChannel != null) WarpChannel.Remove(TimewarpToChannelCommandCallback);
         }
 
         public void WarpCommandCallback(byte ID, object Data)
