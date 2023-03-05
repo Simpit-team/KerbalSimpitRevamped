@@ -363,15 +363,18 @@ namespace KerbalSimpit.Providers
                     if(maneuvers.Count > 0)
                     {
                         myManeuver.timeToNextManeuver = (float)(maneuvers[0].UT - Planetarium.GetUniversalTime());
-                        myManeuver.deltaVNextManeuver = (float)maneuvers[0].DeltaV.magnitude;
+                        myManeuver.deltaVNextManeuver = (float)maneuvers[0].GetPartialDv().magnitude;
 
                         WorldVecToNavHeading(FlightGlobals.ActiveVessel, maneuvers[0].GetBurnVector(maneuvers[0].patch), out myManeuver.headingNextManeuver, out myManeuver.pitchNextManeuver);
 
                         DeltaVStageInfo currentStageInfo = getCurrentStageDeltaV();
                         if (currentStageInfo != null)
                         {
-                            //For now, use a simple crossmultiplication to compute the estimated burn time based on the current stage only
-                            myManeuver.durationNextManeuver = (float)(maneuvers[0].DeltaV.magnitude * currentStageInfo.stageBurnTime) / currentStageInfo.deltaVActual;
+                            //Old method, use a simple crossmultiplication to compute the estimated burn time based on the current stage only
+                            //myManeuver.durationNextManeuver = (float)(maneuvers[0].DeltaV.magnitude * currentStageInfo.stageBurnTime) / currentStageInfo.deltaVActual;
+
+                            // The estimation based on the startBurnIn seems to be more accurate than using the previous method of crossmultiplication
+                            myManeuver.durationNextManeuver = (float)((maneuvers[0].UT - Planetarium.GetUniversalTime() - maneuvers[0].startBurnIn) * 2);
                         }
 
                         foreach (ManeuverNode maneuver in maneuvers)
