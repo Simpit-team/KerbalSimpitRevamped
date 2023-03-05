@@ -87,7 +87,7 @@ namespace KerbalSimpit
         public static byte CameraRotation = 22;
         public static byte CameraTranslation = 23;
         public static byte WarpChange = 24;
-        public static byte TimewarpTo = 29;
+        public static byte TimewarpTo = 30;
         public static byte CustomLog = 25;
         public static byte KeyboardEmulator = 26;
         public static byte VesselCustomAxis = 27;
