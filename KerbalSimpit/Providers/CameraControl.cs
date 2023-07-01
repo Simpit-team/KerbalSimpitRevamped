@@ -341,7 +341,7 @@ namespace KerbalSimPit.Providers
                     break;
 
                 case CameraManager.CameraMode.Map:
-                    Debug.Log("Map Cam");
+                    //Debug.Log("Map Cam");
                     PlanetariumCamera planetariumCamera = PlanetariumCamera.fetch;
                     if ((newCameraRotation.mask & (byte)1) > 0)
                     {
