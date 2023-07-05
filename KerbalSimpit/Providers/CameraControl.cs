@@ -339,6 +339,40 @@ namespace KerbalSimPit.Providers
                         }
                     }
                     break;
+
+                case CameraManager.CameraMode.Map:
+                    //Debug.Log("Map Cam");
+                    PlanetariumCamera planetariumCamera = PlanetariumCamera.fetch;
+                    if ((newCameraRotation.mask & (byte)1) > 0)
+                    {
+                        myCameraRotation.pitch = newCameraRotation.pitch;
+                        float newPitch = planetariumCamera.camPitch + (myCameraRotation.pitch * flightCameraPitchMultiplier);
+
+                        newPitch = Mathf.Clamp(newPitch, planetariumCamera.minPitch, planetariumCamera.maxPitch);
+
+                        planetariumCamera.camPitch = newPitch;
+
+                    }
+                    if ((newCameraRotation.mask & (byte)2) > 0)
+                    {
+                        myCameraRotation.roll = newCameraRotation.roll;
+                    }
+                    if ((newCameraRotation.mask & (byte)4) > 0)
+                    {
+                        myCameraRotation.yaw = newCameraRotation.yaw;
+                        float newHdg = planetariumCamera.camHdg + (myCameraRotation.yaw * flightCameraYawMultiplier);
+                        planetariumCamera.camHdg = newHdg;
+                    }
+                    if ((newCameraRotation.mask & (byte)8) > 0)
+                    {
+                        myCameraRotation.zoom = newCameraRotation.zoom;
+                        float newZoom = planetariumCamera.Distance + (myCameraRotation.zoom * flightCameraZoomMultiplier);
+
+                        newZoom = Mathf.Clamp(newZoom, planetariumCamera.minDistance, planetariumCamera.maxDistance);
+
+                        planetariumCamera.SetDistance(newZoom);
+                    }
+                    break;
                 default:
                     Debug.Log("Kerbal Simpit does not support this camera mode: " + cameraManager.currentCameraMode.ToString());
                     break;
