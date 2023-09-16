@@ -131,7 +131,7 @@ namespace KerbalSimpit.KerbalSimpit.Providers
 
                     if (currentRate < MaxRateIndex)
                     {
-                        TimeWarp.SetRate(currentRate + 1, USE_INSTANT_WARP, DISPLAY_MESSAGE);
+                        UnityMainThreadDispatcher.Instance().Enqueue(() => TimeWarp.SetRate(currentRate + 1, USE_INSTANT_WARP, DISPLAY_MESSAGE));
                     }
                     else
                     {
