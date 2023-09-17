@@ -72,7 +72,7 @@ namespace KerbalSimPit.Providers
         private SASModeInfoStruct mySASInfo, newSASInfo;
 
         private short myThrottle;
-        private volatile bool myThrottleFlag;
+        private bool lastThrottleSentIsZero = false;
 
         private VesselAutopilot.AutopilotMode mySASMode;
         private Vessel lastActiveVessel;
@@ -209,10 +209,7 @@ namespace KerbalSimPit.Providers
 
         public void throttleCallback(byte ID, object Data)
         {
-            // TODO: check length and the like here. Also everywhere else?
-            // Actually let me add that to my Trello board.
             myThrottle = BitConverter.ToInt16((byte[])Data, 0);
-            myThrottleFlag = true;
         }
 
         public void autopilotModeCallback(byte ID, object Data)
@@ -294,10 +291,13 @@ namespace KerbalSimPit.Providers
                 axisGroupModule.UpdateAxisGroup(KSPAxisGroup.WheelThrottle, (float)myWheel.throttle / Int16.MaxValue);
             }
 
-            if (myThrottleFlag)
+            if (myThrottle != 0 || !lastThrottleSentIsZero)
             {
-                // Throttle seems to be handled differently than the other axis. This single line seem to tackle both
+                // Throttle seems to be handled differently than the other axis since when no value is set, a zero is assumed. For throttle, no value set mean the last one is used.
+                // So we need to send a 0 first before stopping to send values.
                 FlightInputHandler.state.mainThrottle = (float)myThrottle / Int16.MaxValue;
+
+                lastThrottleSentIsZero = (myThrottle == 0);
             }
             if(myCustomAxis.custom1 != 0)
             {
