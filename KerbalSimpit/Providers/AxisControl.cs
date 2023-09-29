@@ -72,7 +72,7 @@ namespace KerbalSimPit.Providers
         private SASModeInfoStruct mySASInfo, newSASInfo;
 
         private short myThrottle;
-        private bool lastThrottleSentIsZero = false;
+        private bool lastThrottleSentIsZero = true;
 
         private VesselAutopilot.AutopilotMode mySASMode;
         private Vessel lastActiveVessel;
