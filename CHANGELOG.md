@@ -6,6 +6,10 @@
 
 ### Bugfixes
 
+## v2.3.1
+
+Fixes the throttle not respecting prelaunch default throttle level from the game settings, when a controller is not connected. (bug report by UltraJohn)
+
 ## v2.3.0
 
 ### Features
