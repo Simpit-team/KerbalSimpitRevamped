@@ -12,6 +12,8 @@ namespace KerbalSimpit
         // Propulsion Resources
         public static byte LiquidFuel = 10;
         public static byte LiquidFuelStage = 11;
+        public static byte Methane = 10;
+        public static byte MethaneStage = 11;
         public static byte Oxidizer = 12;
         public static byte OxidizerStage = 13;
         public static byte SolidFuel = 14;
@@ -20,6 +22,19 @@ namespace KerbalSimpit
         public static byte XenonGasStage = 29;
         public static byte MonoPropellant = 16;
         public static byte EvaPropellant = 18;
+
+        //Propulsion Resources on KSP2
+        public static byte IntakeAir = 52;
+        //public static byte TestRocks = xx; //Available in KSP2 but seems to be unused
+        public static byte Hydrogen = 53;
+        public static byte HydrogenStage = 54;
+        //public static byte Methalox = xx; //Available in KSP2 but seems to be unused
+        //public static byte MethaloxStage = xx; //Available in KSP2 but seems to be unused
+        //public static byte MethaneAir = xx; //Available in KSP2 but seems to be unused
+        //public static byte MethaneAirStage = xx; //Available in KSP2 but seems to be unused
+        public static byte Uranium = 55;
+        //public static byte XenonEC = xx; //Available in KSP2 but seems to be unused
+        //public static byte XenonECStage = xx; //Available in KSP2 but seems to be unused
 
         // Vessel Resources
         public static byte ElectricCharge = 17;
@@ -55,6 +70,8 @@ namespace KerbalSimpit
         public static byte BurnTime = 40;
         public static byte CustomActionGroups = 41;
         public static byte TempLimit = 42;
+        public static byte AdvancedActionGroups = 56;
+        public static byte AdvancedCustomActionGroups = 57;
 
         // External Environment
         public static byte TargetInfo = 25;
@@ -78,6 +95,8 @@ namespace KerbalSimpit
         public static byte ActionGroupActivate = 13;
         public static byte ActionGroupDeactivate = 14;
         public static byte ActionGroupToggle = 15;
+        public static byte SetSingleActionGroup = 58;
+        public static byte SetSingleCAG = 59;
         public static byte VesselRotation = 16;
         public static byte VesselTranslation = 17;
         public static byte WheelControl = 18;
@@ -92,6 +111,12 @@ namespace KerbalSimpit
         public static byte KeyboardEmulator = 26;
         public static byte VesselCustomAxis = 27;
         public static byte NavballMode = 28;
+    }
+
+    public static class HandshakeValues
+    {
+        public static byte KerbalSpaceProgram1 = 0x37;
+        public static byte KerbalSpaceProgram2 = 0xC8;
     }
 
     public static class CameraControlBits
@@ -113,7 +138,7 @@ namespace KerbalSimpit
         public const byte NextCameraModeState = 52;
         public const byte PreviousCameraModeState = 53;
         // Cycle Camera Modes
-       // public static byte NextBit = 6;
+        // public static byte NextBit = 6;
         //public static byte PreviousBit = 7;
 
         //public static short 
@@ -132,6 +157,27 @@ namespace KerbalSimpit
         public static byte BrakesBit = 32;
         public static byte AbortBit = 64;
     }
+
+    public static class AdvancedActionGroupIndexes
+    {
+        public const byte advancedStageAction = 0;
+        public const byte advancedGearAction = 1;
+        public const byte advancedLightAction = 2;
+        public const byte advancedRcsAction = 3;
+        public const byte advancedSasAction = 4;
+        public const byte advancedBrakesAction = 5;
+        public const byte advancedAbortAction = 6;
+        public const byte advancedSolarAction = 7;
+        public const byte advancedRadiatorAction = 8;
+    };
+
+    public static class ActionGroupSettings
+    {
+        public const byte nothing = 0;
+        public const byte activate = 1;
+        public const byte deactivate = 2;
+        public const byte toggle = 3;
+    };
 
     public static class WarpControlValues
     {
